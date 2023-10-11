@@ -1,8 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.Domain", "backend\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj", "{9AC0BF22-EABA-4414-8106-1AD074666812}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Domain", "src\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj", "{9AC0BF22-EABA-4414-8106-1AD074666812}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{8BAB869C-0136-46CC-B9A0-46636FC4C9C8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8BAB869C-0136-46CC-B9A0-46636FC4C9C8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infrastructure", "infrastructure", "{B7E89B02-7310-4605-9FB5-C6816DD5EE51}"
 EndProject
@@ -10,13 +13,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{9BBF7E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{29BBBC3B-7154-4E97-8CE0-82567911AFC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.Data.EntityFramework", "backend\infrastructure\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj", "{F28A298E-E7C8-4733-83C8-69CB918DB734}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Data.EntityFramework", "src\infrastructure\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj", "{F28A298E-E7C8-4733-83C8-69CB918DB734}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.Domain.Test", "tests\BuddyLanguage.Domain.Test\BuddyLanguage.Domain.Test.csproj", "{157E1854-F0A3-4819-A032-81BA31F12387}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Domain.Test", "tests\BuddyLanguage.Domain.Test\BuddyLanguage.Domain.Test.csproj", "{157E1854-F0A3-4819-A032-81BA31F12387}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "application", "application", "{1824C987-16E5-4AA7-86EB-680D58B6A5C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.App", "backend\application\BuddyLanguage.App\BuddyLanguage.App.csproj", "{EB441BAB-DAE3-4724-B63A-A182D005DA54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.App", "src\application\BuddyLanguage.App\BuddyLanguage.App.csproj", "{EB441BAB-DAE3-4724-B63A-A182D005DA54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +43,9 @@ Global
 		{EB441BAB-DAE3-4724-B63A-A182D005DA54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB441BAB-DAE3-4724-B63A-A182D005DA54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB441BAB-DAE3-4724-B63A-A182D005DA54}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9AC0BF22-EABA-4414-8106-1AD074666812} = {8BAB869C-0136-46CC-B9A0-46636FC4C9C8}
