@@ -17,9 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Data.EntityFr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Domain.Test", "tests\BuddyLanguage.Domain.Test\BuddyLanguage.Domain.Test.csproj", "{157E1854-F0A3-4819-A032-81BA31F12387}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "application", "application", "{1824C987-16E5-4AA7-86EB-680D58B6A5C6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "presentation", "presentation", "{1824C987-16E5-4AA7-86EB-680D58B6A5C6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.App", "src\application\BuddyLanguage.App\BuddyLanguage.App.csproj", "{EB441BAB-DAE3-4724-B63A-A182D005DA54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.WebApi", "src\presentation\BuddyLanguage.WebApi\BuddyLanguage.WebApi.csproj", "{EB441BAB-DAE3-4724-B63A-A182D005DA54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
