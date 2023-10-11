@@ -1,3 +1,15 @@
-﻿// See https://aka.ms/new-console-template for more information
+using BuddyLanguage.Data.EntityFramework;
+using Microsoft.EntityFrameworkCore;
 
-Console.WriteLine("Hello, World!");
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+
+// Add services to the container.
+
+// Definition of database file name and connection of it as a service
+var dbPath = "myapp.db";
+builder.Services.AddDbContext<AppDbContext>(
+    options => options.UseSqlite($"Data Source={dbPath}"));
+
+app.Run();
