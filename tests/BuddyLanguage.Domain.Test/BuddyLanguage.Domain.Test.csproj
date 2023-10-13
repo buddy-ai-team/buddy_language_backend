@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\backend\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
+      <ProjectReference Include="..\..\src\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
     </ItemGroup>
 
 </Project>
