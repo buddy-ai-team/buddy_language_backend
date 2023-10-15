@@ -8,6 +8,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
+      <ProjectReference Include="..\..\infrastructure\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj" />
+      <ProjectReference Include="..\..\infrastructure\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj" />
     </ItemGroup>
 
 </Project>

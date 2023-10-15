@@ -9,12 +9,12 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         public async void OpenAI_key_is_valid()
         {
             // Arrange
-            var openaiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
-            if(openaiKey == null )
+            var openAiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+            if(openAiKey == null )
             {
                 throw new InvalidOperationException("OPENAI_API_KEY environment variable is not set");
             }
-            var openaiClient = new OpenAiClient(openaiKey);
+            var openaiClient = new OpenAiClient(openAiKey);
             
             // Act
             var answer = await openaiClient.GetChatCompletions(
