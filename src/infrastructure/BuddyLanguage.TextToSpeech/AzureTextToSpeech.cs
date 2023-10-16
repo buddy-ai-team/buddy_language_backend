@@ -32,6 +32,7 @@ namespace BuddyLanguage.TextToSpeech
         public async Task<byte[]> TextToWavByteArrayAsync(string text, Language language, Voice voice, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(text);
+            ArgumentNullException.ThrowIfNull(language);
             ArgumentNullException.ThrowIfNull(voice);
 
             var speechKey = Environment.GetEnvironmentVariable("AZURE_SPEECH_KEY");
