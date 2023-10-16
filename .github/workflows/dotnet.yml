@@ -28,4 +28,6 @@ jobs:
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        ASPNETCORE_TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        ASPNETCORE_OpenAICredentials:ApiKey: ${{ secrets.OPENAI_API_KEY }}
       run: dotnet test --no-build --verbosity normal
