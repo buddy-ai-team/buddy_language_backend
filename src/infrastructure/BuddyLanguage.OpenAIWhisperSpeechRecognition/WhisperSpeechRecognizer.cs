@@ -1,10 +1,11 @@
 ﻿using OpenAI.Managers;
 using OpenAI.ObjectModels.RequestModels;
 using OpenAI.ObjectModels;
+using BuddyLanguage.Domain.Interfaces;
 
 namespace BuddyLanguage.OpenAIWhisperSpeechRecognition
 {
-    public class WhisperSpeechRecognizer
+    public class WhisperSpeechRecognizer : ISpeechRecognizer
     {
         private readonly OpenAIService _openAIService;
         public WhisperSpeechRecognizer(OpenAIService openAIService)
