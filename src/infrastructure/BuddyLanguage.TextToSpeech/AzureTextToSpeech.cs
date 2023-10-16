@@ -89,6 +89,7 @@ namespace BuddyLanguage.TextToSpeech
             ArgumentNullException.ThrowIfNull(language);
             ArgumentNullException.ThrowIfNull(voice);
 
+            //[Voices] https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts
             Dictionary<(Language, Voice), string> voiceMapping = new Dictionary<(Language, Voice), string>
             {
                 {(Language.Russian, Voice.Female), "ru-RU-SvetlanaNeural"},
