@@ -2,6 +2,7 @@
 using OpenAI.ObjectModels.RequestModels;
 using OpenAI.ObjectModels;
 using BuddyLanguage.Domain.Interfaces;
+using BuddyLanguage.Domain.Exceptions;
 
 namespace BuddyLanguage.OpenAIWhisperSpeechRecognition
 {
