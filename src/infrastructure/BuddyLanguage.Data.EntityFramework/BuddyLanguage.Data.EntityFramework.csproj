@@ -21,4 +21,8 @@
       <Folder Include="Repositories\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
+    </ItemGroup>
+
 </Project>
