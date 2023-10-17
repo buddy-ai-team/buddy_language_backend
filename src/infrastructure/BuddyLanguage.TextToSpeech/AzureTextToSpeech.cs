@@ -3,13 +3,17 @@ using BuddyLanguage.Domain.Interfaces;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Logging;
 
+
+
 namespace BuddyLanguage.TextToSpeech
 {
+
     /// <summary>
     /// Implementation of the ITextToSpeech interface using Microsoft Azure Cognitive Services Text-to-Speech.
     /// </summary>
     public class AzureTextToSpeech : ITextToSpeech
     {
+
         private readonly ILogger<AzureTextToSpeech> _logger;
 
         /// <summary>
@@ -43,39 +47,28 @@ namespace BuddyLanguage.TextToSpeech
 
             using (var synthesizer = new SpeechSynthesizer(speechConfig))
             {
-                using (var resultTask = synthesizer.SpeakTextAsync(text))
+                using (var resultTask = await synthesizer.SpeakTextAsync(text).WaitAsync(cancellationToken))
                 {
-                    var completedTask = await Task.WhenAny(resultTask, Task.Delay(-1, cancellationToken));
-                    if (completedTask == resultTask)
+                    if (resultTask.Reason == ResultReason.SynthesizingAudioCompleted)
                     {
-                        var result = await resultTask;
-                        if (result.Reason == ResultReason.SynthesizingAudioCompleted)
-                        {
-                            _logger.LogInformation("Speech synthesized to byte array.");
-                            return result.AudioData;
-                        }
-                        else if (result.Reason == ResultReason.Canceled)
-                        {
-                            var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
-                            _logger.LogInformation($"Speech synthesis canceled. Reason: {cancellation.Reason}");
-
-                            if (cancellation.Reason == CancellationReason.Error)
-                            {
-                                _logger.LogInformation($"Speech synthesis error. ErrorCode={cancellation.ErrorCode}, ErrorDetails={cancellation.ErrorDetails}");
-                            }
-                        }
+                        _logger.LogInformation("Speech synthesized to byte array.");
+                        return resultTask.AudioData;
                     }
-                    else
+                    else if (resultTask.Reason == ResultReason.Canceled)
                     {
-                        // Cancellation requested, handle accordingly
-                        _logger.LogInformation("Speech synthesis request canceled.");
-                        throw new OperationCanceledException();
+                        var cancellation = SpeechSynthesisCancellationDetails.FromResult(resultTask);
+                        _logger.LogInformation($"Speech synthesis canceled. Reason: {cancellation.Reason}");
+
+                        if (cancellation.Reason == CancellationReason.Error)
+                        {
+                            _logger.LogInformation($"Speech synthesis error. ErrorCode={cancellation.ErrorCode}, ErrorDetails={cancellation.ErrorDetails}");
+                        }
                     }
                 }
-
-                // Unreachable code to satisfy the compiler
-                return null;
             }
+
+            //#pragma warning disable CS0161 because it classifies it as an Error
+            return null;
         }
 
         /// <summary>
@@ -99,12 +92,13 @@ namespace BuddyLanguage.TextToSpeech
                 // Add other mappings as needed
             };
 
-            if (voiceMapping.TryGetValue((language, voice), out string voiceName))
+            if (voiceMapping.TryGetValue((language, voice), out string? voiceName))
             {
+                if (voiceName is null) { throw new NotSupportedException("The Language/Voice You Provided Is Not Currently Supported By Our Project!"); }
                 return voiceName;
             }
 
-            throw new NotImplementedException();
+            throw new NotSupportedException("The Language/Voice You Provided Is Not Currently Supported By Our Project!");
         }
     }
 }
