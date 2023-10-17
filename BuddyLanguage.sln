@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.WebApi", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.Infrastructure.IntegrationTest", "tests\BuddyLanguage.Infrastructure.IntegrationTest\BuddyLanguage.Infrastructure.IntegrationTest.csproj", "{BF991769-EAC3-49CA-A315-8A2AB27EDF6B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.Architecture.Test", "tests\BuddyLanguage.Architecture.Test\BuddyLanguage.Architecture.Test.csproj", "{781AD5FE-86F4-47FD-B7F7-F6161541C82E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{BF991769-EAC3-49CA-A315-8A2AB27EDF6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF991769-EAC3-49CA-A315-8A2AB27EDF6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF991769-EAC3-49CA-A315-8A2AB27EDF6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,5 +67,6 @@ Global
 		{1824C987-16E5-4AA7-86EB-680D58B6A5C6} = {8BAB869C-0136-46CC-B9A0-46636FC4C9C8}
 		{EB441BAB-DAE3-4724-B63A-A182D005DA54} = {1824C987-16E5-4AA7-86EB-680D58B6A5C6}
 		{BF991769-EAC3-49CA-A315-8A2AB27EDF6B} = {29BBBC3B-7154-4E97-8CE0-82567911AFC0}
+		{781AD5FE-86F4-47FD-B7F7-F6161541C82E} = {29BBBC3B-7154-4E97-8CE0-82567911AFC0}
 	EndGlobalSection
 EndGlobal
