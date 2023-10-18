@@ -24,6 +24,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Infrastructure.IntegrationTest", "tests\BuddyLanguage.Infrastructure.IntegrationTest\BuddyLanguage.Infrastructure.IntegrationTest.csproj", "{BF991769-EAC3-49CA-A315-8A2AB27EDF6B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.OpenAIWhisperSpeechRecognitionService", "src\infrastructure\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj", "{64D89577-D3E9-40AF-A9FB-03EA41F7356C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.TextToSpeech", "src\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj", "{158B5246-FBDC-4D78-86A6-A5AA9202E445}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +56,10 @@ Global
 		{64D89577-D3E9-40AF-A9FB-03EA41F7356C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64D89577-D3E9-40AF-A9FB-03EA41F7356C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64D89577-D3E9-40AF-A9FB-03EA41F7356C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{158B5246-FBDC-4D78-86A6-A5AA9202E445}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{158B5246-FBDC-4D78-86A6-A5AA9202E445}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{158B5246-FBDC-4D78-86A6-A5AA9202E445}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{158B5246-FBDC-4D78-86A6-A5AA9202E445}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,5 +76,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3EADC4B5-BFDD-4306-A8CF-DFEE33FEA47A}
+		{158B5246-FBDC-4D78-86A6-A5AA9202E445} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8EA996F8-4CC9-4CE0-98C9-1833EAF2E957}
 	EndGlobalSection
 EndGlobal

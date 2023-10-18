@@ -1,11 +1,21 @@
 using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
+using BuddyLanguage.TextToSpeech;
 using Microsoft.EntityFrameworkCore;
 using OpenAI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
+
+//Azure TTS
+builder.Services.AddOptions<AzureTTSConfig>()
+    .BindConfiguration("AzureTTSConfig")
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+// Definition of database file name and connection of it as a service
 var dbPath = "myapp.db";
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlite($"Data Source={dbPath}"));
@@ -19,6 +29,7 @@ builder.Services.AddOpenAIService
     });
 
 builder.Services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
+
 var app = builder.Build();
 
 app.Run();

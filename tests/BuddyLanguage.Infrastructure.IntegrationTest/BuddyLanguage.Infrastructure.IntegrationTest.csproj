@@ -7,11 +7,16 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <UserSecretsId>06bf92cb-0277-4f5f-80b6-3dbc9ac7035f</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
+    <PackageReference Include="Moq" Version="4.20.69" />
     <PackageReference Include="OpenAI.ChatGPT" Version="2.8.0" />
+    <PackageReference Include="Telegram.Bot" Version="19.0.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,6 +26,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
+    <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj" />
   </ItemGroup>
 
 </Project>
