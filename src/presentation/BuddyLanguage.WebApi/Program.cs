@@ -16,4 +16,6 @@ var openAIKey = builder.Services.AddOpenAIService
                           ?? throw new InvalidOperationException
                           ("OPENAI_API_KEY environment variable is not set"); ;
     });
+
+
 app.Run();
