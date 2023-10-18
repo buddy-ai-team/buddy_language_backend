@@ -1,4 +1,6 @@
 using BuddyLanguage.Data.EntityFramework;
+using BuddyLanguage.Domain.Interfaces;
+using BuddyLanguage.OpenAIWhisperSpeechRecognition;
 using Microsoft.EntityFrameworkCore;
 using OpenAI.Extensions;
 
@@ -17,5 +19,6 @@ var openAIKey = builder.Services.AddOpenAIService
                           ("OPENAI_API_KEY environment variable is not set"); ;
     });
 
+builder.Services.AddScoped<ISpeechRecognizer, WhisperSpeechRecognizer>();
 
 app.Run();
