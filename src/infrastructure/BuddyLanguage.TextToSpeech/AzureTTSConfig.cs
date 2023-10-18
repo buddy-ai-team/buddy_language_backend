@@ -10,8 +10,8 @@ namespace BuddyLanguage.TextToSpeech
     public class AzureTTSConfig
     {
         [Required]
-        public string ASPNETCORE_AZURE_SPEECH_KEY { get; set; }
+        public string SpeechKey { get; set; }
         [Required]
-        public string ASPNETCORE_AZURE_SPEECH_REGION { get; set; }
+        public string SpeechRegion { get; set; }
     }
 }

@@ -20,7 +20,7 @@ namespace BuddyLanguage.TextToSpeech
         /// Initializes a new instance of the AzureTextToSpeech class.
         /// </summary>
         /// <param name="logger">The logger for logging messages.</param>
-        public AzureTextToSpeech(IOptionsSnapshot<AzureTTSConfig> config, ILogger<AzureTextToSpeech> logger)
+        public AzureTextToSpeech(IOptions<AzureTTSConfig> config, ILogger<AzureTextToSpeech> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config.Value ?? throw new ArgumentNullException(nameof(config));
@@ -40,8 +40,8 @@ namespace BuddyLanguage.TextToSpeech
             ArgumentNullException.ThrowIfNull(language);
             ArgumentNullException.ThrowIfNull(voice);
 
-            var speechKey = _config.ASPNETCORE_AZURE_SPEECH_KEY;
-            var speechRegion = _config.ASPNETCORE_AZURE_SPEECH_KEY;
+            var speechKey = _config.SpeechKey;
+            var speechRegion = _config.SpeechRegion;
 
             var speechConfig = SpeechConfig.FromSubscription(speechKey, speechRegion);
             speechConfig.SpeechSynthesisVoiceName = GetSynthesisVoiceNameFromEnum(language, voice);

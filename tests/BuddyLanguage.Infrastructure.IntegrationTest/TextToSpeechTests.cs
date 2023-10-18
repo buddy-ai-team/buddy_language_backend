@@ -1,5 +1,6 @@
 ﻿using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.TextToSpeech;
+using FluentAssertions;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -13,13 +14,6 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
     /// </summary>
     public class TextToSpeechTests
     {
-        private readonly Microsoft.Extensions.Configuration.IConfiguration _config;
-
-        public TextToSpeechTests(Microsoft.Extensions.Configuration.IConfiguration config)
-        {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-        }
-
         /// <summary>
         /// Generates all possible combinations of languages and voices for testing.
         /// </summary>
@@ -42,7 +36,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         /// Tests whether the Azure Text-to-Speech service correctly synthesizes speech for various languages and voices.
         /// </summary>
         [Fact]
-        public async Task All_Azure_TTS_Languages_And_Voices_Synthesize()
+        public async Task All_azure_TTS_languages_and_voices_synthesized()
         {
             var combinations = GetLanguageVoiceCombinations();
 
@@ -52,8 +46,14 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
 
                 // Arrange
                 var logger = new LoggerFactory().CreateLogger<AzureTextToSpeech>();
-                var mockOptions = new Mock<IOptionsSnapshot<AzureTTSConfig>>();
-                var textToSpeechClient = new AzureTextToSpeech(mockOptions.Object, logger);
+                var options = Options.Create(new AzureTTSConfig()
+                    {
+                        SpeechKey = GetKeyFromEnvironment("AZURE_SPEECH_KEY"),
+                        SpeechRegion = GetKeyFromEnvironment("AZURE_SPEECH_REGION")
+                    }
+                );
+
+                var textToSpeechClient = new AzureTextToSpeech(options, logger);
                 var text = "Hello"; // You can use any sample text.
                 var cancellationToken = CancellationToken.None;
 
@@ -61,8 +61,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
                 var audioData = await textToSpeechClient.TextToWavByteArrayAsync(text, language, voice, cancellationToken);
 
                 // Assert
-                Assert.NotEmpty(audioData);
-                Assert.NotNull(audioData);
+                audioData.Should().NotBeNullOrEmpty($"Audio Data For Language: {language} and Voice: {voice} combination was null/empty!");
             }
         }
 
@@ -70,33 +69,30 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         /// Verifies the presence and validity of Azure API keys for Text-to-Speech synthesis.
         /// </summary>
         [Fact]
-        public void Verify_Azure_Api_Keys()
+        public void Azure_config_is_valid()
         {
             // Arrange
-            string? speechKey = _config.GetValue<string>("AzureTTSConfig:ASPNETCORE_AZURE_SPEECH_KEY");
-            string? speechRegion = _config.GetValue<string>("AzureTTSConfig:ASPNETCORE_AZURE_SPEECH_REGION"); 
+            //Act
+            string? speechKey = GetKeyFromEnvironment("AZURE_SPEECH_KEY");
+            string? speechRegion = GetKeyFromEnvironment("AZURE_SPEECH_REGION");
 
-            // Act
-            ValidateAzureApiKeys(speechKey, speechRegion);
-
-            // Additional assertions for synthesizer or other validation if needed
+            // Assert
             var speechConfig = SpeechConfig.FromSubscription(speechKey, speechRegion);
             var synthesizer = new SpeechSynthesizer(speechConfig);
-            Assert.NotNull(synthesizer); // Synthesizer will be null or throw an error if any of the keys are null
+            synthesizer.Should().NotBeNull("Synthesiser Was Null! Please double check key validity and that they are defined!"); // Synthesizer will be null or throw an error if any of the keys are null
         }
 
-        // Helper method to validate Azure API keys
-        private void ValidateAzureApiKeys(string? speechKey, string? speechRegion)
+        //Helper Method To Validate Env Variables
+        private string GetKeyFromEnvironment(string keyName)
         {
-            // Assert
-            AssertApiKeyNotNull(speechKey, "Speech Key");
-            AssertApiKeyNotNull(speechRegion, "Speech Region");
-        }
+            if (keyName == null) throw new ArgumentNullException(nameof(keyName));
+            var value = Environment.GetEnvironmentVariable(keyName);
+            if (value is null)
+            {
+                throw new InvalidOperationException($"{keyName} is not set as environment variable");
+            }
 
-        // Helper method to assert that an API key is not null
-        private void AssertApiKeyNotNull(string? apiKey, string apiKeyName)
-        {
-            Assert.True(apiKey != null, $"{apiKeyName} is null. Please set the environment variable for {apiKeyName}.");
+            return value;
         }
     }
 }
