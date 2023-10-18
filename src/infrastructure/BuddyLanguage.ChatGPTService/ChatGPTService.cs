@@ -17,7 +17,7 @@ namespace BuddyLanguage.ChatGPTService
         {
             if (string.IsNullOrEmpty(userMessage))
             {
-                throw new ArgumentException($"\"{nameof(userMessage)}\" не может быть неопределенным или пустым.", nameof(userMessage));
+                throw new ArgumentException($"\"{nameof(userMessage)}\" it cannot be indefinite or empty.", nameof(userMessage));
             }
 
             ChatGPT chatGpt = await _chatGptFactory.Create(userId.ToString(), cancellationToken: cancellationToken);

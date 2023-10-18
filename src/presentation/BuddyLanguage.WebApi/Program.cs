@@ -2,7 +2,6 @@ using BuddyLanguage.ChatGPTService;
 using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using OpenAI.ChatGpt.AspNetCore.Models;
 using OpenAI.ChatGpt.EntityFrameworkCore.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
