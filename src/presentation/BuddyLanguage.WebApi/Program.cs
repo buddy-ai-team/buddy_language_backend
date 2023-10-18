@@ -1,6 +1,6 @@
 using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Domain.Interfaces;
-using BuddyLanguage.OpenAIWhisperSpeechRecognition;
+using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
 using Microsoft.EntityFrameworkCore;
 using OpenAI.Extensions;
 
@@ -11,7 +11,7 @@ var dbPath = "myapp.db";
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlite($"Data Source={dbPath}"));
 
-var openAIKey = builder.Services.AddOpenAIService
+builder.Services.AddOpenAIService
     (settings =>
     {
         settings.ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")
@@ -19,6 +19,6 @@ var openAIKey = builder.Services.AddOpenAIService
                           ("OPENAI_API_KEY environment variable is not set"); ;
     });
 
-builder.Services.AddScoped<ISpeechRecognizer, WhisperSpeechRecognizer>();
+builder.Services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
 
 app.Run();

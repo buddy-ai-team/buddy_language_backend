@@ -1,5 +1,4 @@
-﻿using OnlineShop.Domain.Exceptions;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace BuddyLanguage.Domain.Exceptions
 {

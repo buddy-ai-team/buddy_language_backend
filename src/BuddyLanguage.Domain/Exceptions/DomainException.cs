@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace OnlineShop.Domain.Exceptions
+namespace BuddyLanguage.Domain.Exceptions
 {
     public class DomainException : Exception
     {

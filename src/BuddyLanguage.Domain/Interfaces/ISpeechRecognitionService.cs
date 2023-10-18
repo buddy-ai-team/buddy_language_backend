@@ -1,6 +1,6 @@
 ﻿namespace BuddyLanguage.Domain.Interfaces
 {
-    public interface ISpeechRecognizer
+    public interface ISpeechRecognitionService
     {
         /// <summary>
         /// Supported formats of voiceMessage: flac, m4a, mp3, mp4, mpeg, mpga, oga, ogg, wav, webm

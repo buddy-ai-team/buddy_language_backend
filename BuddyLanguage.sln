@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.WebApi", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Infrastructure.IntegrationTest", "tests\BuddyLanguage.Infrastructure.IntegrationTest\BuddyLanguage.Infrastructure.IntegrationTest.csproj", "{BF991769-EAC3-49CA-A315-8A2AB27EDF6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.OpenAIWhisperSpeechRecognition", "src\infrastructure\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognition.csproj", "{64D89577-D3E9-40AF-A9FB-03EA41F7356C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.OpenAIWhisperSpeechRecognitionService", "src\infrastructure\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj", "{64D89577-D3E9-40AF-A9FB-03EA41F7356C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
