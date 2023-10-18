@@ -10,6 +10,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
       <ProjectReference Include="..\..\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj" />
+      <ProjectReference Include="..\..\infrastructure\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj" />
     </ItemGroup>
 
 </Project>

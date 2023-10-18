@@ -30,4 +30,6 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
         AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+        ASPNETCORE_TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        ASPNETCORE_OpenAICredentials:ApiKey: ${{ secrets.OPENAI_API_KEY }}
       run: dotnet test --no-build --verbosity normal

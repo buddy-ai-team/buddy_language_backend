@@ -13,8 +13,4 @@
       <Folder Include="Services\" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\infrastructure\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj" />
-    </ItemGroup>
-
 </Project>
