@@ -23,7 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.WebApi", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Infrastructure.IntegrationTest", "tests\BuddyLanguage.Infrastructure.IntegrationTest\BuddyLanguage.Infrastructure.IntegrationTest.csproj", "{BF991769-EAC3-49CA-A315-8A2AB27EDF6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.ChatGPTService", "src\infrastructure\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj", "{F13ACF1E-21D9-4598-9E54-965B11225D1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.ChatGPTService", "src\infrastructure\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj", "{F13ACF1E-21D9-4598-9E54-965B11225D1D}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.OpenAIWhisperSpeechRecognitionService", "src\infrastructure\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj", "{64D89577-D3E9-40AF-A9FB-03EA41F7356C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.TextToSpeech", "src\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj", "{158B5246-FBDC-4D78-86A6-A5AA9202E445}"
@@ -79,9 +80,6 @@ Global
 		{EB441BAB-DAE3-4724-B63A-A182D005DA54} = {1824C987-16E5-4AA7-86EB-680D58B6A5C6}
 		{BF991769-EAC3-49CA-A315-8A2AB27EDF6B} = {29BBBC3B-7154-4E97-8CE0-82567911AFC0}
 		{F13ACF1E-21D9-4598-9E54-965B11225D1D} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {EAC86DB5-A9C9-4FD1-864D-30DCCDE141D7}
 		{64D89577-D3E9-40AF-A9FB-03EA41F7356C} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 		{158B5246-FBDC-4D78-86A6-A5AA9202E445} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 	EndGlobalSection
