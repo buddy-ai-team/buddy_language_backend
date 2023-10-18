@@ -2,8 +2,7 @@
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Logging;
-
-
+using Microsoft.Extensions.Options;
 
 namespace BuddyLanguage.TextToSpeech
 {
@@ -15,14 +14,16 @@ namespace BuddyLanguage.TextToSpeech
     {
 
         private readonly ILogger<AzureTextToSpeech> _logger;
+        private readonly AzureTTSConfig _config;
 
         /// <summary>
         /// Initializes a new instance of the AzureTextToSpeech class.
         /// </summary>
         /// <param name="logger">The logger for logging messages.</param>
-        public AzureTextToSpeech(ILogger<AzureTextToSpeech> logger)
+        public AzureTextToSpeech(IOptionsSnapshot<AzureTTSConfig> config, ILogger<AzureTextToSpeech> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _config = config.Value ?? throw new ArgumentNullException(nameof(config));
         }
 
         /// <summary>
@@ -39,8 +40,8 @@ namespace BuddyLanguage.TextToSpeech
             ArgumentNullException.ThrowIfNull(language);
             ArgumentNullException.ThrowIfNull(voice);
 
-            var speechKey = Environment.GetEnvironmentVariable("AZURE_SPEECH_KEY");
-            var speechRegion = Environment.GetEnvironmentVariable("AZURE_SPEECH_REGION");
+            var speechKey = _config.ASPNETCORE_AZURE_SPEECH_KEY;
+            var speechRegion = _config.ASPNETCORE_AZURE_SPEECH_KEY;
 
             var speechConfig = SpeechConfig.FromSubscription(speechKey, speechRegion);
             speechConfig.SpeechSynthesisVoiceName = GetSynthesisVoiceNameFromEnum(language, voice);
@@ -82,23 +83,16 @@ namespace BuddyLanguage.TextToSpeech
             ArgumentNullException.ThrowIfNull(language);
             ArgumentNullException.ThrowIfNull(voice);
 
-            //[Voices] https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts
-            Dictionary<(Language, Voice), string> voiceMapping = new Dictionary<(Language, Voice), string>
+            string voiceName = (language, voice) switch
             {
-                {(Language.Russian, Voice.Female), "ru-RU-SvetlanaNeural"},
-                {(Language.Russian, Voice.Male), "ru-RU-DmitryNeural"},
-                {(Language.English, Voice.Female), "en-US-JennyNeural"},
-                {(Language.English, Voice.Male), "en-US-GuyNeural"},
-                // Add other mappings as needed
+                (Language.Russian, Voice.Female) => "ru-RU-SvetlanaNeural",
+                (Language.Russian, Voice.Male) => "ru-RU-DmitryNeural",
+                (Language.English, Voice.Female) => "en-US-JennyNeural",
+                (Language.English, Voice.Male) => "en-US-GuyNeural",
+                _ => throw new NotSupportedException("The Language/Voice You Provided Is Not Currently Supported By Our Project!")
             };
 
-            if (voiceMapping.TryGetValue((language, voice), out string? voiceName))
-            {
-                if (voiceName is null) { throw new NotSupportedException("The Language/Voice You Provided Is Not Currently Supported By Our Project!"); }
-                return voiceName;
-            }
-
-            throw new NotSupportedException("The Language/Voice You Provided Is Not Currently Supported By Our Project!");
+            return voiceName;
         }
     }
 }

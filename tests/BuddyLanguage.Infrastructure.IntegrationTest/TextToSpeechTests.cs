@@ -1,7 +1,10 @@
 ﻿using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.TextToSpeech;
 using Microsoft.CognitiveServices.Speech;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Moq;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest
 {
@@ -10,6 +13,13 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
     /// </summary>
     public class TextToSpeechTests
     {
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _config;
+
+        public TextToSpeechTests(Microsoft.Extensions.Configuration.IConfiguration config)
+        {
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+        }
+
         /// <summary>
         /// Generates all possible combinations of languages and voices for testing.
         /// </summary>
@@ -42,7 +52,8 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
 
                 // Arrange
                 var logger = new LoggerFactory().CreateLogger<AzureTextToSpeech>();
-                var textToSpeechClient = new AzureTextToSpeech(logger);
+                var mockOptions = new Mock<IOptionsSnapshot<AzureTTSConfig>>();
+                var textToSpeechClient = new AzureTextToSpeech(mockOptions.Object, logger);
                 var text = "Hello"; // You can use any sample text.
                 var cancellationToken = CancellationToken.None;
 
@@ -62,8 +73,8 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         public void Verify_Azure_Api_Keys()
         {
             // Arrange
-            string? speechKey = Environment.GetEnvironmentVariable("AZURE_SPEECH_KEY");
-            string? speechRegion = Environment.GetEnvironmentVariable("AZURE_SPEECH_REGION");
+            string? speechKey = _config.GetValue<string>("AzureTTSConfig:ASPNETCORE_AZURE_SPEECH_KEY");
+            string? speechRegion = _config.GetValue<string>("AzureTTSConfig:ASPNETCORE_AZURE_SPEECH_REGION"); 
 
             // Act
             ValidateAzureApiKeys(speechKey, speechRegion);
