@@ -30,6 +30,10 @@ public class LayersDependenciesTest
             .HaveDependencyOn("BuddyLanguage.Domain")
             .GetResult()
             .IsSuccessful;
+        
+        Assert.True(result1);
+        Assert.True(result2);
+        Assert.True(result3);
     }
     
     [Fact]
@@ -42,5 +46,7 @@ public class LayersDependenciesTest
             .HaveDependencyOn("BuddyLanguage.WebApi")
             .GetResult()
             .IsSuccessful;
+        
+        Assert.True(result1);
     }
 }
