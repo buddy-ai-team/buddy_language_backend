@@ -1,4 +1,4 @@
-using OpenAI.ChatGpt;
+﻿using OpenAI.ChatGpt;
 using OpenAI.ChatGpt.Models.ChatCompletion;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest
@@ -10,16 +10,16 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         {
             // Arrange
             var openaiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
-            if(openaiKey == null )
+            if (openaiKey == null)
             {
                 throw new InvalidOperationException("OPENAI_API_KEY environment variable is not set");
             }
             var openaiClient = new OpenAiClient(openaiKey);
-            
+
             // Act
             var answer = await openaiClient.GetChatCompletions(
-                Dialog.StartAsUser("Hello"), 
-                maxTokens: 3, 
+                Dialog.StartAsUser("Hello"),
+                maxTokens: 3,
                 model: ChatCompletionModels.Gpt3_5_Turbo
             );
 
