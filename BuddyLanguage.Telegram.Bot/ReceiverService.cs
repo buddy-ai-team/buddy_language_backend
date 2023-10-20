@@ -4,13 +4,14 @@ using Telegram.Bot.Types.Enums;
 
 namespace BuddyLanguage.Telegram.Bot
 {
-	public abstract class ReceiverServiceBase<TUpdateHandler> : IReceiverService where TUpdateHandler : IUpdateHandler
+	public abstract class ReceiverService<TUpdateHandler> : IReceiverService where TUpdateHandler : IUpdateHandler
 	{
+		// класс представляет шаблон для службы, которая может принимать и обрабатывать обновления от Telegram бота с использованием указанного обработчика обновлений
 		private readonly ITelegramBotClient _botClient; // клиент Telegram бота, который предоставляет доступ к API Telegram
 		private readonly IUpdateHandler _updateHandler; // обработчик обновлений, который будет использоваться для обработки поступающих обновлений
-		private readonly ILogger<ReceiverServiceBase<TUpdateHandler>> _logger;
+		private readonly ILogger<ReceiverService<TUpdateHandler>> _logger;
 
-		internal ReceiverServiceBase(ITelegramBotClient botClient, TUpdateHandler updateHandler, ILogger<ReceiverServiceBase<TUpdateHandler>> logger)
+		internal ReceiverService(ITelegramBotClient botClient, TUpdateHandler updateHandler, ILogger<ReceiverService<TUpdateHandler>> logger)
 		{
 			_botClient = botClient;
 			_updateHandler = updateHandler;
