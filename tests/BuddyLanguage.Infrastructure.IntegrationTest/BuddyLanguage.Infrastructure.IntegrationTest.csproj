@@ -30,7 +30,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
+    <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj" />
+    <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj" />
+    <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj" />
+    <ProjectReference Include="..\..\src\presentation\BuddyLanguage.WebApi\BuddyLanguage.WebApi.csproj" />
   </ItemGroup>
 
 </Project>
