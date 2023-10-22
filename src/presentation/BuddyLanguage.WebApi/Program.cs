@@ -1,11 +1,10 @@
-using BuddyLanguage.ChatGPTService;
+using BuddyLanguage.ChatGPTServiceLib;
 using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using OpenAI.ChatGpt.EntityFrameworkCore.Extensions;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
 using BuddyLanguage.TextToSpeech;
-using Microsoft.EntityFrameworkCore;
 using OpenAI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +21,6 @@ builder.Services.AddOptions<AzureTTSConfig>()
 var dbPath = "myapp.db";
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlite($"Data Source={dbPath}"));
-
 
 builder.Services.AddChatGptEntityFrameworkIntegration(
     options => options.UseSqlite($"Data Source={dbPath}"));

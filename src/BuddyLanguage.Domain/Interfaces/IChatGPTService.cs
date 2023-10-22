@@ -9,5 +9,6 @@ namespace BuddyLanguage.Domain.Interfaces
     public interface IChatGPTService
     {
         Task<string> GetAnswerFromChatGPT(string userMessage, Guid userId, CancellationToken cancellation);
+        Task<string> GetAnswerWithoutContextOfDialog(string userMessage, CancellationToken cancellationToken, string? systemMessage = null);
     }
 }
