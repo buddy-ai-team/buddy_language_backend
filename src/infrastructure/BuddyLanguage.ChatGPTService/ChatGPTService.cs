@@ -18,7 +18,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
             _openAiClient = openAiClient ?? throw new ArgumentNullException(nameof(openAiClient));
         }
 
-        public async Task<string> GetAnswerFromChatGPT(string userMessage, Guid userId, CancellationToken cancellationToken)
+        public async Task<string> GetAnswerOnTopic(string userMessage, Guid userId, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(userMessage))
             {
@@ -32,34 +32,38 @@ namespace BuddyLanguage.ChatGPTServiceLib
             return answer;
         }
 
-        public async Task<string> GetAnswerWithoutContextOfDialog(string userMessage, CancellationToken cancellationToken, string? systemMessage = null)
+        public async Task<string> GetAnswer(string userMessage, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(userMessage))
             {
                 throw new ArgumentException($"\"{nameof(userMessage)}\" it cannot be indefinite or empty.", nameof(userMessage));
             }
 
-            var dialog = ConfigDialog(userMessage, systemMessage);
+            var dialog = Dialog.StartAsUser(userMessage);
 
             var answer = await _openAiClient.GetChatCompletions(dialog, cancellationToken: cancellationToken);
 
             return answer;
         }
 
-        private UserOrSystemMessage ConfigDialog(string userMessage, string? systemMessage)
+        public async Task<string> GetAnswer(string  prompt, string userMessage, CancellationToken cancellationToken)
         {
-            UserOrSystemMessage dialog;
-
-            if (systemMessage is not null)
+            if (string.IsNullOrEmpty(prompt))
             {
-                dialog = Dialog.StartAsSystem(systemMessage).ThenUser(userMessage);
-            }
-            else
-            {
-                dialog = Dialog.StartAsUser(userMessage);
+                throw new ArgumentException($"\"{nameof(prompt)}\" it cannot be indefinite or empty.", nameof(prompt));
             }
 
-            return dialog;
+            if (string.IsNullOrEmpty(userMessage))
+            {
+                throw new ArgumentException($"\"{nameof(userMessage)}\" it cannot be indefinite or empty.", nameof(userMessage));
+            }
+
+            var dialog = Dialog.StartAsSystem(prompt).ThenUser(userMessage);
+
+            var answer = await _openAiClient.GetChatCompletions(dialog, cancellationToken: cancellationToken);
+
+            return answer;
         }
+
     }
 }
