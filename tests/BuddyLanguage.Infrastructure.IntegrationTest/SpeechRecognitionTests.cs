@@ -11,7 +11,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
     public class SpeechRecognitionTests
     {
         [Fact]
-        public void Whisperservice_creation_with_uncorrectly_data_rejected()
+        public void Whisper_service_creation_with_incorrect_data_is_rejected()
         {
             IOpenAIService openAIService = null;
             FluentActions.Invoking(() => 
@@ -26,7 +26,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         public async Task Voicemessage_are_converted_to_text_succeeded()
         {
             string fileName =
-            @"\Buddy Language\tests\BuddyLanguage.Infrastructure.IntegrationTest\assets\History.mp3";
+            @"assets\History.mp3";
             byte[] bytes = File.ReadAllBytes(fileName);
 
             var service = new OpenAIService(new OpenAiOptions()
@@ -45,8 +45,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [Fact]
         public async Task Voicemessage_are_converted_to_text_with_unsupported_formats_rejected()
         {
-            string fileName =
-            @"\Buddy Language\tests\BuddyLanguage.Infrastructure.IntegrationTest\assets\History.aiff";
+            string fileName = @"assets\History.aiff";
             byte[] bytes = File.ReadAllBytes(fileName);
 
             var service = new OpenAIService(new OpenAiOptions()

@@ -39,4 +39,13 @@
     <Folder Include="assets\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="assets\History.aiff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="assets\History.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
