@@ -1,10 +1,13 @@
 using BuddyLanguage.ChatGPTService;
 using BuddyLanguage.Data.EntityFramework;
+using BuddyLanguage.Data.EntityFramework.Repositories;
 using BuddyLanguage.Domain.Interfaces;
+using BuddyLanguage.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using OpenAI.ChatGpt.EntityFrameworkCore.Extensions;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
 using BuddyLanguage.TextToSpeech;
+using BuddyLanguage.WebApi.Filters;
 using OpenAI.Extensions;
 using Microsoft.Extensions.Options;
 
@@ -27,6 +30,18 @@ var config = builder.Configuration
    .GetSection("NpgsqlConnectionStringOptions")
    .Get<NpgsqlConnectionStringOptions>();
 
+// Подключение репозитория для работы с Ролями
+builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+builder.Services.AddScoped<IRoleRepository, RoleRepositoryEf>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
+builder.Services.AddScoped<RoleService>();
+
+// Подключение фильтров
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<CentralizedExceptionHandlingFilter>(order: 1);
+});
+
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseNpgsql(config.ConnectionString)
 );
@@ -48,5 +63,7 @@ builder.Services.AddOpenAIService
 builder.Services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
 
 var app = builder.Build();
+
+app.MapControllers();
 
 app.Run();

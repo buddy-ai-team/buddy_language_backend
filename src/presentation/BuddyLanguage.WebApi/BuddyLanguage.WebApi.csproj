@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\shared\BuddyLanguage.HttpModels\BuddyLanguage.HttpModels.csproj" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.12">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
