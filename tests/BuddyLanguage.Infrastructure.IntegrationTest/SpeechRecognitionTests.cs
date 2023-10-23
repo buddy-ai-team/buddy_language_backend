@@ -23,7 +23,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         }
 
         [Fact]
-        public async Task Voicemessage_are_converted_to_text_succeeded()
+        public async Task Voice_message_converts_to_text_successfully()
         {
             string fileName = @"assets/History.mp3";
             byte[] bytes = File.ReadAllBytes(fileName);
@@ -42,7 +42,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         }
 
         [Fact]
-        public async Task Voicemessage_are_converted_to_text_with_unsupported_formats_rejected()
+        public async Task Whisper_service_rejects_invalid_file_formats()
         {
             string fileName = @"assets/History.aiff";
             byte[] bytes = File.ReadAllBytes(fileName);
@@ -66,7 +66,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [InlineData(new byte[] { 1, 2, 3 }, null)]
         [InlineData(new byte[0], "VoiceMessage.mp3")]
         [InlineData(null, null)]
-        public async Task Voicemessage_are_converted_to_text_with_uncorrectly_data_rejected
+        public async Task Whisper_service_rejects_files_with_incorrect_data
             (byte[] bytes, string fileName)
         {
             var service = new OpenAIService(new OpenAiOptions()
@@ -84,7 +84,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         }
 
         [Fact] 
-        public void Whisperservice_implements_interface()
+        public void Whisper_service_implements_interface()
         {
             var service = new OpenAIService(new OpenAiOptions()
             {
