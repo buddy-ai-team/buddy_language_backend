@@ -9,11 +9,11 @@ using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
 using BuddyLanguage.TextToSpeech;
 using BuddyLanguage.WebApi.Filters;
 using OpenAI.Extensions;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+//Services
 //Azure TTS
 builder.Services.AddOptions<AzureTTSConfig>()
     .BindConfiguration("AzureTTSConfig")
@@ -21,9 +21,14 @@ builder.Services.AddOptions<AzureTTSConfig>()
     .ValidateOnStart();
 
 // Definition of database file name and connection of it as a service
-var dbPath = "myapp.db";
-builder.Services.AddDbContext<AppDbContext>(
-    options => options.UseSqlite($"Data Source={dbPath}"));
+builder.Services.AddOptions<NpgsqlConnectionStringOptions>()
+    .BindConfiguration("NpgsqlConnectionStringOptions")
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+var config = builder.Configuration
+   .GetSection("NpgsqlConnectionStringOptions")
+   .Get<NpgsqlConnectionStringOptions>();
 
 // Подключение репозитория для работы с Ролями
 builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
@@ -37,9 +42,13 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<CentralizedExceptionHandlingFilter>(order: 1);
 });
 
+builder.Services.AddDbContext<AppDbContext>(
+    options => options.UseNpgsql(config.ConnectionString)
+);
 
 builder.Services.AddChatGptEntityFrameworkIntegration(
-    options => options.UseSqlite($"Data Source={dbPath}"));
+        op => op.UseNpgsql(config.ConnectionString)
+);
 
 builder.Services.AddScoped<IChatGPTService, ChatGPTService>(); 
 
