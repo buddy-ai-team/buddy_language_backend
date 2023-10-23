@@ -4,7 +4,6 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
-using File = System.IO.File;
 
 namespace BuddyLanguage.Telegram.Bot
 {
@@ -49,8 +48,9 @@ namespace BuddyLanguage.Telegram.Bot
 			var action = messageText.Split(' ')[0] switch
 			{
 				"/start" => StartCommand(_botClient, message, cancellationToken),
-				"/menu" => Usage(_botClient, message, cancellationToken) // Отправляет сообщение с инструкциями по использованию бота
-			};
+				"/menu" => Usage(_botClient, message, cancellationToken), // Отправляет сообщение с инструкциями по использованию бота
+				"/voice" => SendVoiceMessage(_botClient, message, cancellationToken)
+			} ;
 			Message sentMessage = await action;
 			_logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
 		}
@@ -69,7 +69,7 @@ namespace BuddyLanguage.Telegram.Bot
 		static async Task<Message> Usage(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
 		{
 			const string usage = "Usage:\n" +
-								 "/inline_mode";
+								 "/voice";
 
 			return await botClient.SendTextMessageAsync(
 				chatId: message.Chat.Id,
@@ -107,7 +107,7 @@ namespace BuddyLanguage.Telegram.Bot
 
 			return await botClient.SendVoiceAsync(
 				chatId: message.Chat.Id,
-				voice: new InputOnlineFile(fileStream, fileName),
+				voice: InputFile.FromStream(fileStream, fileName),
 				caption: "Nice Voice Message",
 				cancellationToken: cancellationToken);
 		}
