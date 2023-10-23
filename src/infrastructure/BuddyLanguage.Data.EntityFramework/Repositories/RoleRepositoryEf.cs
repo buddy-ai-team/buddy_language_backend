@@ -10,10 +10,6 @@ public class RoleRepositoryEf : EfRepository<Role>, IRoleRepository
     {
     }
 
-    public async Task<Role?> GetByName(string name, CancellationToken cancellationToken = default)
-    {
-        if (name == null) 
-            throw new ArgumentNullException(nameof(name));
-        return await Entities.SingleOrDefaultAsync(e => e.Name == name, cancellationToken);
-    }
+    public async Task<IReadOnlyList<Role>> GetAll(CancellationToken cancellationToken)
+        => await Entities.ToListAsync(cancellationToken);
 }

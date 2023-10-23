@@ -2,8 +2,8 @@
 
 namespace BuddyLanguage.HttpModels.Requests;
 
-public class RoleRequest
+public class RoleByIdRequest
 {
     [Required]
-    public string Name { get; set; }
+    public Guid Id { get; set; }
 }

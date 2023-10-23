@@ -2,7 +2,7 @@
 
 namespace BuddyLanguage.Data.EntityFramework.Repositories;
 
-public class UnitOfWorkEf : IUnitOfWork, IAsyncDisposable
+public class UnitOfWorkEf : IUnitOfWork
 {
     public IRoleRepository RoleRepository { get; }
     
@@ -16,8 +16,6 @@ public class UnitOfWorkEf : IUnitOfWork, IAsyncDisposable
             RoleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
         }
     
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         => _dbContext.SaveChangesAsync(cancellationToken);
-    public void Dispose() => _dbContext.Dispose();
-    public ValueTask DisposeAsync() => _dbContext.DisposeAsync();
 }

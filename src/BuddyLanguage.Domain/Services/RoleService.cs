@@ -16,15 +16,13 @@ public class RoleService
         _uow = uow ?? throw new ArgumentNullException(nameof(uow));
     }
 
-    public virtual async Task<Role> GetRoleByName(string name, CancellationToken cancellationToken)
+    public virtual async Task<Role> GetRoleById(Guid id, CancellationToken cancellationToken)
     {
-        if (name == null) throw new ArgumentNullException(nameof(name));
-
-        var role = await _uow.RoleRepository.GetByName(name, cancellationToken);
+        var role = await _uow.RoleRepository.GetById(id, cancellationToken);
         
         if (role is null)
         {
-            throw new RoleNotFoundException("Role with given name not found");
+            throw new RoleNotFoundException("Role with given id not found");
         }
         
         return role;
@@ -35,15 +33,19 @@ public class RoleService
         return await _uow.RoleRepository.GetAll(cancellationToken);
     }
 
-    public virtual async Task<Role> ChangePromptByRoleName(string name, string newPrompt, CancellationToken cancellationToken)
+    public virtual async Task<Role> ChangePromptByRoleId(Guid id, string newName, string newPrompt, CancellationToken cancellationToken)
     {
-        var role = await _uow.RoleRepository.GetByName(name, cancellationToken);
+        if (newName is null) throw new NameOfRoleNotDefinedException("Name of role was not defined");
+        if (newPrompt is null) throw new PromptOfRoleNotDefinedException("Prompt of role was not defined");
+
+        var role = await _uow.RoleRepository.GetById(id, cancellationToken);
         
         if (role is null)
         {
-            throw new RoleNotFoundException("Role with given name not found");
+            throw new RoleNotFoundException("Role with given id not found");
         }
-        
+
+        role.Name = newName;
         role.Prompt = newPrompt;
         
         await _uow.RoleRepository.Update(role, cancellationToken);
@@ -51,14 +53,16 @@ public class RoleService
         return await _uow.RoleRepository.GetById(role.Id, cancellationToken);
     }
 
-    public virtual async Task<Role> AddRole(Role role, CancellationToken cancellationToken)
+    public virtual async Task<Role> AddRole(string name, string prompt, CancellationToken cancellationToken)
     {
-        var existingRole = await _uow.RoleRepository.GetByName(role.Name!, cancellationToken);
+        if (string.IsNullOrWhiteSpace(name))
+            throw new NameOfRoleNotDefinedException("Name of role was not defined");
         
-        if (existingRole is not null)
-        {
-            throw new RoleAlreadyExistsException("Role with given name already exists");
-        }
+        if (string.IsNullOrWhiteSpace(prompt))
+            throw new PromptOfRoleNotDefinedException("Prompt of role was not defined");
+
+        var role = new Role(Guid.NewGuid(), name, prompt);
+        
         await _uow.RoleRepository.Add(role, cancellationToken);
         await _uow.SaveChangesAsync(cancellationToken);
         return await _uow.RoleRepository.GetById(role.Id, cancellationToken);

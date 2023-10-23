@@ -30,8 +30,9 @@ public class CentralizedExceptionHandlingFilter
     {
         return context.Exception switch
         {
-            RoleNotFoundException => "Роль с таким именем не наёдена",
-            RoleAlreadyExistsException => "Роль с таким имененм уже существует!",
+            RoleNotFoundException => "Роль не найдена",
+            RoleAlreadyExistsException => "Роль уже существует!",
+            NameOfRoleNotDefinedException => "Не задан промпт для роли!",
             DomainException => "Необработанная ошибка!",
             _ => null
         };

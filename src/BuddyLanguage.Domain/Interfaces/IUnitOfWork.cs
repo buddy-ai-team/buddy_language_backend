@@ -1,6 +1,6 @@
 ﻿namespace BuddyLanguage.Domain.Interfaces;
 
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork
 {
     IRoleRepository RoleRepository { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
