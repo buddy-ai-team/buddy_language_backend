@@ -25,8 +25,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [Fact]
         public async Task Voicemessage_are_converted_to_text_succeeded()
         {
-            string fileName =
-            @"assets\History.mp3";
+            string fileName = @"assets/History.mp3";
             byte[] bytes = File.ReadAllBytes(fileName);
 
             var service = new OpenAIService(new OpenAiOptions()
@@ -45,7 +44,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [Fact]
         public async Task Voicemessage_are_converted_to_text_with_unsupported_formats_rejected()
         {
-            string fileName = @"assets\History.aiff";
+            string fileName = @"assets/History.aiff";
             byte[] bytes = File.ReadAllBytes(fileName);
 
             var service = new OpenAIService(new OpenAiOptions()
