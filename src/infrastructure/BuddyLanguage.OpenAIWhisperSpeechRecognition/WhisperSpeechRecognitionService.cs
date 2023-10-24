@@ -2,7 +2,6 @@
 using OpenAI.ObjectModels;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Exceptions;
-using Microsoft.Extensions.DependencyInjection;
 using OpenAI.Interfaces;
 
 namespace BuddyLanguage.OpenAIWhisperSpeechRecognitionService
@@ -17,6 +16,8 @@ namespace BuddyLanguage.OpenAIWhisperSpeechRecognitionService
         public async Task<string> RecognizeSpeechToTextAsync
             (byte[] voiceMessage, string fileName, CancellationToken cancellationToken)
         {
+            ArgumentNullException.ThrowIfNull(voiceMessage);
+            ArgumentNullException.ThrowIfNull(fileName);
             if (voiceMessage.Length <= 0)
             {
                 throw new ArgumentException(nameof(voiceMessage));
