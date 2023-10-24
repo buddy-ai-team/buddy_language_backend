@@ -2,7 +2,6 @@
 using OpenAI.ObjectModels;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Exceptions;
-using Microsoft.Extensions.DependencyInjection;
 using OpenAI.Interfaces;
 
 namespace BuddyLanguage.OpenAIWhisperSpeechRecognitionService
@@ -10,13 +9,15 @@ namespace BuddyLanguage.OpenAIWhisperSpeechRecognitionService
     public class WhisperSpeechRecognitionService : ISpeechRecognitionService
     {
         private readonly IOpenAIService _openAIService;
-        public WhisperSpeechRecognitionService(IServiceProvider serviceProvider)
+        public WhisperSpeechRecognitionService(IOpenAIService openAIService)
         {
-            _openAIService = serviceProvider.GetRequiredService<IOpenAIService>();      
+            _openAIService = openAIService ?? throw new ArgumentNullException(nameof(openAIService));
         }
         public async Task<string> RecognizeSpeechToTextAsync
-            (byte[] voiceMessage, CancellationToken cancellationToken)
+            (byte[] voiceMessage, string fileName, CancellationToken cancellationToken)
         {
+            ArgumentNullException.ThrowIfNull(voiceMessage);
+            ArgumentNullException.ThrowIfNull(fileName);
             if (voiceMessage.Length <= 0)
             {
                 throw new ArgumentException(nameof(voiceMessage));
@@ -26,7 +27,7 @@ namespace BuddyLanguage.OpenAIWhisperSpeechRecognitionService
                 .Audio
                 .CreateTranscription(new AudioCreateTranscriptionRequest()
                 {
-                    FileName = "VoiceMessage",
+                    FileName = fileName,
                     File = voiceMessage,
                     Model = Models.WhisperV1,
                     ResponseFormat = StaticValues.AudioStatics.ResponseFormat.VerboseJson

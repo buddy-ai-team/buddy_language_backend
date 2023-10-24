@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.TextToSpeech"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.Architecture.Test", "tests\BuddyLanguage.Architecture.Test\BuddyLanguage.Architecture.Test.csproj", "{781AD5FE-86F4-47FD-B7F7-F6161541C82E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.HttpModels", "shared\BuddyLanguage.HttpModels\BuddyLanguage.HttpModels.csproj", "{4D262B1C-28C3-42B2-B449-9C683A87A44D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{158B5246-FBDC-4D78-86A6-A5AA9202E445}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{158B5246-FBDC-4D78-86A6-A5AA9202E445}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{158B5246-FBDC-4D78-86A6-A5AA9202E445}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D262B1C-28C3-42B2-B449-9C683A87A44D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D262B1C-28C3-42B2-B449-9C683A87A44D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D262B1C-28C3-42B2-B449-9C683A87A44D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D262B1C-28C3-42B2-B449-9C683A87A44D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +95,7 @@ Global
 		{F13ACF1E-21D9-4598-9E54-965B11225D1D} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 		{64D89577-D3E9-40AF-A9FB-03EA41F7356C} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 		{158B5246-FBDC-4D78-86A6-A5AA9202E445} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
+		{4D262B1C-28C3-42B2-B449-9C683A87A44D} = {9BBF7E54-7319-4B7E-8D7E-0F371F7EF0DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EA996F8-4CC9-4CE0-98C9-1833EAF2E957}
