@@ -1,6 +1,8 @@
 ﻿using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Services;
+using BuddyLanguage.HttpModels.Requests.WordEntity;
+using BuddyLanguage.HttpModels.Responses.WordEntity;
 using Microsoft.AspNetCore.Mvc;
 
 #pragma warning disable CS8604
@@ -19,19 +21,19 @@ public class WordEntityController : ControllerBase
     }
 
     [HttpGet("id")]
-    public async Task<ActionResult<WordEntity>> GetWordEntityById(Guid wordId, CancellationToken cancellationToken)
+    public async Task<ActionResult<WordEntityResponse>> GetWordEntityById(Guid wordId, CancellationToken cancellationToken)
     {
-        var word = await _wordService.GetWordById(wordId, cancellationToken);
-        return Ok(word);
+        var wordVar = await _wordService.GetWordById(wordId, cancellationToken);
+        var response = new WordEntityResponse(wordVar.Id, wordVar.AccountId, wordVar.Word, wordVar.WordStatus);
+        return Ok(response);
     }
 
     [HttpPost("update")]
-    public async Task<ActionResult<WordEntity>> UpdateWordEntityStatus(Guid wordId, WordEntityStatus status, CancellationToken cancellationToken)
+    public async Task<ActionResult<WordEntityResponse>> UpdateWordEntityStatus(UpdateWordEntityStatusRequest request, CancellationToken cancellationToken)
     {
-        //Should I Put WordEntityStatus into Shared or give HttpModels a dependency to domain? because how are we going to create
-        //a WordEntityStatus in the frontend?
-        var word = await _wordService.UpdateWordEntityStatusById(wordId, status, cancellationToken);
-        return Ok(word);
+        var wordVar = await _wordService.UpdateWordEntityStatusById(request.Id, request.Status, cancellationToken);
+        var response = new WordEntityResponse(wordVar.Id, wordVar.AccountId, wordVar.Word, wordVar.WordStatus);
+        return Ok(response);
     }
 
     [HttpGet("accountid")]
@@ -43,11 +45,11 @@ public class WordEntityController : ControllerBase
     }
 
     [HttpPost("add")]
-    public async Task<ActionResult<WordEntity>> AddWordEntity
-        (Guid accountId, string word, WordEntityStatus status, CancellationToken cancellationToken)
+    public async Task<ActionResult<WordEntityResponse>> AddWordEntity
+        (AddWordEntityRequest request, CancellationToken cancellationToken)
     {
-        //Same issue as update here
-        var wordVar = await _wordService.AddWord(accountId, word, status, cancellationToken);
-        return Ok(wordVar);
+        var wordVar = await _wordService.AddWord(request.AccountId, request.Word, request.Status, cancellationToken);
+        var response = new WordEntityResponse(wordVar.Id, wordVar.AccountId, wordVar.Word, wordVar.WordStatus);
+        return Ok(response);
     }
 }
