@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BuddyLanguage.HttpModels.Requests;
+namespace BuddyLanguage.HttpModels.Requests.Role;
 
 public class RoleByIdRequest
 {

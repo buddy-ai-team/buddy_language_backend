@@ -1,7 +1,7 @@
 ﻿using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Services;
-using BuddyLanguage.HttpModels.Requests;
-using BuddyLanguage.HttpModels.Responses;
+using BuddyLanguage.HttpModels.Requests.Role;
+using BuddyLanguage.HttpModels.Responses.Role;
 using Microsoft.AspNetCore.Mvc;
 
 #pragma warning disable CS8604

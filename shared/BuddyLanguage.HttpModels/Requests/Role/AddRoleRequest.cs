@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BuddyLanguage.HttpModels.Requests;
+namespace BuddyLanguage.HttpModels.Requests.Role;
 
-public class UpdateRoleRequest
+public class AddRoleRequest
 {
-    [Required]
-    public Guid Id { get; set; }
     [Required]
     public string Name { get; set; }
     [Required]
