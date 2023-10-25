@@ -24,16 +24,14 @@ public class WordEntityController : ControllerBase
     public async Task<ActionResult<WordEntityResponse>> GetWordEntityById(Guid wordId, CancellationToken cancellationToken)
     {
         var wordVar = await _wordService.GetWordById(wordId, cancellationToken);
-        var response = new WordEntityResponse(wordVar.Id, wordVar.AccountId, wordVar.Word, wordVar.WordStatus);
-        return Ok(response);
+        return new WordEntityResponse(wordVar.Id, wordVar.AccountId, wordVar.Word, wordVar.WordStatus);
     }
 
     [HttpPost("update")]
     public async Task<ActionResult<WordEntityResponse>> UpdateWordEntityStatus(UpdateWordEntityStatusRequest request, CancellationToken cancellationToken)
     {
         var wordVar = await _wordService.UpdateWordEntityStatusById(request.Id, request.Status, cancellationToken);
-        var response = new WordEntityResponse(wordVar.Id, wordVar.AccountId, wordVar.Word, wordVar.WordStatus);
-        return Ok(response);
+        return new WordEntityResponse(wordVar.Id, wordVar.AccountId, wordVar.Word, wordVar.WordStatus);
     }
 
     [HttpGet("accountid")]
@@ -49,7 +47,6 @@ public class WordEntityController : ControllerBase
         (AddWordEntityRequest request, CancellationToken cancellationToken)
     {
         var wordVar = await _wordService.AddWord(request.AccountId, request.Word, request.Status, cancellationToken);
-        var response = new WordEntityResponse(wordVar.Id, wordVar.AccountId, wordVar.Word, wordVar.WordStatus);
-        return Ok(response);
+        return new WordEntityResponse(wordVar.Id, wordVar.AccountId, wordVar.Word, wordVar.WordStatus);
     }
 }
