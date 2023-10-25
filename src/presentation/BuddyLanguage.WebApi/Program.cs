@@ -1,4 +1,4 @@
-using BuddyLanguage.ChatGPTService;
+using BuddyLanguage.ChatGPTServiceLib;
 using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Data.EntityFramework.Repositories;
 using BuddyLanguage.Domain.Interfaces;
