@@ -29,9 +29,9 @@ namespace BuddyLanguage.Domain.Services
             return word;
         }
 
-        public virtual async Task<IReadOnlyList<WordEntity>> GetWordsByAccountId(Guid accountId, CancellationToken cancellationToken)
+        public virtual Task<IReadOnlyList<WordEntity>> GetWordsByAccountId(Guid accountId, CancellationToken cancellationToken)
         {
-            return await _uow.WordEntityRepository.GetWordsByAccountId(accountId, cancellationToken);
+            return _uow.WordEntityRepository.GetWordsByAccountId(accountId, cancellationToken);
         }
 
         public virtual async Task<WordEntity> UpdateWordEntityStatusById(Guid id, WordEntityStatus status, CancellationToken cancellationToken)

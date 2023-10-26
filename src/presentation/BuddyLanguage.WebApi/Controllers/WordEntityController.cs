@@ -34,7 +34,7 @@ public class WordEntityController : ControllerBase
         return new WordEntityResponse(wordVar.Id, wordVar.AccountId, wordVar.Word, wordVar.WordStatus);
     }
 
-    [HttpGet("accountid")]
+    [HttpGet("id-account")]
     public async Task<ActionResult<IReadOnlyList<WordEntity>>> GetAllWordEntitiesForAccountById
         (Guid accountId, CancellationToken cancellationToken)
     {
