@@ -8,15 +8,18 @@ public class NameOfRoleNotDefinedException : DomainException
     {
     }
 
-    public NameOfRoleNotDefinedException(string? message) : base(message)
+    public NameOfRoleNotDefinedException(string? message)
+        : base(message)
     {
     }
 
-    public NameOfRoleNotDefinedException(string? message, Exception? innerException) : base(message, innerException)
+    public NameOfRoleNotDefinedException(string? message, Exception? innerException)
+        : base(message, innerException)
     {
     }
 
-    protected NameOfRoleNotDefinedException(SerializationInfo info, StreamingContext context) : base(info, context)
+    protected NameOfRoleNotDefinedException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
     {
     }
 }

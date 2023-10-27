@@ -1,7 +1,7 @@
 ﻿using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Exceptions.Role;
-using Microsoft.Extensions.Logging;
 using BuddyLanguage.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BuddyLanguage.Domain.Services;
 
@@ -35,8 +35,8 @@ public class RoleService
 
     public virtual async Task<Role> ChangePromptByRoleId(Guid id, string newName, string newPrompt, CancellationToken cancellationToken)
     {
-        if (newName is null) throw new NameOfRoleNotDefinedException("Name of role was not defined");
-        if (newPrompt is null) throw new PromptOfRoleNotDefinedException("Prompt of role was not defined");
+        ArgumentException.ThrowIfNullOrEmpty(newName);
+        ArgumentException.ThrowIfNullOrEmpty(newPrompt);
 
         var role = await _uow.RoleRepository.GetById(id, cancellationToken);
 
@@ -61,7 +61,9 @@ public class RoleService
         }
 
         if (string.IsNullOrWhiteSpace(prompt))
+        {
             throw new PromptOfRoleNotDefinedException("Prompt of role was not defined");
+        }
 
         var role = new Role(Guid.NewGuid(), name, prompt);
 

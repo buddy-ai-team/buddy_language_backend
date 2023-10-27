@@ -8,15 +8,18 @@ public class PromptOfRoleNotDefinedException : DomainException
     {
     }
 
-    public PromptOfRoleNotDefinedException(string? message) : base(message)
+    public PromptOfRoleNotDefinedException(string? message)
+        : base(message)
     {
     }
 
-    public PromptOfRoleNotDefinedException(string? message, Exception? innerException) : base(message, innerException)
+    public PromptOfRoleNotDefinedException(string? message, Exception? innerException)
+        : base(message, innerException)
     {
     }
 
-    protected PromptOfRoleNotDefinedException(SerializationInfo info, StreamingContext context) : base(info, context)
+    protected PromptOfRoleNotDefinedException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
     {
     }
 }

@@ -23,7 +23,8 @@ namespace BuddyLanguage.Domain.Exceptions.WordEntity
         {
         }
 
-        protected WordEntityNameUndefinedException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected WordEntityNameUndefinedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

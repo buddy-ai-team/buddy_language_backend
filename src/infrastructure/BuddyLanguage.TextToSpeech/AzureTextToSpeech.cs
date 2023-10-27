@@ -12,7 +12,6 @@ namespace BuddyLanguage.TextToSpeech
     /// </summary>
     public class AzureTextToSpeech : ITextToSpeech
     {
-
         private readonly ILogger<AzureTextToSpeech> _logger;
         private readonly AzureTTSConfig _config;
 
@@ -46,30 +45,31 @@ namespace BuddyLanguage.TextToSpeech
             var speechConfig = SpeechConfig.FromSubscription(speechKey, speechRegion);
             speechConfig.SpeechSynthesisVoiceName = GetSynthesisVoiceNameFromEnum(language, voice);
 
-            using (var synthesizer = new SpeechSynthesizer(speechConfig))
+            using var synthesizer = new SpeechSynthesizer(speechConfig);
+            using var resultTask = await synthesizer.SpeakTextAsync(text).WaitAsync(cancellationToken);
+            switch (resultTask.Reason)
             {
-                using (var resultTask = await synthesizer.SpeakTextAsync(text).WaitAsync(cancellationToken))
+                case ResultReason.SynthesizingAudioCompleted:
+                    _logger.LogInformation("Speech synthesized to byte array");
+                    return resultTask.AudioData;
+                case ResultReason.Canceled:
                 {
-                    if (resultTask.Reason == ResultReason.SynthesizingAudioCompleted)
+                    var cancellation = SpeechSynthesisCancellationDetails.FromResult(resultTask);
+                    if (cancellation.Reason == CancellationReason.Error)
                     {
-                        _logger.LogInformation("Speech synthesized to byte array.");
-                        return resultTask.AudioData;
+                        _logger.LogError("Speech synthesis error. ErrorCode={CancellationErrorCode}, ErrorDetails={CancellationErrorDetails}",
+                            cancellation.ErrorCode, cancellation.ErrorDetails);
                     }
-                    else if (resultTask.Reason == ResultReason.Canceled)
-                    {
-                        var cancellation = SpeechSynthesisCancellationDetails.FromResult(resultTask);
-                        _logger.LogInformation($"Speech synthesis canceled. Reason: {cancellation.Reason}");
 
-                        if (cancellation.Reason == CancellationReason.Error)
-                        {
-                            _logger.LogInformation($"Speech synthesis error. ErrorCode={cancellation.ErrorCode}, ErrorDetails={cancellation.ErrorDetails}");
-                        }
-                    }
+                    // TODO: throw SpeechSynthesyzingException
+                    throw new InvalidOperationException($"Speech synthesis failed. " +
+                                                        $"Error: {cancellation.ErrorCode} {cancellation.ErrorDetails}");
                 }
+                default:
+                    // TODO: throw SpeechSynthesyzingException
+                    throw new InvalidOperationException($"Speech synthesis failed. " +
+                                                        $"ResultReason: {resultTask.Reason}");
             }
-
-            //#pragma warning disable CS0161 because it classifies it as an Error
-            return null;
         }
 
         /// <summary>
