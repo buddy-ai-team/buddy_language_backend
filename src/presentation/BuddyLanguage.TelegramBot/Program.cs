@@ -4,7 +4,7 @@ using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var token = builder.Configuration["telegramBotToken"];
+var token = builder.Configuration["BotConfiguration:BotToken"];
 if(string.IsNullOrEmpty(token))
 {
     throw new InvalidOperationException("Telegram bot token is not set");

@@ -46,8 +46,9 @@ public class TelegramBotUpdatesListener : BackgroundService
         }
         else
         {
-            // TODO call UnknownCommandHandler:
-        }
+			var unknownCommandHandler = _serviceProvider.GetRequiredService<UnknownCommandHandler>();
+			await unknownCommandHandler.HandleAsync(update, cancellationToken);
+		}
     }
 
     private Task ErrorHandler(ITelegramBotClient _, Exception exception, CancellationToken cancellationToken)
