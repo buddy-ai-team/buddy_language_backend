@@ -1,10 +1,5 @@
-﻿using BuddyLanguage.Domain.Enumerations;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using BuddyLanguage.Domain.Enumerations;
 
 namespace BuddyLanguage.HttpModels.Requests.WordEntity
 {
@@ -12,6 +7,7 @@ namespace BuddyLanguage.HttpModels.Requests.WordEntity
     {
         [Required]
         public Guid Id { get; set; }
+
         [Required]
         public WordEntityStatus Status { get; set; }
     }

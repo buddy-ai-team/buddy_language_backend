@@ -5,8 +5,6 @@ public class Role : IEntity
     private string? _name;
     private string? _prompt;
 
-    public Guid Id { get; init; }
-
     public Role(Guid id, string name, string prompt)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -15,20 +13,23 @@ public class Role : IEntity
         }
 
         if (string.IsNullOrWhiteSpace(prompt))
+        {
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(prompt));
+        }
 
         Id = id;
         _name = name;
         _prompt = prompt;
     }
 
+    public Guid Id { get; init; }
+
     public string? Name
     {
         get => _name;
         set
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Value is null or whitespace" + nameof(value));
+            ArgumentException.ThrowIfNullOrEmpty(value);
             _name = value;
         }
     }
@@ -39,7 +40,10 @@ public class Role : IEntity
         set
         {
             if (string.IsNullOrWhiteSpace(value))
+            {
                 throw new ArgumentException("Value is null or whitespace" + nameof(value));
+            }
+
             _prompt = value;
         }
     }

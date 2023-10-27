@@ -26,9 +26,14 @@ builder.Services.AddOptions<NpgsqlConnectionStringOptions>()
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
-var config = builder.Configuration
-   .GetSection("NpgsqlConnectionStringOptions")
+NpgsqlConnectionStringOptions? config = builder.Configuration
+   .GetRequiredSection("NpgsqlConnectionStringOptions")
    .Get<NpgsqlConnectionStringOptions>();
+
+if (config is null)
+{
+    throw new InvalidOperationException("NpgsqlConnectionStringOptions is null");
+}
 
 //Repositories
 builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
@@ -55,7 +60,7 @@ builder.Services.AddChatGptEntityFrameworkIntegration(
         op => op.UseNpgsql(config.ConnectionString)
 );
 
-builder.Services.AddScoped<IChatGPTService, ChatGPTService>(); 
+builder.Services.AddScoped<IChatGPTService, ChatGPTService>();
 
 builder.Services.AddOpenAIService
     (settings =>

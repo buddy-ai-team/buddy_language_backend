@@ -53,7 +53,9 @@ namespace BuddyLanguage.Domain.Services
         public virtual async Task<WordEntity> AddWord(Guid accountId, string word, WordEntityStatus status, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(word))
+            {
                 throw new WordEntityNameUndefinedException("Name of word was undefined");
+            }
 
             var wordVar = new WordEntity(Guid.NewGuid(), accountId, word, status);
 

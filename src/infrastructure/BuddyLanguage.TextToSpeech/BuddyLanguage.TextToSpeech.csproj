@@ -6,19 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.32.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
   </ItemGroup>
 

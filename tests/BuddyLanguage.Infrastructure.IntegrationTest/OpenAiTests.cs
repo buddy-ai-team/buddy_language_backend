@@ -6,7 +6,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
     public class OpenAiTests
     {
         [Fact]
-        public async void OpenAI_key_is_valid()
+        public async Task OpenAI_key_is_valid()
         {
             // Arrange
             var openaiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");

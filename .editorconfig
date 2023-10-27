@@ -25,6 +25,11 @@ dotnet_diagnostic.SA1600.severity = none
 dotnet_diagnostic.SA1413.severity = none
 dotnet_diagnostic.SA1005.severity = none
 dotnet_diagnostic.RCS1037.severity = none
+dotnet_diagnostic.SA0001.severity = none
+dotnet_diagnostic.SA1401.severity = none
+dotnet_diagnostic.SA1629.severity = none
+dotnet_diagnostic.VSTHRD200.severity = none
+
 
 # Default settings:
 # A newline ending every file
@@ -203,3 +208,4 @@ indent_size = 2
 end_of_line = lf
 [*.{cmd,bat}]
 end_of_line = crlf
+
