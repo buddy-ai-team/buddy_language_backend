@@ -1,6 +1,7 @@
 using System.Reflection;
-using BuddyLanguage.Data.EntityFramework;
+using BuddyLanguage.ChatGPTServiceLib;
 using BuddyLanguage.Domain.Services;
+using BuddyLanguage.TextToSpeech;
 using BuddyLanguage.WebApi.Controllers;
 using NetArchTest.Rules;
 using FluentAssertions;
@@ -13,7 +14,7 @@ public class LayersDependenciesTest
     /// <summary>
     /// Перечень существующих сборок
     /// </summary>
-    private static readonly Assembly InfrastructureAssembly = typeof(AppDbContext).Assembly;
+    private static readonly Assembly InfrastructureAssembly = typeof(ChatGPTService).Assembly;
     private static readonly Assembly PresentationAssembly = typeof(RoleController).Assembly;
     private static readonly Assembly DomainAssembly = typeof(RoleService).Assembly;
     
@@ -55,11 +56,11 @@ public class LayersDependenciesTest
     }
     
     [Fact]
-    public void presentation_not_depends_on_infrastructure()
+    public void presentation_depends_on_infrastructure()
     {
         Types.That()
             .ResideInNamespace(PresentationNamespace)
-            .ShouldNot().HaveDependencyOn(InfrastructureNamespace)
+            .Should().HaveDependencyOn(InfrastructureNamespace)
             .GetResult().IsSuccessful
             .Should().BeTrue();
     }
@@ -68,18 +69,18 @@ public class LayersDependenciesTest
     public void infrastructure_depends_on_domain()
     {
         Types.That()
-            .ResideInNamespace(PresentationNamespace)
+            .ResideInNamespace(InfrastructureNamespace)
             .Should().HaveDependencyOn(DomainNamespace)
             .GetResult().IsSuccessful
             .Should().BeTrue();
     }
     
     [Fact]
-    public void infrastructure_depends_on_presentation()
+    public void infrastructure_not_depends_on_presentation()
     {
         Types.That()
-            .ResideInNamespace(PresentationNamespace)
-            .Should().HaveDependencyOn(DomainNamespace)
+            .ResideInNamespace(InfrastructureNamespace)
+            .ShouldNot().HaveDependencyOn(PresentationNamespace)
             .GetResult().IsSuccessful
             .Should().BeTrue();
     }
