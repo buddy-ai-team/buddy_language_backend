@@ -1,4 +1,4 @@
-using BuddyLanguage.ChatGPTService;
+using BuddyLanguage.ChatGPTServiceLib;
 using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Data.EntityFramework.Repositories;
 using BuddyLanguage.Domain.Interfaces;
@@ -30,13 +30,18 @@ var config = builder.Configuration
    .GetSection("NpgsqlConnectionStringOptions")
    .Get<NpgsqlConnectionStringOptions>();
 
-// Подключение репозитория для работы с Ролями
+//Repositories
 builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-builder.Services.AddScoped<IRoleRepository, RoleRepositoryEf>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
-builder.Services.AddScoped<RoleService>();
 
-// Подключение фильтров
+builder.Services.AddScoped<IRoleRepository, RoleRepositoryEf>();
+builder.Services.AddScoped<IWordEntityRepository, WordEntityRepositoryEf>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
+
+builder.Services.AddScoped<RoleService>();
+builder.Services.AddScoped<WordEntityService>();
+
+//Filters
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<CentralizedExceptionHandlingFilter>(order: 1);

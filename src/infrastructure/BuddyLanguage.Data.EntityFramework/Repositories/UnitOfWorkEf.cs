@@ -9,7 +9,6 @@ public class UnitOfWorkEf : IUnitOfWork
     public IUserRepository UserRepository { get; }
     
     private readonly AppDbContext _dbContext;
-    
     public UnitOfWorkEf(
         AppDbContext dbContext,
         IRoleRepository roleRepository,
