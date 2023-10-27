@@ -11,15 +11,18 @@ namespace BuddyLanguage.Domain.Exceptions.WordEntity
         {
         }
 
-        public WordEntityNotFoundException(string? message) : base(message)
+        public WordEntityNotFoundException(string? message)
+            : base(message)
         {
         }
 
-        public WordEntityNotFoundException(string? message, Exception? innerException) : base(message, innerException)
+        public WordEntityNotFoundException(string? message, Exception? innerException)
+            : base(message, innerException)
         {
         }
 
-        protected WordEntityNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected WordEntityNotFoundException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }
