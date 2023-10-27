@@ -8,10 +8,7 @@ public class WordEntity : IEntity
 
     private WordEntityStatus _wordStatus;
 
-    public Guid Id { get; init; }
-
-    //External Key To User.Id
-    public Guid AccountId { get; init; }
+    protected WordEntity() { }  
 
     public WordEntity(Guid id, Guid accountId, string word, WordEntityStatus wordStatus)
     {
@@ -19,10 +16,18 @@ public class WordEntity : IEntity
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(word));
 
         Id = id;
-        AccountId = accountId;
+        UserId = accountId;
         _word = word;
         _wordStatus = wordStatus;
     }
+
+    public Guid Id { get; init; }
+
+    //External Key To User.Id
+    public Guid UserId { get; init; }
+    public User User { get; set; }
+
+
 
     public string? Word
     {

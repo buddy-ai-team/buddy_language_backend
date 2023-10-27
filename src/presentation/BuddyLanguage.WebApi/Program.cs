@@ -35,11 +35,13 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
 
 builder.Services.AddScoped<IRoleRepository, RoleRepositoryEf>();
 builder.Services.AddScoped<IWordEntityRepository, WordEntityRepositoryEf>();
+builder.Services.AddScoped<IUserRepository, UserRepositoryEf>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
 
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<WordEntityService>();
+builder.Services.AddScoped<UserService>();
 
 //Filters
 builder.Services.AddControllers(options =>
