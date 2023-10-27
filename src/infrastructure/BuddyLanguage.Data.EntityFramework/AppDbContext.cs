@@ -13,5 +13,6 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        //Add WordEntity To Account External Key Once Account Is Implemented
     }
 }
