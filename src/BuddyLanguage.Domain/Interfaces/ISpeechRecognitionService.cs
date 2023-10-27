@@ -3,7 +3,7 @@
     public interface ISpeechRecognitionService
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="voiceMessage">
         /// Supported formats: flac, m4a, mp3, mp4, mpeg, mpga, oga, ogg, wav, webm

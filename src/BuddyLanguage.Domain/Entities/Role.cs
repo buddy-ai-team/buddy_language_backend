@@ -4,13 +4,16 @@ public class Role : IEntity
 {
     private string? _name;
     private string? _prompt;
-    
+
     public Guid Id { get; init; }
 
     public Role(Guid id, string name, string prompt)
     {
         if (string.IsNullOrWhiteSpace(name))
+        {
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
+        }
+
         if (string.IsNullOrWhiteSpace(prompt))
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(prompt));
 
