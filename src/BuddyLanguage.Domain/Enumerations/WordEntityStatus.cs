@@ -8,8 +8,19 @@ namespace BuddyLanguage.Domain.Enumerations
 {
     public enum WordEntityStatus
     {
-       Learning, 
-        Learned, 
+        /// <summary>
+        ///   Word is being learned
+        /// </summary>
+        Learning,
+
+        /// <summary>
+        ///  Word is learned
+        /// </summary>
+        Learned,
+
+        /// <summary>
+        ///  Word is removed from learning
+        /// </summary>
         Dropped
     }
 }

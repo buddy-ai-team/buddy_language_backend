@@ -35,16 +35,16 @@ public class WordEntityController : ControllerBase
     }
 
     [HttpGet("id-account")]
-    public async Task<ActionResult<IReadOnlyList<WordEntity>>> GetAllWordEntitiesForAccountById
-        (Guid accountId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<WordEntity>>> GetAllWordEntitiesForAccountById(
+        Guid accountId, CancellationToken cancellationToken)
     {
         var wordEntities = await _wordService.GetWordsByAccountId(accountId, cancellationToken);
         return Ok(wordEntities);
     }
 
     [HttpPost("add")]
-    public async Task<ActionResult<WordEntityResponse>> AddWordEntity
-        (AddWordEntityRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<WordEntityResponse>> AddWordEntity(
+        AddWordEntityRequest request, CancellationToken cancellationToken)
     {
         var wordVar = await _wordService.AddWord(request.AccountId, request.Word, request.Status, cancellationToken);
         return new WordEntityResponse(wordVar.Id, wordVar.UserId, wordVar.Word, wordVar.WordStatus);

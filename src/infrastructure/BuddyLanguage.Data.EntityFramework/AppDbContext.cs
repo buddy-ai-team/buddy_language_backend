@@ -11,8 +11,8 @@ public class AppDbContext : DbContext
     public DbSet<WordEntity> WordEntities => Set<WordEntity>();
 
     public AppDbContext(
-        DbContextOptions<AppDbContext> options) :
-        base(options)
+        DbContextOptions<AppDbContext> options)
+        : base(options)
     {
     }
 

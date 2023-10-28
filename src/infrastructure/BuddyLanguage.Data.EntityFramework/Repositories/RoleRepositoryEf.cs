@@ -6,7 +6,8 @@ namespace BuddyLanguage.Data.EntityFramework.Repositories;
 
 public class RoleRepositoryEf : EfRepository<Role>, IRoleRepository
 {
-    public RoleRepositoryEf(AppDbContext dbContext) : base(dbContext)
+    public RoleRepositoryEf(AppDbContext dbContext)
+        : base(dbContext)
     {
     }
 

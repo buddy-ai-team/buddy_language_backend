@@ -1,10 +1,10 @@
-﻿using FluentAssertions;
-using BuddyLanguage.Domain.Exceptions;
+﻿using BuddyLanguage.Domain.Exceptions;
+using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
+using FluentAssertions;
+using OpenAI;
 using OpenAI.Interfaces;
 using OpenAI.Managers;
-using OpenAI;
-using BuddyLanguage.Domain.Interfaces;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest
 {
@@ -13,10 +13,9 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [Fact]
         public void Whisper_service_creation_with_incorrect_data_is_rejected()
         {
-            IOpenAIService openAIService = null;
-            FluentActions.Invoking(() => 
-            { 
-                WhisperSpeechRecognitionService whisperService = new(openAIService); 
+            FluentActions.Invoking(() =>
+            {
+                WhisperSpeechRecognitionService whisperService = new(null!);
             })
                .Should()
                .Throw<ArgumentNullException>();
@@ -26,11 +25,11 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         public async Task Voice_message_converts_to_text_successfully()
         {
             string fileName = @"assets/History.mp3";
-            byte[] bytes = File.ReadAllBytes(fileName);
+            byte[] bytes = await File.ReadAllBytesAsync(fileName);
 
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY"),
+                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new InvalidOperationException(),
             });
 
             IOpenAIService openAIService = service;
@@ -49,7 +48,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
 
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY"),
+                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new InvalidOperationException(),
             });
 
             IOpenAIService openAIService = service;
@@ -60,18 +59,19 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
                 await whisperService.RecognizeSpeechToTextAsync(bytes, fileName, default);
             }).Should().ThrowAsync<InvalidSpeechRecognitionException>();
         }
-   
+
         [Theory]
         [InlineData(null, "VoiceMessage.mp3")]
         [InlineData(new byte[] { 1, 2, 3 }, null)]
         [InlineData(new byte[0], "VoiceMessage.mp3")]
         [InlineData(null, null)]
-        public async Task Whisper_service_rejects_files_with_incorrect_data
-            (byte[] bytes, string fileName)
+        public async Task Whisper_service_rejects_files_with_incorrect_data(
+            byte[] bytes,
+            string fileName)
         {
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY"),
+                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new InvalidOperationException(),
             });
 
             IOpenAIService openAIService = service;
@@ -83,12 +83,12 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
             }).Should().ThrowAsync<ArgumentException>();
         }
 
-        [Fact] 
+        [Fact]
         public void Whisper_service_implements_interface()
         {
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY"),
+                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new InvalidOperationException()
             });
             IOpenAIService openAIService = service;
             WhisperSpeechRecognitionService whisperService = new(openAIService);

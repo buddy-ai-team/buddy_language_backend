@@ -16,7 +16,8 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         /// <summary>
         /// Generates all possible combinations of languages and voices for testing.
         /// </summary>
-        public static IEnumerable<(Language, Voice)> GetLanguageVoiceCombinations()
+        /// <returns>Pair of possible variants Language-Voice</returns>
+        public static IEnumerable<(Language Language, Voice Voice)> GetLanguageVoiceCombinations()
         {
             var combinations = new List<(Language, Voice)>();
 
@@ -34,6 +35,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         /// <summary>
         /// Tests whether the Azure Text-to-Speech service correctly synthesizes speech for various languages and voices.
         /// </summary>
+        /// <returns>Nothing</returns>
         [Fact]
         public async Task All_azure_TTS_languages_and_voices_synthesized()
         {
@@ -49,8 +51,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
                     {
                         SpeechKey = GetKeyFromEnvironment("AZURE_SPEECH_KEY"),
                         SpeechRegion = GetKeyFromEnvironment("AZURE_SPEECH_REGION")
-                    }
-                );
+                    });
 
                 var textToSpeechClient = new AzureTextToSpeech(options, logger);
                 var text = "Hello"; // You can use any sample text.
@@ -84,7 +85,11 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         //Helper Method To Validate Env Variables
         private string GetKeyFromEnvironment(string keyName)
         {
-            if (keyName == null) throw new ArgumentNullException(nameof(keyName));
+            if (keyName == null)
+            {
+                throw new ArgumentNullException(nameof(keyName));
+            }
+
             var value = Environment.GetEnvironmentVariable(keyName);
             if (value is null)
             {

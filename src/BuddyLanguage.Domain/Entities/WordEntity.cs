@@ -12,8 +12,7 @@ public class WordEntity : IEntity
 
     public WordEntity(Guid id, Guid accountId, string word, WordEntityStatus wordStatus)
     {
-        if (string.IsNullOrWhiteSpace(word))
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(word));
+        ArgumentException.ThrowIfNullOrEmpty(word);
 
         Id = id;
         UserId = accountId;
@@ -34,8 +33,7 @@ public class WordEntity : IEntity
         get => _word;
         set
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Value is null or whitespace" + nameof(value));
+            ArgumentException.ThrowIfNullOrEmpty(value);
             _word = value;
         }
     }

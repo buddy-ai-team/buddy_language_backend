@@ -1,10 +1,7 @@
-﻿using BuddyLanguage.Domain.Enumerations;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using BuddyLanguage.Domain.Enumerations;
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 namespace BuddyLanguage.HttpModels.Requests.WordEntity
 {
@@ -12,10 +9,11 @@ namespace BuddyLanguage.HttpModels.Requests.WordEntity
     {
         [Required]
         public string Word { get; set; }
+
         [Required]
         public Guid AccountId { get; init; }
+
         [Required]
         public WordEntityStatus Status { get; set; }
-
     }
 }
