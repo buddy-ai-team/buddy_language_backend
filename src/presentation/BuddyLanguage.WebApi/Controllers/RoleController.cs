@@ -1,7 +1,7 @@
 ﻿using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Services;
-using BuddyLanguage.HttpModels.Requests;
-using BuddyLanguage.HttpModels.Responses;
+using BuddyLanguage.HttpModels.Requests.Role;
+using BuddyLanguage.HttpModels.Responses.Role;
 using Microsoft.AspNetCore.Mvc;
 
 #pragma warning disable CS8604
@@ -18,7 +18,7 @@ public class RoleController : ControllerBase
     {
         _roleService = roleService ?? throw new ArgumentNullException(nameof(roleService));
     }
-    
+
     [HttpGet("id")]
     public async Task<ActionResult<RoleResponse>> GetRoleById(RoleByIdRequest roleByIdRequest, CancellationToken cancellationToken)
     {
@@ -31,14 +31,14 @@ public class RoleController : ControllerBase
     public async Task<ActionResult<UpdateRoleResponse>> UpdateRole(UpdateRoleRequest request, CancellationToken cancellationToken)
     {
         var role = await _roleService.ChangePromptByRoleId(request.Id, request.Name, request.Prompt, cancellationToken);
-        
+
         return new UpdateRoleResponse(role.Id, role.Name, role.Prompt);
     }
-    
+
     [HttpGet("all")]
     public async Task<ActionResult<Role[]>> GetAllRoles(CancellationToken cancellationToken)
     {
-        var products =  await _roleService.GetAll(cancellationToken);
+        var products = await _roleService.GetAll(cancellationToken);
         return Ok(products);
     }
 
@@ -46,7 +46,7 @@ public class RoleController : ControllerBase
     public async Task<ActionResult<UpdateRoleResponse>> AddRole(AddRoleRequest request, CancellationToken cancellationToken)
     {
         var role = await _roleService.AddRole(request.Name, request.Prompt, cancellationToken);
-        
+
         return new UpdateRoleResponse(role.Id, role.Name, role.Prompt);
     }
 }
