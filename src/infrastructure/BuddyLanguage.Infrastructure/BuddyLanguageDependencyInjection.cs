@@ -50,6 +50,7 @@ public static class BuddyLanguageDependencyInjection
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         services.AddScoped<IRoleRepository, RoleRepositoryEf>();
         services.AddScoped<IWordEntityRepository, WordEntityRepositoryEf>();
+        services.AddScoped<IUserRepository, UserRepositoryEf>();
         services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
 
         services.AddDbContext<AppDbContext>(
@@ -80,6 +81,7 @@ public static class BuddyLanguageDependencyInjection
     {
         services.AddScoped<RoleService>();
         services.AddScoped<WordEntityService>();
+        services.AddScoped<UserService>();
 
         return services;
     }
