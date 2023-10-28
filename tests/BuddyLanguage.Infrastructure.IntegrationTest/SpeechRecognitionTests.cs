@@ -1,10 +1,10 @@
-﻿using FluentAssertions;
-using BuddyLanguage.Domain.Exceptions;
+﻿using BuddyLanguage.Domain.Exceptions;
+using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
+using FluentAssertions;
+using OpenAI;
 using OpenAI.Interfaces;
 using OpenAI.Managers;
-using OpenAI;
-using BuddyLanguage.Domain.Interfaces;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest
 {
@@ -29,7 +29,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
 
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY"),
+                ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
             });
 
             IOpenAIService openAIService = service;
@@ -48,7 +48,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
 
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY"),
+                ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
             });
 
             IOpenAIService openAIService = service;
@@ -65,12 +65,12 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [InlineData(new byte[] { 1, 2, 3 }, null)]
         [InlineData(new byte[0], "VoiceMessage.mp3")]
         [InlineData(null, null)]
-        public async Task Whisper_service_rejects_files_with_incorrect_data
-            (byte[] bytes, string fileName)
+        public async Task Whisper_service_rejects_files_with_incorrect_data(
+            byte[] bytes, string fileName)
         {
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY"),
+                ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
             });
 
             IOpenAIService openAIService = service;
@@ -87,12 +87,28 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         {
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY"),
+                ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
             });
             IOpenAIService openAIService = service;
             WhisperSpeechRecognitionService whisperService = new(openAIService);
 
             whisperService.Should().BeAssignableTo<ISpeechRecognitionService>();
+        }
+
+        private string GetKeyFromEnvironment(string keyName)
+        {
+            if (keyName == null)
+            {
+                throw new ArgumentNullException(nameof(keyName));
+            }
+
+            var value = Environment.GetEnvironmentVariable(keyName);
+            if (value is null)
+            {
+                throw new InvalidOperationException($"{keyName} is not set as environment variable");
+            }
+
+            return value;
         }
     }
 }
