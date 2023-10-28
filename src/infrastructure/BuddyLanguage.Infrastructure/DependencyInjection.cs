@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenAI.ChatGpt.EntityFrameworkCore.Extensions;
 using OpenAI.Extensions;
 
-namespace BuddyLanguage.DependencyInjection;
+namespace BuddyLanguage.Infrastructure;
 
 public static class BuddyLanguageDependencyInjection
 {
@@ -34,23 +34,21 @@ public static class BuddyLanguageDependencyInjection
             .ValidateOnStart();
         
         var config = configuration
-            .GetSection("NpgsqlConnectionStringOptions")
+            .GetRequiredSection("NpgsqlConnectionStringOptions")
             .Get<NpgsqlConnectionStringOptions>();
         
         // Подключение репозитория для работы с Ролями
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         services.AddScoped<IRoleRepository, RoleRepositoryEf>();
+        services.AddScoped<IWordEntityRepository, WordEntityRepositoryEf>();
         services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
-        services.AddScoped<RoleService>();
-
-        
 
         services.AddDbContext<AppDbContext>(
-            options => options.UseNpgsql(config.ConnectionString)
+            options => options.UseNpgsql(config!.ConnectionString)
         );
 
         services.AddChatGptEntityFrameworkIntegration(
-            op => op.UseNpgsql(config.ConnectionString)
+            op => op.UseNpgsql(config!.ConnectionString)
         );
 
         services.AddScoped<IChatGPTService, ChatGPTService>(); 
@@ -64,14 +62,28 @@ public static class BuddyLanguageDependencyInjection
         });
 
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
+
+        services.AddScoped<IChatGPTService, ChatGPTService>();
         
         return services;
     }
 
     private static IServiceCollection AddDomainServices(
+        this IServiceCollection services)
+    {
+        services.AddScoped<RoleService>();
+        services.AddScoped<WordEntityService>();
+        
+        return services;
+    }
+    
+    public static IServiceCollection AddServiceCollection  (
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddInfrastructureServices(configuration);
+        services.AddDomainServices();
+        
         return services;
     }
 }
