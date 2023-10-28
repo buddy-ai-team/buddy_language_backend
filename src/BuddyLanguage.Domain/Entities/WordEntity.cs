@@ -2,13 +2,11 @@
 
 namespace BuddyLanguage.Domain.Entities;
 
+#pragma warning disable CS8618 
+
 public class WordEntity : IEntity
 {
     private string? _word;
-
-    private WordEntityStatus _wordStatus;
-
-    protected WordEntity() { }  
 
     public WordEntity(Guid id, Guid accountId, string word, WordEntityStatus wordStatus)
     {
@@ -17,16 +15,21 @@ public class WordEntity : IEntity
         Id = id;
         UserId = accountId;
         _word = word;
-        _wordStatus = wordStatus;
+        WordStatus = wordStatus;
+    }
+
+    protected WordEntity()
+    {
     }
 
     public Guid Id { get; init; }
 
+    public WordEntityStatus WordStatus { get; set; }
+
     //External Key To User.Id
     public Guid UserId { get; init; }
+
     public User User { get; set; }
-
-
 
     public string? Word
     {
@@ -35,15 +38,6 @@ public class WordEntity : IEntity
         {
             ArgumentException.ThrowIfNullOrEmpty(value);
             _word = value;
-        }
-    }
-
-    public WordEntityStatus WordStatus
-    {
-        get => _wordStatus;
-        set
-        {
-            _wordStatus = value;
         }
     }
 }

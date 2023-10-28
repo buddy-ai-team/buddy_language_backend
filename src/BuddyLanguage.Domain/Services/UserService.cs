@@ -17,22 +17,32 @@ namespace BuddyLanguage.Domain.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-
-        public virtual async Task<User> TryRegister(string firstName,
-            string lastName, string telegramId, CancellationToken cancellationToken)
+        public virtual async Task<User> TryRegister(
+            string firstName,
+            string lastName,
+            string telegramId,
+            CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(firstName))
+            {
                 throw new ArgumentException("firstName was null or empty");
+            }
+
             if (string.IsNullOrWhiteSpace(lastName))
+            {
                 throw new ArgumentException("lastName was null or empty");
+            }
+
             if (string.IsNullOrWhiteSpace(telegramId))
+            {
                 throw new ArgumentException("telegramId was null or empty");
+            }
 
             try
             {
                 await _uow.UserRepository.GetUserByTelegramId(telegramId, cancellationToken);
             }
-            catch(UserNotFoundException)
+            catch (UserNotFoundException)
             {
                 var userVar = new User(Guid.NewGuid(), firstName, lastName, telegramId);
 
@@ -40,6 +50,7 @@ namespace BuddyLanguage.Domain.Services
                 await _uow.SaveChangesAsync(cancellationToken);
                 return await _uow.UserRepository.GetById(userVar.Id, cancellationToken);
             }
+
             return await _uow.UserRepository.GetUserByTelegramId(telegramId, cancellationToken); 
         }
 
@@ -58,7 +69,9 @@ namespace BuddyLanguage.Domain.Services
         public virtual async Task<User> GetUserByTelegramId(string telegramId, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(telegramId))
+            {
                 throw new ArgumentException("telegramId was null or empty");
+            }
 
             var user = await _uow.UserRepository.GetUserByTelegramId(telegramId, cancellationToken);
 
@@ -70,8 +83,12 @@ namespace BuddyLanguage.Domain.Services
             return user;
         }
 
-        public virtual async Task<User> UpdateUserById(Guid id, string firstName, string lastName, 
-            string telegramId, CancellationToken cancellationToken)
+        public virtual async Task<User> UpdateUserById(
+            Guid id,
+            string firstName,
+            string lastName, 
+            string telegramId,
+            CancellationToken cancellationToken)
         {
             var user = await _uow.UserRepository.GetById(id, cancellationToken);
 
@@ -89,15 +106,26 @@ namespace BuddyLanguage.Domain.Services
             return await _uow.UserRepository.GetById(user.Id, cancellationToken);
         }
 
-        public virtual async Task<User> AddUser(string firstName, 
-            string lastName, string telegramId, CancellationToken cancellationToken)
+        public virtual async Task<User> AddUser(
+            string firstName, 
+            string lastName,
+            string telegramId,
+            CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(firstName))
+            {
                 throw new ArgumentException("firstName was null or empty");
+            }
+
             if (string.IsNullOrWhiteSpace(lastName))
+            {
                 throw new ArgumentException("lastName was null or empty");
+            }
+
             if (string.IsNullOrWhiteSpace(telegramId))
+            {
                 throw new ArgumentException("telegramId was null or empty");
+            }
 
             var userVar = new User(Guid.NewGuid(), firstName, lastName, telegramId);
 

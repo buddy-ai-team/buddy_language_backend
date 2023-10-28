@@ -1,5 +1,4 @@
 ﻿using BuddyLanguage.Domain.Entities;
-using System.Security.Principal;
 
 namespace BuddyLanguage.Domain.Interfaces
 {

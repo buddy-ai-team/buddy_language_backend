@@ -1,16 +1,12 @@
-﻿using BuddyLanguage.Domain.Entities;
-using BuddyLanguage.Domain.Services;
+﻿using BuddyLanguage.Domain.Services;
 using BuddyLanguage.HttpModels.Requests.User;
 using BuddyLanguage.HttpModels.Responses.User;
-using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Mvc;
 
 #pragma warning disable CS8604
 
 namespace BuddyLanguage.WebApi.Controllers
 {
-
-
     [Route("user")]
     [ApiController]
     public class UserController : ControllerBase
@@ -39,14 +35,18 @@ namespace BuddyLanguage.WebApi.Controllers
         [HttpPost("update")]
         public async Task<ActionResult<UserResponse>> UpdateUser(UpdateUserRequest request, CancellationToken cancellationToken)
         {
-            var userVar = await _userService.UpdateUserById(request.Id, request.FirstName, request.LastName, 
-                request.TelegramId, cancellationToken);
+            var userVar = await _userService.UpdateUserById(
+                request.Id,
+                request.FirstName,
+                request.LastName, 
+                request.TelegramId,
+                cancellationToken);
             return new UserResponse(userVar.Id, userVar.FirstName, userVar.LastName, userVar.TelegramId);
         }
 
         [HttpPost("add")]
-        public async Task<ActionResult<UserResponse>> AddWordEntity
-            (AddUserRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<UserResponse>> AddWordEntity(
+            AddUserRequest request, CancellationToken cancellationToken)
         {
             var userVar = await _userService.AddUser(request.FirstName, request.LastName, request.TelegramId, cancellationToken);
             return new UserResponse(userVar.Id, userVar.FirstName, userVar.LastName, userVar.TelegramId);

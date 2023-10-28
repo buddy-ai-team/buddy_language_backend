@@ -13,15 +13,18 @@ namespace BuddyLanguage.Domain.Exceptions.User
         {
         }
 
-        public UserNotFoundException(string? message) : base(message)
+        public UserNotFoundException(string? message)
+            : base(message)
         {
         }
 
-        public UserNotFoundException(string? message, Exception? innerException) : base(message, innerException)
+        public UserNotFoundException(string? message, Exception? innerException)
+            : base(message, innerException)
         {
         }
 
-        protected UserNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected UserNotFoundException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }
