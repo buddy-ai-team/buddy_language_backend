@@ -2,10 +2,6 @@
 {
     public class User : IEntity
     {
-        //List of WordEntities
-        //Reverse Navigation Property
-        public List<WordEntity>? WordEntities;
-
         private string? _firstName;
         private string? _lastName;
         private string _telegramId;
@@ -35,6 +31,10 @@
         }
 
         public Guid Id { get; init; }
+
+        //List of WordEntities
+        //Reverse Navigation Property
+        public List<WordEntity>? WordEntities { get; set; }
 
         public string? FirstName
         {

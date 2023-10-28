@@ -11,7 +11,7 @@ namespace BuddyLanguage.Data.EntityFramework.Repositories
         {
         }
 
-        public async Task<IReadOnlyList<WordEntity>> GetWordsByAccountId(Guid accountId, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<WordEntity>> GetWordsByUserId(Guid accountId, CancellationToken cancellationToken)
         {
             var words = await Entities.Where(x => x.UserId == accountId).ToListAsync(cancellationToken);
             return words.AsReadOnly();

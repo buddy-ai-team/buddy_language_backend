@@ -6,15 +6,14 @@ namespace BuddyLanguage.Domain.Entities;
 
 public class WordEntity : IEntity
 {
-    private string? _word;
+    private string _word;
 
-    public WordEntity(Guid id, Guid accountId, string word, WordEntityStatus wordStatus)
+    public WordEntity(Guid id, Guid accountId, string word, Language language, WordEntityStatus wordStatus)
     {
-        ArgumentException.ThrowIfNullOrEmpty(word);
-
         Id = id;
         UserId = accountId;
         _word = word;
+        Language = language;
         WordStatus = wordStatus;
     }
 
@@ -24,6 +23,8 @@ public class WordEntity : IEntity
 
     public Guid Id { get; init; }
 
+    public Language Language { get; set; }
+
     public WordEntityStatus WordStatus { get; set; }
 
     //External Key To User.Id
@@ -31,7 +32,7 @@ public class WordEntity : IEntity
 
     public User User { get; set; }
 
-    public string? Word
+    public string Word
     {
         get => _word;
         set

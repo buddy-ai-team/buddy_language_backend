@@ -5,10 +5,10 @@ using BuddyLanguage.Domain.Enumerations;
 
 namespace BuddyLanguage.HttpModels.Requests.WordEntity
 {
-    public class AddWordEntityRequest
+    public class UpdateWordEntityRequest
     {
         [Required]
-        public Guid AccountId { get; init; }
+        public Guid Id { get; set; }
 
         [Required]
         public string Word { get; set; }

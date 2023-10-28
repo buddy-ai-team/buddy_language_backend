@@ -23,20 +23,9 @@ namespace BuddyLanguage.Domain.Services
             string telegramId,
             CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(firstName))
-            {
-                throw new ArgumentException("firstName was null or empty");
-            }
-
-            if (string.IsNullOrWhiteSpace(lastName))
-            {
-                throw new ArgumentException("lastName was null or empty");
-            }
-
-            if (string.IsNullOrWhiteSpace(telegramId))
-            {
-                throw new ArgumentException("telegramId was null or empty");
-            }
+            ArgumentException.ThrowIfNullOrEmpty(firstName, nameof(firstName));
+            ArgumentException.ThrowIfNullOrEmpty(lastName, nameof(lastName));
+            ArgumentException.ThrowIfNullOrEmpty(telegramId, nameof(telegramId));
 
             try
             {
@@ -44,11 +33,11 @@ namespace BuddyLanguage.Domain.Services
             }
             catch (UserNotFoundException)
             {
-                var userVar = new User(Guid.NewGuid(), firstName, lastName, telegramId);
+                var user = new User(Guid.NewGuid(), firstName, lastName, telegramId);
 
-                await _uow.UserRepository.Add(userVar, cancellationToken);
+                await _uow.UserRepository.Add(user, cancellationToken);
                 await _uow.SaveChangesAsync(cancellationToken);
-                return await _uow.UserRepository.GetById(userVar.Id, cancellationToken);
+                return user;
             }
 
             return await _uow.UserRepository.GetUserByTelegramId(telegramId, cancellationToken); 
@@ -68,10 +57,7 @@ namespace BuddyLanguage.Domain.Services
 
         public virtual async Task<User> GetUserByTelegramId(string telegramId, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(telegramId))
-            {
-                throw new ArgumentException("telegramId was null or empty");
-            }
+            ArgumentException.ThrowIfNullOrEmpty(telegramId, nameof(telegramId));
 
             var user = await _uow.UserRepository.GetUserByTelegramId(telegramId, cancellationToken);
 
@@ -90,6 +76,10 @@ namespace BuddyLanguage.Domain.Services
             string telegramId,
             CancellationToken cancellationToken)
         {
+            ArgumentException.ThrowIfNullOrEmpty(firstName, nameof(firstName));
+            ArgumentException.ThrowIfNullOrEmpty(lastName, nameof(lastName));
+            ArgumentException.ThrowIfNullOrEmpty(telegramId, nameof(telegramId));
+
             var user = await _uow.UserRepository.GetById(id, cancellationToken);
 
             if (user is null)
@@ -112,26 +102,15 @@ namespace BuddyLanguage.Domain.Services
             string telegramId,
             CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(firstName))
-            {
-                throw new ArgumentException("firstName was null or empty");
-            }
+            ArgumentException.ThrowIfNullOrEmpty(firstName, nameof(firstName));
+            ArgumentException.ThrowIfNullOrEmpty(lastName, nameof(lastName));
+            ArgumentException.ThrowIfNullOrEmpty(telegramId, nameof(telegramId));
 
-            if (string.IsNullOrWhiteSpace(lastName))
-            {
-                throw new ArgumentException("lastName was null or empty");
-            }
+            var user = new User(Guid.NewGuid(), firstName, lastName, telegramId);
 
-            if (string.IsNullOrWhiteSpace(telegramId))
-            {
-                throw new ArgumentException("telegramId was null or empty");
-            }
-
-            var userVar = new User(Guid.NewGuid(), firstName, lastName, telegramId);
-
-            await _uow.UserRepository.Add(userVar, cancellationToken);
+            await _uow.UserRepository.Add(user, cancellationToken);
             await _uow.SaveChangesAsync(cancellationToken);
-            return await _uow.UserRepository.GetById(userVar.Id, cancellationToken);
+            return user;
         }
     }
 }
