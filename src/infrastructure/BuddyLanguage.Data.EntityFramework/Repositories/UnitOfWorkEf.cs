@@ -22,6 +22,8 @@ public class UnitOfWorkEf : IUnitOfWork
 
     public IWordEntityRepository WordEntityRepository { get; }
 
+    public IUserRepository UserRepository { get; }
+
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         => _dbContext.SaveChangesAsync(cancellationToken);
 }
