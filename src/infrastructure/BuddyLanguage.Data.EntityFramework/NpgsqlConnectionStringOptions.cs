@@ -10,6 +10,6 @@ namespace BuddyLanguage.Data.EntityFramework
     public class NpgsqlConnectionStringOptions
     {
         [Required]
-        public string ConnectionString { get; set; }
+        public string ConnectionString { get; set; } = null!;
     }
 }

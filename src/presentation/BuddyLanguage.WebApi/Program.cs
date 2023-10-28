@@ -1,5 +1,5 @@
-using BuddyLanguage.WebApi.Filters;
 using BuddyLanguage.Infrastructure;
+using BuddyLanguage.WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 

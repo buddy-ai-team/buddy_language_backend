@@ -13,15 +13,18 @@ namespace BuddyLanguage.Domain.Exceptions.WordEntity
         {
         }
 
-        public WordEntityNameUndefinedException(string? message) : base(message)
+        public WordEntityNameUndefinedException(string? message)
+            : base(message)
         {
         }
 
-        public WordEntityNameUndefinedException(string? message, Exception? innerException) : base(message, innerException)
+        public WordEntityNameUndefinedException(string? message, Exception? innerException)
+            : base(message, innerException)
         {
         }
 
-        protected WordEntityNameUndefinedException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected WordEntityNameUndefinedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }
