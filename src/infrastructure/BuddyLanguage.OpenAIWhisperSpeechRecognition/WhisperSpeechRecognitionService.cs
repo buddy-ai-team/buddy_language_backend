@@ -1,20 +1,22 @@
-﻿using OpenAI.ObjectModels.RequestModels;
-using OpenAI.ObjectModels;
+﻿using BuddyLanguage.Domain.Exceptions;
 using BuddyLanguage.Domain.Interfaces;
-using BuddyLanguage.Domain.Exceptions;
 using OpenAI.Interfaces;
+using OpenAI.ObjectModels;
+using OpenAI.ObjectModels.RequestModels;
 
 namespace BuddyLanguage.OpenAIWhisperSpeechRecognitionService
 {
     public class WhisperSpeechRecognitionService : ISpeechRecognitionService
     {
         private readonly IOpenAIService _openAIService;
+
         public WhisperSpeechRecognitionService(IOpenAIService openAIService)
         {
             _openAIService = openAIService ?? throw new ArgumentNullException(nameof(openAIService));
         }
-        public async Task<string> RecognizeSpeechToTextAsync
-            (byte[] voiceMessage, string fileName, CancellationToken cancellationToken)
+
+        public async Task<string> RecognizeSpeechToTextAsync(
+            byte[] voiceMessage, string fileName, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(voiceMessage);
             ArgumentNullException.ThrowIfNull(fileName);
@@ -23,15 +25,17 @@ namespace BuddyLanguage.OpenAIWhisperSpeechRecognitionService
                 throw new ArgumentException(nameof(voiceMessage));
             }
 
-              var response = await _openAIService
+            var response = await _openAIService
                 .Audio
-                .CreateTranscription(new AudioCreateTranscriptionRequest()
+                .CreateTranscription(
+                    new AudioCreateTranscriptionRequest()
                 {
                     FileName = fileName,
                     File = voiceMessage,
                     Model = Models.WhisperV1,
                     ResponseFormat = StaticValues.AudioStatics.ResponseFormat.VerboseJson
-                }, cancellationToken);
+                },
+                    cancellationToken);
 
             if (!response.Successful)
             {

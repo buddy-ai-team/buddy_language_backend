@@ -14,14 +14,14 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
             {
                 throw new InvalidOperationException("OPENAI_API_KEY environment variable is not set");
             }
+
             var openaiClient = new OpenAiClient(openaiKey);
 
             // Act
             var answer = await openaiClient.GetChatCompletions(
                 Dialog.StartAsUser("Hello"),
                 maxTokens: 3,
-                model: ChatCompletionModels.Gpt3_5_Turbo
-            );
+                model: ChatCompletionModels.Gpt3_5_Turbo);
 
             // Assert
             Assert.NotNull(answer);
