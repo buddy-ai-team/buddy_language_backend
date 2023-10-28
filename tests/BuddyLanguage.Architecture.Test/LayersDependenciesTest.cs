@@ -1,42 +1,46 @@
 using System.Reflection;
-using BuddyLanguage.ChatGPTServiceLib;
 using BuddyLanguage.Domain.Services;
-using BuddyLanguage.TextToSpeech;
-using BuddyLanguage.WebApi.Controllers;
-using NetArchTest.Rules;
+using BuddyLanguage.Infrastructure;
+using BuddyLanguage.WebApi.Filters;
 using FluentAssertions;
+using NetArchTest.Rules;
 
 namespace BuddyLanguage.Architecture.Test;
 
 public class LayersDependenciesTest
 {
-    
     /// <summary>
     /// Перечень существующих сборок
     /// </summary>
-    private static readonly Assembly InfrastructureAssembly = typeof(ChatGPTService).Assembly;
-    private static readonly Assembly PresentationAssembly = typeof(RoleController).Assembly;
+    private static readonly Assembly InfrastructureAssembly = typeof(BuddyLanguageDependencyInjection).Assembly;
+    private static readonly Assembly PresentationWebApiAssembly = typeof(CentralizedExceptionHandlingFilter).Assembly;
     private static readonly Assembly DomainAssembly = typeof(RoleService).Assembly;
-    
+
     /// <summary>
-    /// Перечень существующих namespace
+    /// Gets перечень существующих namespace
     /// </summary>
-    private static string PresentationNamespace => PresentationAssembly.GetName().Name!;
+    private static string PresentationNamespace => PresentationWebApiAssembly.GetName().Name!;
+
     private static string DomainNamespace => DomainAssembly.GetName().Name!;
+
     private static string InfrastructureNamespace => InfrastructureAssembly.GetName().Name!;
 
     /// <summary>
     /// Определение всех Types доступных в проекте
     /// </summary>
+    // ReSharper disable once InconsistentNaming
+#pragma warning disable SA1201
     private static readonly Types Types =
-        Types.InAssemblies(new[] { 
-            InfrastructureAssembly, 
-            PresentationAssembly, 
-            DomainAssembly 
+#pragma warning restore SA1201
+        Types.InAssemblies(new[]
+        {
+            InfrastructureAssembly,
+            PresentationWebApiAssembly,
+            DomainAssembly
         });
-    
+
     [Fact]
-    public void domain_not_depends_on_presentation()
+    public void Domain_not_depends_on_presentation()
     {
         Types.That()
             .ResideInNamespace(DomainNamespace)
@@ -44,9 +48,9 @@ public class LayersDependenciesTest
             .GetResult().IsSuccessful
             .Should().BeTrue();
     }
-    
+
     [Fact]
-    public void domain_not_depends_on_infrastructure()
+    public void Domain_not_depends_on_infrastructure()
     {
         Types.That()
             .ResideInNamespace(DomainNamespace)
@@ -54,19 +58,19 @@ public class LayersDependenciesTest
             .GetResult().IsSuccessful
             .Should().BeTrue();
     }
-    
+
     [Fact]
-    public void presentation_depends_on_infrastructure()
+    public void Presentation_depends_on_domain()
     {
         Types.That()
             .ResideInNamespace(PresentationNamespace)
-            .Should().HaveDependencyOn(InfrastructureNamespace)
+            .Should().HaveDependencyOn(DomainNamespace)
             .GetResult().IsSuccessful
             .Should().BeTrue();
     }
-    
+
     [Fact]
-    public void infrastructure_depends_on_domain()
+    public void Infrastructure_depends_on_domain()
     {
         Types.That()
             .ResideInNamespace(InfrastructureNamespace)
@@ -74,9 +78,9 @@ public class LayersDependenciesTest
             .GetResult().IsSuccessful
             .Should().BeTrue();
     }
-    
+
     [Fact]
-    public void infrastructure_not_depends_on_presentation()
+    public void Infrastructure_not_depends_on_presentation()
     {
         Types.That()
             .ResideInNamespace(InfrastructureNamespace)
