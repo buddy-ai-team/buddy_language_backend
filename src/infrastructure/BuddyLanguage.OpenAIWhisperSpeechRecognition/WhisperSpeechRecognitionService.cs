@@ -29,12 +29,12 @@ namespace BuddyLanguage.OpenAIWhisperSpeechRecognitionService
                 .Audio
                 .CreateTranscription(
                     new AudioCreateTranscriptionRequest()
-                    {
-                        FileName = fileName,
-                        File = voiceMessage,
-                        Model = Models.WhisperV1,
-                        ResponseFormat = StaticValues.AudioStatics.ResponseFormat.VerboseJson
-                    },
+                {
+                    FileName = fileName,
+                    File = voiceMessage,
+                    Model = Models.WhisperV1,
+                    ResponseFormat = StaticValues.AudioStatics.ResponseFormat.VerboseJson
+                },
                     cancellationToken);
 
             if (!response.Successful)

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace BuddyLanguage.TextToSpeech
 {
-
     /// <summary>
     /// Implementation of the ITextToSpeech interface using Microsoft Azure Cognitive Services Text-to-Speech.
     /// </summary>
@@ -16,8 +15,9 @@ namespace BuddyLanguage.TextToSpeech
         private readonly AzureTTSConfig _config;
 
         /// <summary>
-        /// Initializes a new instance of the AzureTextToSpeech class.
+        /// Initializes a new instance of the <see cref="AzureTextToSpeech"/> class.
         /// </summary>
+        /// <param name="config">Configuration of AzureTTS</param>
         /// <param name="logger">The logger for logging messages.</param>
         public AzureTextToSpeech(IOptions<AzureTTSConfig> config, ILogger<AzureTextToSpeech> logger)
         {
@@ -57,14 +57,17 @@ namespace BuddyLanguage.TextToSpeech
                     var cancellation = SpeechSynthesisCancellationDetails.FromResult(resultTask);
                     if (cancellation.Reason == CancellationReason.Error)
                     {
-                        _logger.LogError("Speech synthesis error. ErrorCode={CancellationErrorCode}, ErrorDetails={CancellationErrorDetails}",
-                            cancellation.ErrorCode, cancellation.ErrorDetails);
+                        _logger.LogError(
+                            "Speech synthesis error. ErrorCode={CancellationErrorCode}, ErrorDetails={CancellationErrorDetails}",
+                            cancellation.ErrorCode,
+                            cancellation.ErrorDetails);
                     }
 
                     // TODO: throw SpeechSynthesyzingException
                     throw new InvalidOperationException($"Speech synthesis failed. " +
                                                         $"Error: {cancellation.ErrorCode} {cancellation.ErrorDetails}");
                 }
+
                 default:
                     // TODO: throw SpeechSynthesyzingException
                     throw new InvalidOperationException($"Speech synthesis failed. " +

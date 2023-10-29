@@ -66,7 +66,8 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [InlineData(new byte[0], "VoiceMessage.mp3")]
         [InlineData(null, null)]
         public async Task Whisper_service_rejects_files_with_incorrect_data(
-            byte[] bytes, string fileName)
+            byte[] bytes,
+            string fileName)
         {
             var service = new OpenAIService(new OpenAiOptions()
             {
@@ -87,7 +88,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         {
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
+                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new InvalidOperationException()
             });
             IOpenAIService openAIService = service;
             WhisperSpeechRecognitionService whisperService = new(openAIService);
