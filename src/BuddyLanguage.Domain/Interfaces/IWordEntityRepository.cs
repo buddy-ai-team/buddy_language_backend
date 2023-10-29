@@ -4,6 +4,6 @@ namespace BuddyLanguage.Domain.Interfaces
 {
     public interface IWordEntityRepository : IRepository<WordEntity>
     {
-        Task<IReadOnlyList<WordEntity>> GetWordsByAccountId(Guid accountId, CancellationToken cancellationToken);
+        Task<IReadOnlyList<WordEntity>> GetWordsByUserId(Guid accountId, CancellationToken cancellationToken);
     }
 }
