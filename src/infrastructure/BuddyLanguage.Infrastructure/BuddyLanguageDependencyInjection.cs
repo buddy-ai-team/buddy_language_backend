@@ -54,12 +54,17 @@ public static class BuddyLanguageDependencyInjection
         services.AddScoped<IWordEntityRepository, WordEntityRepositoryEf>();
         services.AddScoped<IUserRepository, UserRepositoryEf>();
         services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
+        
+        if (config is null || string.IsNullOrEmpty(config.ConnectionString))
+        {
+            throw new InvalidOperationException("MySqlConnectionStringOptions is missing or invalid in configuration.");
+        }
 
         services.AddDbContext<AppDbContext>(
-            optionsAction: options => options.UseMySql(config!.ConnectionString, mySqlServerVersion));
+            optionsAction: options => options.UseMySql(config.ConnectionString, mySqlServerVersion));
 
         services.AddChatGptEntityFrameworkIntegration(
-            op => op.UseMySql(config!.ConnectionString, mySqlServerVersion));
+            op => op.UseMySql(config.ConnectionString, mySqlServerVersion));
 
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
