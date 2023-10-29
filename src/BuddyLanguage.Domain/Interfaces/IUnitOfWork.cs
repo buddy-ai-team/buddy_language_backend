@@ -6,5 +6,7 @@ public interface IUnitOfWork
 
     IWordEntityRepository WordEntityRepository { get; }
 
+    IUserRepository UserRepository { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
