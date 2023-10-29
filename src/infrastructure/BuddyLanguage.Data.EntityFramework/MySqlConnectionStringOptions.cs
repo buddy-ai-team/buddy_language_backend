@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BuddyLanguage.Data.EntityFramework
 {
-    public class NpgsqlConnectionStringOptions
+    public class MySqlConnectionStringOptions
     {
         [Required]
         public string ConnectionString { get; set; } = null!;
