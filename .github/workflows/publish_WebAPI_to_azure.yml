@@ -22,7 +22,7 @@ name: Build and deploy WebAPI
 env:
   AZURE_WEBAPP_NAME: buddylanguage # set this to the name of your Azure Web App
   AZURE_WEBAPP_PACKAGE_PATH: './src/presentation/BuddyLanguage.WebApi' # set this to the path to your web app project, defaults to the repository root
-  DOTNET_VERSION: ${{ env.APP_DOTNET_VERSION }} # set this to the .NET Core version to use
+  DOTNET_VERSION: '${{ env.APP_DOTNET_VERSION }}' # set this to the .NET Core version to use
 
 on:
   push:
