@@ -24,6 +24,4 @@ app.UseSwaggerUI();
 
 app.MapControllers();
 
-app.MapGet("/lifecheck", () => "OK");
-
 app.Run();
