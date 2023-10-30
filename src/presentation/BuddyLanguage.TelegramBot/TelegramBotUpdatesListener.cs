@@ -1,5 +1,6 @@
 ﻿using BuddyLanguage.Domain.Services;
 using BuddyLanguage.TelegramBot.Commands;
+using OpenAI.ChatGpt.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -23,9 +24,12 @@ public class TelegramBotUpdatesListener : BackgroundService
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var options = new ReceiverOptions() { AllowedUpdates = Array.Empty<UpdateType>() };
+
+        var me = await _botClient.GetMeAsync(stoppingToken);
+        _logger.LogInformation("Start listening for @{BotName}", me.Username);
 
         // StartReceiving - Long Polling постоянно опрашивает сервера Telegram на предмет новых сообщений (на тредпуле)
         _botClient.StartReceiving(
@@ -33,7 +37,6 @@ public class TelegramBotUpdatesListener : BackgroundService
             pollingErrorHandler: ErrorHandler,
             options,
             cancellationToken: stoppingToken);
-        return Task.CompletedTask;
     }
 
     private Task SendTypingActionAsync(ChatId chatId)
@@ -48,12 +51,15 @@ public class TelegramBotUpdatesListener : BackgroundService
 
         //Chain of responsibility
         var commandHandler = botCommandHandlers.FirstOrDefault(handler => handler.CanHandleCommand(update));
+        _logger.LogInformation("Received update of type {UpdateType}", update.Type);
+        _logger.LogInformation("Command handler: {CommandHandler}", commandHandler?.GetType().Name);
+
         if (commandHandler != null && update.Message != null)
         {
             await SendTypingActionAsync(update.Message.Chat.Id); // Показываем, что робот печатает сообщение
-            await commandHandler.HandleAsync(update, cancellationToken);
             await _botClient.SendTextMessageAsync(
-                update.Message.Chat.Id, "Робот пишет...", cancellationToken: cancellationToken);
+                update.Message.Chat.Id, "Дай подумать...", cancellationToken: cancellationToken);
+            await commandHandler.HandleAsync(update, cancellationToken);
         }
         else
         {

@@ -32,8 +32,8 @@ namespace BuddyLanguage.Domain.Services
             ArgumentNullException.ThrowIfNull(user);
 
             // TODO User.NativeLanguage
-            var nativeLanguage = Language.English;
-            var learnedLanguage = Language.Russian;
+            var nativeLanguage = Language.Russian;
+            var learnedLanguage = Language.English;
 
             if (oggVoiceMessage.Length == 0)
             {
