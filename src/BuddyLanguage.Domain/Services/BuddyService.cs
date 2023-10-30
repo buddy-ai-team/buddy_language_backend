@@ -1,6 +1,5 @@
 ﻿using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Enumerations;
-using BuddyLanguage.Domain.Exceptions;
 using BuddyLanguage.Domain.Interfaces;
 
 namespace BuddyLanguage.Domain.Services
@@ -10,17 +9,21 @@ namespace BuddyLanguage.Domain.Services
         private readonly IChatGPTService _chatGPTService;
         private readonly ISpeechRecognitionService _speechRecognitionService;
         private readonly ITextToSpeech _textToSpeechService;
+        private readonly WordEntityService _wordService;
 
         public BuddyService(
             IChatGPTService chatGPTService,
             ISpeechRecognitionService speechRecognitionService,
-            ITextToSpeech textToSpeechService)
+            ITextToSpeech textToSpeechService,
+            WordEntityService wordService)
         {
             _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
             _speechRecognitionService = speechRecognitionService
                 ?? throw new ArgumentNullException(nameof(speechRecognitionService));
             _textToSpeechService = textToSpeechService
                 ?? throw new ArgumentNullException(nameof(textToSpeechService));
+            _wordService = wordService
+                ?? throw new ArgumentNullException(nameof(wordService));
         }
 
         public virtual async Task<(byte[] VoiceWavMessage, string Mistakes, string Words)>
@@ -35,17 +38,13 @@ namespace BuddyLanguage.Domain.Services
 
             var textMessage = await _speechRecognitionService.RecognizeSpeechToTextAsync(
                 voiceMessage, fileName, cancellationToken);
-            if (textMessage is null)
-            {
-                throw new InvalidSpeechRecognitionException(nameof(voiceMessage));
-            }
 
             var answerToQuestion = await Task.Run(() => GetAnswerToQuestion(textMessage, user.Id, cancellationToken));
             var mistakes = await Task.Run(() => GetGrammarMistakes(textMessage, cancellationToken));
             var learningWords = await Task.Run(() => GetLearningWords(textMessage, cancellationToken));
 
             var words = await ConvertStringToArray(learningWords, cancellationToken);
-            AddWordsToUser(words, user.Id, cancellationToken); 
+            await AddWordsToUser(words, user.Id, cancellationToken); 
 
             var voiceWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
                 answerToQuestion, Language.English, Voice.Male, cancellationToken);
@@ -53,7 +52,7 @@ namespace BuddyLanguage.Domain.Services
             return (voiceWavMessage, mistakes, learningWords);
         }
 
-        private void AddWordsToUser(string[] words, Guid userId, CancellationToken cancellationToken)
+        private async Task AddWordsToUser(string[] words, Guid userId, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(words);
             if (words.Length <= 0)
@@ -61,12 +60,10 @@ namespace BuddyLanguage.Domain.Services
                 throw new ArgumentException(nameof(words));
             }
 
-            foreach (var item in words)
-            {
-                WordEntity word = new WordEntity(
-                    Guid.Empty, userId, item, Language.English, WordEntityStatus.Learning);
-
-                //user.AddWord(word, cancellationToken);
+            foreach (var word in words)
+            {            
+                await _wordService.AddWord(
+                    userId, word, Language.English, WordEntityStatus.Learning, cancellationToken);
             }
         }
 
