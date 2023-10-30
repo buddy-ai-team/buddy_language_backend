@@ -8,15 +8,18 @@ namespace BuddyLanguage.Domain.Exceptions
         {
         }
 
-        public InvalidSpeechRecognitionException(string? message) : base(message)
+        public InvalidSpeechRecognitionException(string? message)
+            : base(message)
         {
         }
 
-        public InvalidSpeechRecognitionException(string? message, Exception? innerException) : base(message, innerException)
+        public InvalidSpeechRecognitionException(string? message, Exception? innerException)
+            : base(message, innerException)
         {
         }
 
-        protected InvalidSpeechRecognitionException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected InvalidSpeechRecognitionException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

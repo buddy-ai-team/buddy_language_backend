@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace BuddyLanguage.WebApi.Filters;
 
-public class CentralizedExceptionHandlingFilter 
+public class CentralizedExceptionHandlingFilter
     : Attribute, IExceptionFilter, IOrderedFilter
 {
     public int Order { get; set; }
@@ -20,7 +20,7 @@ public class CentralizedExceptionHandlingFilter
         {
             context.Result = new ObjectResult(new ErrorResponse(message, statusCode))
             {
-                StatusCode=(409)
+                StatusCode = 409
             };
             context.ExceptionHandled = true;
         }
@@ -37,5 +37,4 @@ public class CentralizedExceptionHandlingFilter
             _ => null
         };
     }
-    
 }

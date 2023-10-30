@@ -5,17 +5,18 @@ using Telegram.Bot;
 var builder = WebApplication.CreateBuilder(args);
 
 var token = builder.Configuration["BotConfiguration:BotToken"];
-if(string.IsNullOrEmpty(token))
+if (string.IsNullOrEmpty(token))
 {
     throw new InvalidOperationException("Telegram bot token is not set");
 }
+
 builder.Services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(token));
 builder.Services.AddHostedService<TelegramBotUpdatesListener>();
 
-builder.Services.AddSingleton<BotCommandHandler, StartCommandHandler>();
-builder.Services.AddSingleton<BotCommandHandler, SetBaseLanguageCommandHandler>();
-builder.Services.AddSingleton<BotCommandHandler, UserVoiceCommandHandler>();
-builder.Services.AddSingleton<BotCommandHandler, UserVoiceCommandHandler>();
+builder.Services.AddSingleton<IBotCommandHandler, StartCommandHandler>();
+builder.Services.AddSingleton<IBotCommandHandler, UnknownCommandHandler>();
+builder.Services.AddSingleton<IBotCommandHandler, UserVoiceCommandHandler>();
+builder.Services.AddSingleton<IBotCommandHandler, UserVoiceCommandHandler>();
 
 var app = builder.Build();
 

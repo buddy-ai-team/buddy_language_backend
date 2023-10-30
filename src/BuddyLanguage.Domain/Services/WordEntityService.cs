@@ -25,41 +25,52 @@ namespace BuddyLanguage.Domain.Services
             {
                 throw new WordEntityNotFoundException("Word with given id not found");
             }
-
+            
             return word;
         }
 
-        public virtual Task<IReadOnlyList<WordEntity>> GetWordsByAccountId(Guid accountId, CancellationToken cancellationToken)
+        public virtual Task<IReadOnlyList<WordEntity>> GetWordsByAccountId(Guid userId, CancellationToken cancellationToken)
         {
-            return _uow.WordEntityRepository.GetWordsByAccountId(accountId, cancellationToken);
+            return _uow.WordEntityRepository.GetWordsByUserId(userId, cancellationToken);
         }
 
-        public virtual async Task<WordEntity> UpdateWordEntityStatusById(Guid id, WordEntityStatus status, CancellationToken cancellationToken)
+        public virtual async Task<WordEntity> UpdateWordEntityById(
+            Guid id,
+            string word,
+            Language language,
+            WordEntityStatus status,
+            CancellationToken cancellationToken)
         {
-            var word = await _uow.WordEntityRepository.GetById(id, cancellationToken);
+            var wordVar = await _uow.WordEntityRepository.GetById(id, cancellationToken);
 
-            if (word is null)
+            if (wordVar is null)
             {
                 throw new WordEntityNotFoundException("Word with given id not found");
             }
 
-            word.WordStatus = status;
+            wordVar.Word = word;
+            wordVar.Language = language;
+            wordVar.WordStatus = status;
 
-            await _uow.WordEntityRepository.Update(word, cancellationToken);
+            await _uow.WordEntityRepository.Update(wordVar, cancellationToken);
             await _uow.SaveChangesAsync(cancellationToken);
-            return await _uow.WordEntityRepository.GetById(word.Id, cancellationToken);
+            return await _uow.WordEntityRepository.GetById(wordVar.Id, cancellationToken);
         }
 
-        public virtual async Task<WordEntity> AddWord(Guid accountId, string word, WordEntityStatus status, CancellationToken cancellationToken)
+        public virtual async Task<WordEntity> AddWord(
+            Guid accountId,
+            string word,
+            Language language,
+            WordEntityStatus status,
+            CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(word))
-                throw new WordEntityNameUndefinedException("Name of word was undefined");
+            ArgumentException.ThrowIfNullOrEmpty(word, nameof(word));   
 
-            var wordVar = new WordEntity(Guid.NewGuid(), accountId, word, status);
+            var wordVar = new WordEntity(Guid.NewGuid(), accountId, word, language, status);
 
             await _uow.WordEntityRepository.Add(wordVar, cancellationToken);
             await _uow.SaveChangesAsync(cancellationToken);
-            return await _uow.WordEntityRepository.GetById(wordVar.Id, cancellationToken);
+            return wordVar;
         }
     }
 }
