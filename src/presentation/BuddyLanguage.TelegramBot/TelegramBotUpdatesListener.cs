@@ -1,4 +1,5 @@
-﻿using BuddyLanguage.TelegramBot.Commands;
+﻿using BuddyLanguage.Domain.Services;
+using BuddyLanguage.TelegramBot.Commands;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -22,40 +23,50 @@ public class TelegramBotUpdatesListener : BackgroundService
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var options = new ReceiverOptions() { AllowedUpdates = Array.Empty<UpdateType>() };
+
         // StartReceiving - Long Polling постоянно опрашивает сервера Telegram на предмет новых сообщений (на тредпуле)
         _botClient.StartReceiving(
             updateHandler: UpdateHander,
             pollingErrorHandler: ErrorHandler,
             options,
-            cancellationToken: stoppingToken
-        );
+            cancellationToken: stoppingToken);
+        return Task.CompletedTask;
     }
 
-    private async Task UpdateHander(ITelegramBotClient _, Update update, CancellationToken cancellationToken)
+    private async Task SendTypingActionAsync(ChatId chatId)
+    {
+        await _botClient.SendChatActionAsync(chatId, ChatAction.Typing);
+        await Task.Delay(2000);
+    }
+
+    private async Task UpdateHander(ITelegramBotClient telegramBotClient, Update update, CancellationToken cancellationToken)
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var botCommandHandlers = scope.ServiceProvider.GetServices<BotCommandHandler>();
+        var botCommandHandlers = scope.ServiceProvider.GetServices<IBotCommandHandler>().ToArray();
+
         //Chain of responsibility
         var commandHandler = botCommandHandlers.FirstOrDefault(handler => handler.CanHandleCommand(update));
-        if (commandHandler != null)
+        if (commandHandler != null && update.Message != null)
         {
+            await SendTypingActionAsync(update.Message.Chat.Id); // Показываем, что робот печатает сообщение
             await commandHandler.HandleAsync(update, cancellationToken);
+            await _botClient.SendTextMessageAsync(update.Message.Chat.Id, "Робот пишет...");
         }
         else
         {
-			var unknownCommandHandler = _serviceProvider.GetRequiredService<UnknownCommandHandler>();
-			await unknownCommandHandler.HandleAsync(update, cancellationToken);
-		}
+            var unknownCommandHandler = botCommandHandlers.First(handler => handler is UnknownCommandHandler);
+            await unknownCommandHandler.HandleAsync(update, cancellationToken);
+        }
     }
 
-    private Task ErrorHandler(ITelegramBotClient _, Exception exception, CancellationToken cancellationToken)
+    private Task ErrorHandler(ITelegramBotClient telegramBotClient, Exception exception, CancellationToken cancellationToken)
     {
         _logger.LogError(exception, "Error in TelegramBotUpdatesListener");
         return Task.CompletedTask;
     }
 }
 
-public record User(string TelegramUserId); //TODO: заменить на реальную модель пользователя
+//public record User(string TelegramUserId);

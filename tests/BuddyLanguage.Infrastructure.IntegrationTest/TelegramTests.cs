@@ -19,7 +19,5 @@ public class TelegramTests
         // Act
         // Assert
         Assert.True(await botClient.TestApiAsync());
-        
-        
     }
 }
