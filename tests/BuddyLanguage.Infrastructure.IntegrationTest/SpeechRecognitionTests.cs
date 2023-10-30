@@ -29,7 +29,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
 
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new InvalidOperationException(),
+                ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
             });
 
             IOpenAIService openAIService = service;
@@ -48,7 +48,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
 
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new InvalidOperationException(),
+                ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
             });
 
             IOpenAIService openAIService = service;
@@ -71,7 +71,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         {
             var service = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new InvalidOperationException(),
+                ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
             });
 
             IOpenAIService openAIService = service;
@@ -94,6 +94,22 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
             WhisperSpeechRecognitionService whisperService = new(openAIService);
 
             whisperService.Should().BeAssignableTo<ISpeechRecognitionService>();
+        }
+
+        private string GetKeyFromEnvironment(string keyName)
+        {
+            if (keyName == null)
+            {
+                throw new ArgumentNullException(nameof(keyName));
+            }
+
+            var value = Environment.GetEnvironmentVariable(keyName);
+            if (value is null)
+            {
+                throw new InvalidOperationException($"{keyName} is not set as environment variable");
+            }
+
+            return value;
         }
     }
 }
