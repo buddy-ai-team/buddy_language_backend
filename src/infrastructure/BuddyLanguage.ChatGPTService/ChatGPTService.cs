@@ -1,9 +1,6 @@
-﻿using OpenAI.ChatGpt.AspNetCore;
+﻿using BuddyLanguage.Domain.Interfaces;
 using OpenAI.ChatGpt;
-using BuddyLanguage.Domain.Interfaces;
-using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
-using System.Threading.Channels;
-using System.Text;
+using OpenAI.ChatGpt.AspNetCore;
 
 namespace BuddyLanguage.ChatGPTServiceLib
 {
@@ -46,7 +43,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
             return answer;
         }
 
-        public async Task<string> GetAnswer(string  prompt, string userMessage, CancellationToken cancellationToken)
+        public async Task<string> GetAnswer(string prompt, string userMessage, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(prompt))
             {
@@ -64,6 +61,5 @@ namespace BuddyLanguage.ChatGPTServiceLib
 
             return answer;
         }
-
     }
 }

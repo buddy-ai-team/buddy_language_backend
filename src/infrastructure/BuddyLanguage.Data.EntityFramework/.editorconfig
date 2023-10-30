@@ -1,0 +1,4 @@
+# Exclude EntityFramework Migrations
+[Migrations/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none

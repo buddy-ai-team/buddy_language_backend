@@ -8,15 +8,18 @@ public class RoleAlreadyExistsException : DomainException
     {
     }
 
-    public RoleAlreadyExistsException(string? message) : base(message)
+    public RoleAlreadyExistsException(string? message)
+        : base(message)
     {
     }
 
-    public RoleAlreadyExistsException(string? message, Exception? innerException) : base(message, innerException)
+    public RoleAlreadyExistsException(string? message, Exception? innerException)
+        : base(message, innerException)
     {
     }
 
-    protected RoleAlreadyExistsException(SerializationInfo info, StreamingContext context) : base(info, context)
+    protected RoleAlreadyExistsException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
     {
     }
 }
