@@ -11,21 +11,17 @@ namespace BuddyLanguage.Domain.Services
         private readonly IChatGPTService _chatGPTService;
         private readonly ISpeechRecognitionService _speechRecognitionService;
         private readonly ITextToSpeech _textToSpeechService;
-        private readonly WordEntityService _wordService;
 
         public BuddyService(
             IChatGPTService chatGPTService,
             ISpeechRecognitionService speechRecognitionService,
-            ITextToSpeech textToSpeechService,
-            WordEntityService wordService)
+            ITextToSpeech textToSpeechService)
         {
             _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
             _speechRecognitionService = speechRecognitionService
                 ?? throw new ArgumentNullException(nameof(speechRecognitionService));
             _textToSpeechService = textToSpeechService
                 ?? throw new ArgumentNullException(nameof(textToSpeechService));
-            _wordService = wordService
-                ?? throw new ArgumentNullException(nameof(wordService));
         }
 
         public virtual async Task<(byte[] VoiceWavMessage, string Mistakes, string Words)>
@@ -49,8 +45,6 @@ namespace BuddyLanguage.Domain.Services
             var mistakes = await Task.Run(() => GetGrammaticalErrors(textMessage, cancellationToken));
             var learningWords = await Task.Run(() => GetLearningWords(textMessage, cancellationToken));
 
-            //await _wordService.AddWord(
-            //    user.Id, "слово", Language.English, WordEntityStatus.Learning, cancellationToken);
             var voiceWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
                 answerToQuestion, Language.English, Voice.Male, cancellationToken);
             if (voiceMessage is null)
@@ -96,7 +90,8 @@ namespace BuddyLanguage.Domain.Services
             var dictionary = new ConcurrentDictionary<string, string>();
             var russianWordsPropmt =
                 "Find Russian words in this text and write them in the following format: " +
-                "russian word - english translate";
+                "russian word english translate separated by dash. If there are no Russian words," +
+                "then write Good Job!";
             var learningWords = await _chatGPTService.GetAnswer(
                 russianWordsPropmt, textMessage, cancellationToken);
             if (learningWords is null)
