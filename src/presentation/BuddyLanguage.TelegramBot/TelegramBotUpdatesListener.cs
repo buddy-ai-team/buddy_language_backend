@@ -36,16 +36,15 @@ public class TelegramBotUpdatesListener : BackgroundService
         return Task.CompletedTask;
     }
 
-    private async Task SendTypingActionAsync(ChatId chatId)
-    {
-        await _botClient.SendChatActionAsync(chatId, ChatAction.Typing);
-        await Task.Delay(2000);
-    }
+    private Task SendTypingActionAsync(ChatId chatId)
+        => _botClient.SendChatActionAsync(chatId, ChatAction.Typing);
 
-    private async Task UpdateHander(ITelegramBotClient telegramBotClient, Update update, CancellationToken cancellationToken)
+    private async Task UpdateHander(
+        ITelegramBotClient telegramBotClient, Update update, CancellationToken cancellationToken)
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var botCommandHandlers = scope.ServiceProvider.GetServices<IBotCommandHandler>().ToArray();
+        var botCommandHandlers = scope.ServiceProvider
+            .GetServices<IBotCommandHandler>().ToArray();
 
         //Chain of responsibility
         var commandHandler = botCommandHandlers.FirstOrDefault(handler => handler.CanHandleCommand(update));
@@ -53,7 +52,8 @@ public class TelegramBotUpdatesListener : BackgroundService
         {
             await SendTypingActionAsync(update.Message.Chat.Id); // Показываем, что робот печатает сообщение
             await commandHandler.HandleAsync(update, cancellationToken);
-            await _botClient.SendTextMessageAsync(update.Message.Chat.Id, "Робот пишет...");
+            await _botClient.SendTextMessageAsync(
+                update.Message.Chat.Id, "Робот пишет...", cancellationToken: cancellationToken);
         }
         else
         {
@@ -62,7 +62,10 @@ public class TelegramBotUpdatesListener : BackgroundService
         }
     }
 
-    private Task ErrorHandler(ITelegramBotClient telegramBotClient, Exception exception, CancellationToken cancellationToken)
+    private Task ErrorHandler(
+        ITelegramBotClient telegramBotClient,
+        Exception exception,
+        CancellationToken cancellationToken)
     {
         _logger.LogError(exception, "Error in TelegramBotUpdatesListener");
         return Task.CompletedTask;
