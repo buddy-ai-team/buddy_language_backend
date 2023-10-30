@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using BuddyLanguage.Domain.Entities;
+﻿using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Exceptions;
 using BuddyLanguage.Domain.Interfaces;
@@ -45,6 +44,9 @@ namespace BuddyLanguage.Domain.Services
             var mistakes = await Task.Run(() => GetGrammaticalErrors(textMessage, cancellationToken));
             var learningWords = await Task.Run(() => GetLearningWords(textMessage, cancellationToken));
 
+            var words = await ConvertStringToArray(learningWords, cancellationToken);
+            AddWordsToUser(words, user, cancellationToken); 
+
             var voiceWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
                 answerToQuestion, Language.English, Voice.Male, cancellationToken);
             if (voiceMessage is null)
@@ -55,11 +57,29 @@ namespace BuddyLanguage.Domain.Services
             return (voiceWavMessage, mistakes, learningWords);
         }
 
+        private void AddWordsToUser(string[] words, User user, CancellationToken cancellationToken)
+        {
+            ArgumentNullException.ThrowIfNull(user);
+            ArgumentNullException.ThrowIfNull(words);
+            if (words.Length <= 0)
+            {
+                throw new ArgumentException(nameof(words));
+            }
+
+            foreach (var item in words)
+            {
+                WordEntity word = new WordEntity(
+                    Guid.Empty, user.Id, item, Language.English, WordEntityStatus.Learning);
+
+                //user.AddWord(word, cancellationToken);
+            }
+        }
+
         private async Task<string> GetAnswerToQuestion(string textMessage, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
-            var answerPrompt = "Answer the question in English";
-            var answerToQuestion = await _chatGPTService.GetAnswer(textMessage, answerPrompt, cancellationToken);
+            var prompt = "Answer the question in English";
+            var answerToQuestion = await _chatGPTService.GetAnswer(textMessage, prompt, cancellationToken);
             if (answerToQuestion is null)
             {
                 throw new ArgumentNullException(nameof(answerToQuestion));
@@ -71,11 +91,11 @@ namespace BuddyLanguage.Domain.Services
         private async Task<string> GetGrammaticalErrors(string textMessage, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
-            var grammaPropmt =
+            var prompt =
                 "Find grammatical errors in this text.Write the rules for these " +
                 "grammatical errors.";
             var answerOfGramma = await _chatGPTService.GetAnswer(
-                grammaPropmt, textMessage, cancellationToken);
+                prompt, textMessage, cancellationToken);
             if (answerOfGramma is null)
             {
                 throw new ArgumentNullException(nameof(answerOfGramma));
@@ -87,19 +107,34 @@ namespace BuddyLanguage.Domain.Services
         private async Task<string> GetLearningWords(string textMessage, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
-            var dictionary = new ConcurrentDictionary<string, string>();
-            var russianWordsPropmt =
+            var prompt =
                 "Find Russian words in this text and write them in the following format: " +
                 "russian word english translate separated by dash. If there are no Russian words," +
                 "then write Good Job!";
             var learningWords = await _chatGPTService.GetAnswer(
-                russianWordsPropmt, textMessage, cancellationToken);
+                prompt, textMessage, cancellationToken);
             if (learningWords is null)
             {
                 throw new ArgumentNullException(nameof(learningWords));
             }
 
             return learningWords;
+        }
+
+        private async Task<string[]> ConvertStringToArray(string textMessage, CancellationToken cancellationToken)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(textMessage);
+            var prompt =
+                "Leave only English words from this text and separate them with a comma";
+            var englishWords = await _chatGPTService.GetAnswer(
+                prompt, textMessage, cancellationToken);
+            if (englishWords is null)
+            {
+                throw new ArgumentNullException(nameof(englishWords));
+            }
+
+            var words = englishWords.Split(' ');
+            return words;
         }
     }
 }
