@@ -1,11 +1,14 @@
+using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
 using BuddyLanguage.TelegramBot.Commands;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddApplicationServices(builder.Configuration);
+
 var token = builder.Configuration["BotConfiguration:BotToken"];
-if (string.IsNullOrEmpty(token))
+if (string.IsNullOrWhiteSpace(token))
 {
     throw new InvalidOperationException("Telegram bot token is not set");
 }
@@ -13,10 +16,10 @@ if (string.IsNullOrEmpty(token))
 builder.Services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(token));
 builder.Services.AddHostedService<TelegramBotUpdatesListener>();
 
-builder.Services.AddSingleton<IBotCommandHandler, StartCommandHandler>();
-builder.Services.AddSingleton<IBotCommandHandler, UnknownCommandHandler>();
-builder.Services.AddSingleton<IBotCommandHandler, UserVoiceCommandHandler>();
-builder.Services.AddSingleton<IBotCommandHandler, UserVoiceCommandHandler>();
+builder.Services.AddScoped<IBotCommandHandler, StartCommandHandler>();
+builder.Services.AddScoped<IBotCommandHandler, UnknownCommandHandler>();
+builder.Services.AddScoped<IBotCommandHandler, UserVoiceCommandHandler>();
+builder.Services.AddScoped<IBotCommandHandler, UserVoiceCommandHandler>();
 
 var app = builder.Build();
 

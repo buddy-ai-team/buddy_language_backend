@@ -8,7 +8,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //Domain and Infrastructure services
-builder.Services.AddServiceCollection(builder.Configuration);
+builder.Services.AddApplicationServices(builder.Configuration);
 
 //Filters
 builder.Services.AddControllers(options =>

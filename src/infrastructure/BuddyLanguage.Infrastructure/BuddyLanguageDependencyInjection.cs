@@ -8,6 +8,7 @@ using BuddyLanguage.TextToSpeech;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenAI.ChatGpt.EntityFrameworkCore;
 using OpenAI.ChatGpt.EntityFrameworkCore.Extensions;
 using OpenAI.Extensions;
 
@@ -15,7 +16,7 @@ namespace BuddyLanguage.Infrastructure;
 
 public static class BuddyLanguageDependencyInjection
 {
-    public static IServiceCollection AddServiceCollection(
+    public static IServiceCollection AddApplicationServices(
         this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -54,7 +55,7 @@ public static class BuddyLanguageDependencyInjection
         services.AddScoped<IWordEntityRepository, WordEntityRepositoryEf>();
         services.AddScoped<IUserRepository, UserRepositoryEf>();
         services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
-        
+
         if (config is null || string.IsNullOrEmpty(config.ConnectionString))
         {
             throw new InvalidOperationException("MySqlConnectionStringOptions is missing or invalid in configuration.");
@@ -63,20 +64,29 @@ public static class BuddyLanguageDependencyInjection
         services.AddDbContext<AppDbContext>(
             optionsAction: options => options.UseMySql(config.ConnectionString, mySqlServerVersion));
 
+        services.AddDbContext<ChatGptDbContextTmp>(
+            options => options.UseMySql(config.ConnectionString, mySqlServerVersion));
+
         services.AddChatGptEntityFrameworkIntegration(
-            op => op.UseMySql(config.ConnectionString, mySqlServerVersion));
+            op => op.UseMySql(
+                config.ConnectionString,
+                mySqlServerVersion,
+                builder =>
+                {
+                    builder.MigrationsAssembly(typeof(ChatGptDbContext).Assembly.FullName);
+                }));
 
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
         services.AddOpenAIService(
         settings =>
         {
-            settings.ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")
-                              ?? throw new InvalidOperationException(
+            settings.ApiKey = configuration["OPENAI_API_KEY"] ?? throw new InvalidOperationException(
                                   "OPENAI_API_KEY environment variable is not set");
         });
 
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
+        services.AddScoped<ITextToSpeech, AzureTextToSpeech>();
 
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
@@ -89,6 +99,7 @@ public static class BuddyLanguageDependencyInjection
         services.AddScoped<RoleService>();
         services.AddScoped<WordEntityService>();
         services.AddScoped<UserService>();
+        services.AddScoped<BuddyService>();
 
         return services;
     }

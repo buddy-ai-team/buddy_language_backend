@@ -18,29 +18,29 @@ namespace BuddyLanguage.Domain.Services
         }
 
         public virtual async Task<User> TryRegister(
-            string firstName,
-            string lastName,
+            string? firstName,
+            string? lastName,
             string telegramId,
             CancellationToken cancellationToken)
         {
-            ArgumentException.ThrowIfNullOrEmpty(firstName, nameof(firstName));
-            ArgumentException.ThrowIfNullOrEmpty(lastName, nameof(lastName));
             ArgumentException.ThrowIfNullOrEmpty(telegramId, nameof(telegramId));
 
             try
             {
                 await _uow.UserRepository.GetUserByTelegramId(telegramId, cancellationToken);
             }
-            catch (UserNotFoundException)
+
+            //TODO: FIX
+            catch (InvalidOperationException)
             {
-                var user = new User(Guid.NewGuid(), firstName, lastName, telegramId);
+                var user = new User(Guid.NewGuid(), firstName ?? string.Empty, lastName ?? string.Empty, telegramId);
 
                 await _uow.UserRepository.Add(user, cancellationToken);
                 await _uow.SaveChangesAsync(cancellationToken);
                 return user;
             }
 
-            return await _uow.UserRepository.GetUserByTelegramId(telegramId, cancellationToken); 
+            return await _uow.UserRepository.GetUserByTelegramId(telegramId, cancellationToken);
         }
 
         public virtual async Task<User> GetUserById(Guid id, CancellationToken cancellationToken)
@@ -72,7 +72,7 @@ namespace BuddyLanguage.Domain.Services
         public virtual async Task<User> UpdateUserById(
             Guid id,
             string firstName,
-            string lastName, 
+            string lastName,
             string telegramId,
             CancellationToken cancellationToken)
         {
@@ -97,7 +97,7 @@ namespace BuddyLanguage.Domain.Services
         }
 
         public virtual async Task<User> AddUser(
-            string firstName, 
+            string firstName,
             string lastName,
             string telegramId,
             CancellationToken cancellationToken)

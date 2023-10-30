@@ -11,11 +11,13 @@ public class StartCommandHandler : IBotCommandHandler
 {
     private readonly ITelegramBotClient _botClient;
     private readonly UserService _userService;
+    private readonly ILogger<StartCommandHandler> _logger;
 
-    public StartCommandHandler(ITelegramBotClient botClient, UserService userService)
+    public StartCommandHandler(ITelegramBotClient botClient, UserService userService, ILogger<StartCommandHandler> logger)
     {
         _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public string Command => "/start";
@@ -34,6 +36,11 @@ public class StartCommandHandler : IBotCommandHandler
 
             if (messageText == "/start")
             {
+                _logger.LogInformation(
+                    "Received /start command from {TelegramId} ({FirstName} {LastName})",
+                    telegramId,
+                    firstName,
+                    lastName);
                 var user = await _userService.TryRegister(firstName, lastName, telegramId, cancellationToken);
 
                 if (user != null)
@@ -48,12 +55,12 @@ public class StartCommandHandler : IBotCommandHandler
 
                     // TODO: Отправка первого аудиосообщения от бота
                     /*var welcomeBytes = await AzureTextToSpeech.TextToWavByteArrayAsync(welcomeMessage, Domain.Enumerations.Language.Russian, Domain.Enumerations.Voice.Female, cancellationToken: cancellationToken);*/
-                    
-                    using var memoryStream = new MemoryStream();
-                    await _botClient.SendVoiceAsync(
-                    chatId: telegramId,
-                    voice: InputFile.FromStream(memoryStream, "answer.ogg"),
-                    cancellationToken: cancellationToken);
+
+                    // using var memoryStream = new MemoryStream();
+                    // await _botClient.SendVoiceAsync(
+                    // chatId: telegramId,
+                    // voice: InputFile.FromStream(memoryStream, "answer.ogg"),
+                    // cancellationToken: cancellationToken);
                 }
             }
 

@@ -8,25 +8,10 @@
 
         public User(Guid id, string firstName, string lastName, string telegramId)
         {
-            if (string.IsNullOrWhiteSpace(firstName))
-            {
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(firstName));
-            }
-
-            if (string.IsNullOrWhiteSpace(lastName))
-            {
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(lastName));
-            }
-
-            if (string.IsNullOrWhiteSpace(telegramId))
-            {
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(telegramId));
-            }
-
             Id = id;
-            _firstName = firstName;
-            _lastName = lastName;
-            _telegramId = telegramId;
+            _firstName = firstName ?? throw new ArgumentNullException(nameof(firstName));
+            _lastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
+            _telegramId = telegramId ?? throw new ArgumentNullException(nameof(telegramId));
             WordEntities = new List<WordEntity>();
         }
 
