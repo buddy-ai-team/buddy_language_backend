@@ -40,26 +40,21 @@ namespace BuddyLanguage.Domain.Services
                 throw new InvalidSpeechRecognitionException(nameof(voiceMessage));
             }
 
-            var answerToQuestion = await Task.Run(() => GetAnswerToQuestion(textMessage, cancellationToken));
-            var mistakes = await Task.Run(() => GetGrammaticalErrors(textMessage, cancellationToken));
+            var answerToQuestion = await Task.Run(() => GetAnswerToQuestion(textMessage, user.Id, cancellationToken));
+            var mistakes = await Task.Run(() => GetGrammarMistakes(textMessage, cancellationToken));
             var learningWords = await Task.Run(() => GetLearningWords(textMessage, cancellationToken));
 
             var words = await ConvertStringToArray(learningWords, cancellationToken);
-            AddWordsToUser(words, user, cancellationToken); 
+            AddWordsToUser(words, user.Id, cancellationToken); 
 
             var voiceWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
                 answerToQuestion, Language.English, Voice.Male, cancellationToken);
-            if (voiceMessage is null)
-            {
-                throw new InvalidTextToSpeechException(nameof(voiceMessage)); 
-            }
 
             return (voiceWavMessage, mistakes, learningWords);
         }
 
-        private void AddWordsToUser(string[] words, User user, CancellationToken cancellationToken)
+        private void AddWordsToUser(string[] words, Guid userId, CancellationToken cancellationToken)
         {
-            ArgumentNullException.ThrowIfNull(user);
             ArgumentNullException.ThrowIfNull(words);
             if (words.Length <= 0)
             {
@@ -69,17 +64,16 @@ namespace BuddyLanguage.Domain.Services
             foreach (var item in words)
             {
                 WordEntity word = new WordEntity(
-                    Guid.Empty, user.Id, item, Language.English, WordEntityStatus.Learning);
+                    Guid.Empty, userId, item, Language.English, WordEntityStatus.Learning);
 
                 //user.AddWord(word, cancellationToken);
             }
         }
 
-        private async Task<string> GetAnswerToQuestion(string textMessage, CancellationToken cancellationToken)
+        private async Task<string> GetAnswerToQuestion(string textMessage, Guid userId, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
-            var prompt = "Answer the question in English";
-            var answerToQuestion = await _chatGPTService.GetAnswer(textMessage, prompt, cancellationToken);
+            var answerToQuestion = await _chatGPTService.GetAnswerOnTopic(textMessage, userId, cancellationToken);
             if (answerToQuestion is null)
             {
                 throw new ArgumentNullException(nameof(answerToQuestion));
@@ -88,7 +82,7 @@ namespace BuddyLanguage.Domain.Services
             return answerToQuestion;
         }
 
-        private async Task<string> GetGrammaticalErrors(string textMessage, CancellationToken cancellationToken)
+        private async Task<string> GetGrammarMistakes(string textMessage, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
             var prompt =
