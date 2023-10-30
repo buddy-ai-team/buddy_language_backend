@@ -37,14 +37,16 @@ public static class BuddyLanguageDependencyInjection
             .ValidateOnStart();
 
         // Definition of database file name and connection of it as a service
-        services.AddOptions<NpgsqlConnectionStringOptions>()
-            .BindConfiguration("NpgsqlConnectionStringOptions")
+        services.AddOptions<MySqlConnectionStringOptions>()
+            .BindConfiguration("MySqlConnectionStringOptions")
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
         var config = configuration
-            .GetRequiredSection("NpgsqlConnectionStringOptions")
-            .Get<NpgsqlConnectionStringOptions>();
+            .GetRequiredSection("MySqlConnectionStringOptions")
+            .Get<MySqlConnectionStringOptions>();
+
+        var mySqlServerVersion = new MySqlServerVersion(new Version(8, 0));
 
         // Подключение репозитория для работы с Ролями
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
@@ -52,12 +54,17 @@ public static class BuddyLanguageDependencyInjection
         services.AddScoped<IWordEntityRepository, WordEntityRepositoryEf>();
         services.AddScoped<IUserRepository, UserRepositoryEf>();
         services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
+        
+        if (config is null || string.IsNullOrEmpty(config.ConnectionString))
+        {
+            throw new InvalidOperationException("MySqlConnectionStringOptions is missing or invalid in configuration.");
+        }
 
         services.AddDbContext<AppDbContext>(
-            optionsAction: options => options.UseNpgsql(config!.ConnectionString));
+            optionsAction: options => options.UseMySql(config.ConnectionString, mySqlServerVersion));
 
         services.AddChatGptEntityFrameworkIntegration(
-            op => op.UseNpgsql(config!.ConnectionString));
+            op => op.UseMySql(config.ConnectionString, mySqlServerVersion));
 
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
