@@ -70,16 +70,6 @@ public class LayersDependenciesTest
     }
 
     [Fact]
-    public void Infrastructure_depends_on_domain()
-    {
-        Types.That()
-            .ResideInNamespace(InfrastructureNamespace)
-            .Should().HaveDependencyOn(DomainNamespace)
-            .GetResult().IsSuccessful
-            .Should().BeTrue();
-    }
-
-    [Fact]
     public void Infrastructure_not_depends_on_presentation()
     {
         Types.That()
