@@ -66,6 +66,12 @@ namespace BuddyLanguage.Domain.Services
             return (voiceWavMessage, mistakes, learningWords);
         }
 
+        public Task ResetTopic(User user, CancellationToken cancellationToken)
+        {
+            ArgumentNullException.ThrowIfNull(user);
+            return _chatGPTService.ResetTopic(user.Id, cancellationToken);
+        }
+
         private async Task AddWordsToUser(string[] words, Guid userId, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(words);

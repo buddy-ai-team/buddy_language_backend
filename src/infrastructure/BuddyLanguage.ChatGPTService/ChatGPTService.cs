@@ -61,5 +61,11 @@ namespace BuddyLanguage.ChatGPTServiceLib
 
             return answer;
         }
+
+        public async Task ResetTopic(Guid userId, CancellationToken cancellationToken)
+        {
+            ChatGPT chatGpt = await _chatGptFactory.Create(userId.ToString(), cancellationToken: cancellationToken);
+            await chatGpt.StartNewTopic(cancellationToken: cancellationToken);
+        }
     }
 }
