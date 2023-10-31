@@ -4,6 +4,8 @@ using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using static BuddyLanguage.Domain.Enumerations.Language;
+using static BuddyLanguage.Domain.Enumerations.Voice;
 
 namespace BuddyLanguage.TextToSpeech
 {
@@ -49,7 +51,6 @@ namespace BuddyLanguage.TextToSpeech
             using var speechSynthesizer = new SpeechSynthesizer(speechConfig, null);
 
             var result = await speechSynthesizer.SpeakTextAsync(text).WaitAsync(cancellationToken);
-
             switch (result.Reason)
             {
                 case ResultReason.SynthesizingAudioCompleted:
@@ -91,10 +92,10 @@ namespace BuddyLanguage.TextToSpeech
 
             string voiceName = (language, voice) switch
             {
-                (Language.Russian, Voice.Female) => "ru-RU-SvetlanaNeural",
-                (Language.Russian, Voice.Male) => "ru-RU-DmitryNeural",
-                (Language.English, Voice.Female) => "en-US-JennyNeural",
-                (Language.English, Voice.Male) => "en-US-GuyNeural",
+                (Russian, Female) => "ru-RU-SvetlanaNeural",
+                (Russian, Male) => "ru-RU-DmitryNeural",
+                (English, Female) => "en-US-JennyNeural",
+                (English, Male) => "en-US-GuyNeural",
                 _ => throw new NotSupportedException("The Language/Voice You Provided Is Not Currently Supported By Our Project!")
             };
 

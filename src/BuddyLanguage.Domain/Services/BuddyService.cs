@@ -1,6 +1,7 @@
 ﻿using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BuddyLanguage.Domain.Services
 {
@@ -10,12 +11,14 @@ namespace BuddyLanguage.Domain.Services
         private readonly ISpeechRecognitionService _speechRecognitionService;
         private readonly ITextToSpeech _textToSpeechService;
         private readonly WordEntityService _wordService;
+        private readonly ILogger<BuddyService> _logger;
 
         public BuddyService(
             IChatGPTService chatGPTService,
             ISpeechRecognitionService speechRecognitionService,
             ITextToSpeech textToSpeechService,
-            WordEntityService wordService)
+            WordEntityService wordService,
+            ILogger<BuddyService> logger)
         {
             _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
             _speechRecognitionService = speechRecognitionService
@@ -24,6 +27,7 @@ namespace BuddyLanguage.Domain.Services
                 ?? throw new ArgumentNullException(nameof(textToSpeechService));
             _wordService = wordService
                 ?? throw new ArgumentNullException(nameof(wordService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public virtual async Task<(byte[] VoiceWavMessage, string Mistakes, string Words)>
@@ -42,11 +46,16 @@ namespace BuddyLanguage.Domain.Services
 
             var textMessage = await _speechRecognitionService.RecognizeSpeechToTextAsync(
                 oggVoiceMessage, "voice.ogg", cancellationToken);
+            _logger.LogDebug("Recognized text: {TextMessage}", textMessage);
 
             // TODO(Khristina): сделать выполнение параллельным
             var assistantAnswer = await GetAssistantAnswer(textMessage, user.Id, cancellationToken);
             var mistakes = await GetGrammarMistakes(textMessage, nativeLanguage,  learnedLanguage, cancellationToken);
             var learningWords = await GetLearningWords(textMessage, cancellationToken);
+
+            _logger.LogDebug("Assistant answer: {AssistantAnswer}", assistantAnswer);
+            _logger.LogDebug("Grammar mistakes: {Mistakes}", mistakes);
+            _logger.LogDebug("Learning words: {LearningWords}", learningWords);
 
             var words = await ConvertStringToArray(learningWords, cancellationToken);
             await AddWordsToUser(words, user.Id, cancellationToken);
