@@ -36,3 +36,11 @@ var app = builder.Build();
 app.MapGet("/", () => "Hello World!");
 
 app.Run();
+
+/// <summary>
+/// Dummy class to make WebApplication.CreateBuilder() work
+/// </summary>
+// ReSharper disable once ClassNeverInstantiated.Global
+public partial class Program
+{
+}

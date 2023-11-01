@@ -12,6 +12,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{9BBF7E54-7319-4B7E-8D7E-0F371F7EF0DD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{29BBBC3B-7154-4E97-8CE0-82567911AFC0}"
+	ProjectSection(SolutionItems) = preProject
+		tests\Directory.Build.props = tests\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Data.EntityFramework", "src\infrastructure\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj", "{F28A298E-E7C8-4733-83C8-69CB918DB734}"
 EndProject
@@ -42,6 +45,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configs", "configs", "{1202
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.TelegramBot", "src\presentation\BuddyLanguage.TelegramBot\BuddyLanguage.TelegramBot.csproj", "{ED529C28-1A3A-41FF-9485-0218F55D47C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.TelegramBot.IntegrationTest", "tests\BuddyLanguage.TelegramBot.IntegrationTest\BuddyLanguage.TelegramBot.IntegrationTest.csproj", "{6CC5E47B-C9C1-4278-9075-E411464E773C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +100,10 @@ Global
 		{ED529C28-1A3A-41FF-9485-0218F55D47C3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{41B8D7D8-A562-4E59-92BE-800B880247E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{41B8D7D8-A562-4E59-92BE-800B880247E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CC5E47B-C9C1-4278-9075-E411464E773C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CC5E47B-C9C1-4278-9075-E411464E773C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CC5E47B-C9C1-4278-9075-E411464E773C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CC5E47B-C9C1-4278-9075-E411464E773C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,6 +123,7 @@ Global
 		{4D262B1C-28C3-42B2-B449-9C683A87A44D} = {9BBF7E54-7319-4B7E-8D7E-0F371F7EF0DD}
 		{ED529C28-1A3A-41FF-9485-0218F55D47C3} = {1824C987-16E5-4AA7-86EB-680D58B6A5C6}
 		{41B8D7D8-A562-4E59-92BE-800B880247E4} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
+		{6CC5E47B-C9C1-4278-9075-E411464E773C} = {29BBBC3B-7154-4E97-8CE0-82567911AFC0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EA996F8-4CC9-4CE0-98C9-1833EAF2E957}
