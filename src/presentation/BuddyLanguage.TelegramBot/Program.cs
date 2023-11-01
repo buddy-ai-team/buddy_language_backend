@@ -19,7 +19,13 @@ if (string.IsNullOrWhiteSpace(token))
 builder.Services.AddSingleton(new TelegramBotClientOptions(token));
 
 // TODO Implement Polly after update to .NET 8: https://github.com/dotnet/docs/blob/main/docs/core/resilience/http-resilience.md
-builder.Services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(token));
+builder.Services.AddHttpClient("TelegramBotClient");
+builder.Services.AddSingleton<ITelegramBotClient>(provider =>
+{
+    IHttpClientFactory factory = provider.GetRequiredService<IHttpClientFactory>();
+    HttpClient client = factory.CreateClient("TelegramBotClient");
+    return new TelegramBotClient(token, client);
+});
 
 builder.Services.AddSingleton<BotUserStateService>();
 
