@@ -1,6 +1,9 @@
 ﻿using BuddyLanguage.Domain.Interfaces;
+using Microsoft.Extensions.Options;
 using OpenAI.ChatGpt;
 using OpenAI.ChatGpt.AspNetCore;
+using OpenAI.ChatGpt.Models;
+using OpenAI.ChatGpt.Models.ChatCompletion;
 
 namespace BuddyLanguage.ChatGPTServiceLib
 {
@@ -8,21 +11,29 @@ namespace BuddyLanguage.ChatGPTServiceLib
     {
         private readonly ChatGPTFactory _chatGptFactory;
         private readonly IOpenAiClient _openAiClient;
+        private readonly ChatGPTConfig _config; // TODO ChatGPTModelsConfig
+        private readonly string _model = ChatCompletionModels.Gpt4;
 
-        public ChatGPTService(ChatGPTFactory chatGptFactory, IOpenAiClient openAiClient)
+        public ChatGPTService(
+            ChatGPTFactory chatGptFactory,
+            IOpenAiClient openAiClient,
+            IOptionsSnapshot<ChatGPTConfig> chatgptOptions)
         {
+            ArgumentNullException.ThrowIfNull(chatgptOptions);
             _chatGptFactory = chatGptFactory ?? throw new ArgumentNullException(nameof(chatGptFactory));
             _openAiClient = openAiClient ?? throw new ArgumentNullException(nameof(openAiClient));
+            _config = chatgptOptions.Value ??
+                      throw new ArgumentNullException($"{nameof(chatgptOptions)}.{nameof(chatgptOptions.Value)}");
         }
 
         public async Task<string> GetAnswerOnTopic(string userMessage, Guid userId, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(userMessage))
-            {
-                throw new ArgumentException($"\"{nameof(userMessage)}\" it cannot be indefinite or empty.", nameof(userMessage));
-            }
-
-            ChatGPT chatGpt = await _chatGptFactory.Create(userId.ToString(), cancellationToken: cancellationToken);
+            ArgumentException.ThrowIfNullOrEmpty(userMessage);
+            _config.Model = _model; // TODO fix
+            ChatGPT chatGpt = await _chatGptFactory.Create(
+                userId.ToString(),
+                _config,
+                cancellationToken: cancellationToken);
             var chatService = await chatGpt.ContinueOrStartNewTopic(cancellationToken);
             var answer = await chatService.GetNextMessageResponse(userMessage, cancellationToken);
 
@@ -57,7 +68,10 @@ namespace BuddyLanguage.ChatGPTServiceLib
 
             var dialog = Dialog.StartAsSystem(prompt).ThenUser(userMessage);
 
-            var answer = await _openAiClient.GetChatCompletions(dialog, cancellationToken: cancellationToken);
+            var answer = await _openAiClient.GetChatCompletions(
+                dialog,
+                model: _config.Model ?? ChatCompletionModels.Gpt3_5_Turbo_16k,
+                cancellationToken: cancellationToken);
 
             return answer;
         }

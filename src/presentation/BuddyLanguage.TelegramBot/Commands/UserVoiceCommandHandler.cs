@@ -37,7 +37,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         }
 
         await _botClient.SendTextMessageAsync(
-            update.Message!.Chat.Id, "Дай подумать...", cancellationToken: cancellationToken);
+            update.Message!.Chat.Id, "Thinking...", cancellationToken: cancellationToken);
 
         var user = await _userService.GetUserByTelegramId(telegramUserId, cancellationToken);
 
