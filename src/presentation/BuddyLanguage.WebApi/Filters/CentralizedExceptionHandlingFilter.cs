@@ -4,6 +4,8 @@ using BuddyLanguage.Domain.Exceptions.Role;
 using BuddyLanguage.HttpModels.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Sentry;
+using Serilog;
 
 namespace BuddyLanguage.WebApi.Filters;
 
@@ -18,6 +20,9 @@ public class CentralizedExceptionHandlingFilter
         HttpStatusCode statusCode = HttpStatusCode.Conflict;
         if (message != null)
         {
+            Log.Logger.Error(context.Exception, "An error occurred in the application");
+            SentrySdk.CaptureException(context.Exception);
+
             context.Result = new ObjectResult(new ErrorResponse(message, statusCode))
             {
                 StatusCode = 409

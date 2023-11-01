@@ -2,6 +2,8 @@
 using BuddyLanguage.TelegramBot.Commands;
 using BuddyLanguage.TelegramBot.Services;
 using OpenAI.ChatGpt.Interfaces;
+using Sentry;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -12,18 +14,15 @@ namespace BuddyLanguage.TelegramBot;
 public class TelegramBotUpdatesListener : BackgroundService
 {
     private readonly ITelegramBotClient _botClient;
-    private readonly ILogger<TelegramBotUpdatesListener> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly BotUserStateService _userStateService;
 
     public TelegramBotUpdatesListener(
         ITelegramBotClient telegramBotClient,
-        ILogger<TelegramBotUpdatesListener> logger,
         IServiceProvider serviceProvider,
         BotUserStateService userStateService)
     {
         _botClient = telegramBotClient ?? throw new ArgumentNullException(nameof(telegramBotClient));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _userStateService = userStateService ?? throw new ArgumentNullException(nameof(userStateService));
     }
@@ -33,7 +32,7 @@ public class TelegramBotUpdatesListener : BackgroundService
         var options = new ReceiverOptions() { AllowedUpdates = Array.Empty<UpdateType>() };
 
         var me = await _botClient.GetMeAsync(stoppingToken);
-        _logger.LogInformation("Start listening for @{BotName}", me.Username);
+        Log.Logger.Information("Start listening for @{BotName}", me.Username);
 
         // StartReceiving - Long Polling постоянно опрашивает сервера Telegram на предмет новых сообщений (на тредпуле)
         _botClient.StartReceiving(
@@ -59,7 +58,7 @@ public class TelegramBotUpdatesListener : BackgroundService
         }
         else if (update.Type != UpdateType.Message)
         {
-            _logger.LogInformation("Received update of unsupported type {UpdateType}", update.Type);
+            Log.Logger.Information("Received update of unsupported type {UpdateType}", update.Type);
             return;
         }
 
@@ -69,8 +68,8 @@ public class TelegramBotUpdatesListener : BackgroundService
 
         //Chain of responsibility
         var commandHandler = botCommandHandlers.FirstOrDefault(handler => handler.CanHandleCommand(update));
-        _logger.LogInformation("Received update of type {UpdateType}", update.Type);
-        _logger.LogInformation("Command handler: {CommandHandler}", commandHandler?.GetType().Name);
+        Log.Logger.Information("Received update of type {UpdateType}", update.Type);
+        Log.Logger.Information("Command handler: {CommandHandler}", commandHandler?.GetType().Name);
 
         if (commandHandler != null && update.Message != null)
         {
@@ -129,7 +128,8 @@ public class TelegramBotUpdatesListener : BackgroundService
         Exception exception,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "Error in TelegramBotUpdatesListener");
+        Log.Logger.Error(exception, "Error in TelegramBotUpdatesListener");
+        SentrySdk.CaptureException(exception);
         return Task.CompletedTask;
     }
 }

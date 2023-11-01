@@ -1,4 +1,5 @@
 ﻿using BuddyLanguage.Domain.Services;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -8,13 +9,11 @@ public class StartCommandHandler : IBotCommandHandler
 {
     private readonly ITelegramBotClient _botClient;
     private readonly UserService _userService;
-    private readonly ILogger<StartCommandHandler> _logger;
 
-    public StartCommandHandler(ITelegramBotClient botClient, UserService userService, ILogger<StartCommandHandler> logger)
+    public StartCommandHandler(ITelegramBotClient botClient, UserService userService)
     {
         _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public string Command => "/start";
@@ -29,7 +28,7 @@ public class StartCommandHandler : IBotCommandHandler
             var lastName = message.From.LastName ?? string.Empty; // Присваиваем пустую строку, если lastName равно null
             bool isRegistered = false; // Переменная для проверки регистрации пользователя
 
-            _logger.LogInformation(
+            Log.Logger.Information(
                 "Run start command for {TelegramId} ({FirstName} {LastName})",
                 telegramId,
                 firstName,
