@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 namespace BuddyLanguage.TelegramBot.Services;
 
-public class BotUserStateService
+public class TelegramUserRepository
 {
     private const string CorrectPassword = "112";
 

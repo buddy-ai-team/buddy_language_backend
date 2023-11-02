@@ -15,16 +15,16 @@ public class TelegramBotUpdatesListener : BackgroundService
 {
     private readonly ITelegramBotClient _botClient;
     private readonly IServiceProvider _serviceProvider;
-    private readonly BotUserStateService _userStateService;
+    private readonly TelegramUserRepository _telegramUserRepository;
 
     public TelegramBotUpdatesListener(
         ITelegramBotClient telegramBotClient,
         IServiceProvider serviceProvider,
-        BotUserStateService userStateService)
+        TelegramUserRepository telegramUserRepository)
     {
         _botClient = telegramBotClient ?? throw new ArgumentNullException(nameof(telegramBotClient));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        _userStateService = userStateService ?? throw new ArgumentNullException(nameof(userStateService));
+        _telegramUserRepository = telegramUserRepository ?? throw new ArgumentNullException(nameof(telegramUserRepository));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -87,15 +87,15 @@ public class TelegramBotUpdatesListener : BackgroundService
     {
         // TODO: to commands
         var telegramId = message.From!.Id;
-        if (_userStateService.IsAuthenticated(telegramId))
+        if (_telegramUserRepository.IsAuthenticated(telegramId))
         {
             return true;
         }
 
-        if (_userStateService.GetUserState(telegramId) == UserBotStates.AccessPassword
+        if (_telegramUserRepository.GetUserState(telegramId) == UserBotStates.AccessPassword
             && message.Text is { } password)
         {
-            if (!_userStateService.VerifyPasswordAndUpdateState(telegramId, password))
+            if (!_telegramUserRepository.VerifyPasswordAndUpdateState(telegramId, password))
             {
                 await _botClient.SendTextMessageAsync(
                     message.Chat.Id,
@@ -118,7 +118,7 @@ public class TelegramBotUpdatesListener : BackgroundService
             message.Chat.Id,
             "Вы не авторизованы. Пожалуйста, авторизуйтесь.\nВведите пароль:",
             cancellationToken: cancellationToken);
-        _userStateService.SetUserState(message.From.Id, UserBotStates.AccessPassword);
+        _telegramUserRepository.SetUserState(message.From.Id, UserBotStates.AccessPassword);
 
         return false;
     }

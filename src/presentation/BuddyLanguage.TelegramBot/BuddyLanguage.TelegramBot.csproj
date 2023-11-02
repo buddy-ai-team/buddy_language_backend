@@ -28,7 +28,7 @@
 
     <ItemGroup>
       <Compile Update="Services\UserBotStates.cs">
-        <DependentUpon>BotUserStateService.cs</DependentUpon>
+        <DependentUpon>TelegramUserRepository.cs</DependentUpon>
       </Compile>
     </ItemGroup>
 
