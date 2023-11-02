@@ -1,4 +1,5 @@
 ﻿using BuddyLanguage.Domain.Services;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using User = BuddyLanguage.Domain.Entities.User;
@@ -25,14 +26,22 @@ public class ResetTopicCommand : IBotCommandHandler
 
     public async Task HandleAsync(Update update, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(update);
-        if (update.Message is { From: not null } message)
+        try
         {
-            var telegramId = message.From.Id.ToString();
-            User user = await _userService.GetUserByTelegramId(telegramId, cancellationToken);
-            await _buddyService.ResetTopic(user, cancellationToken);
-            await _botClient.SendTextMessageAsync(
-                message.Chat.Id, "Тема сброшена", cancellationToken: cancellationToken);
+            ArgumentNullException.ThrowIfNull(update);
+            if (update.Message is { From: not null } message)
+            {
+                var telegramId = message.From.Id.ToString();
+                User user = await _userService.GetUserByTelegramId(telegramId, cancellationToken);
+                await _buddyService.ResetTopic(user, cancellationToken);
+                Log.Logger.Information("Reset topic for user {TelegramId}", telegramId);
+                await _botClient.SendTextMessageAsync(
+                    message.Chat.Id, "Тема сброшена", cancellationToken: cancellationToken);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, "Error in ResetTopicCommand: {ErrorMessage}", ex.Message);
         }
     }
 }

@@ -27,7 +27,7 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.Sentry(o =>
     {
-        o.Dsn = "https://70228ed8115b87d41a3cf0c17896d3bd@o4506146415837184.ingest.sentry.io/4506146476654592";
+        o.Dsn = builder.Configuration["Sentry:Dsn"];
         o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
         o.MinimumEventLevel = LogEventLevel.Error;
     })
