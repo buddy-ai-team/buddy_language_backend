@@ -4,6 +4,7 @@ using OpenAI.ChatGpt;
 using OpenAI.ChatGpt.AspNetCore;
 using OpenAI.ChatGpt.Models;
 using OpenAI.ChatGpt.Models.ChatCompletion;
+using OpenAI.ChatGpt.Modules.StructuredResponse;
 
 namespace BuddyLanguage.ChatGPTServiceLib
 {
@@ -12,7 +13,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
         private readonly ChatGPTFactory _chatGptFactory;
         private readonly IOpenAiClient _openAiClient;
         private readonly ChatGPTConfig _config; // TODO ChatGPTModelsConfig
-        private readonly string _model = ChatCompletionModels.Gpt3_5_Turbo;
+        private readonly string _model = ChatCompletionModels.Gpt4;
 
         public ChatGPTService(
             ChatGPTFactory chatGptFactory,
@@ -70,10 +71,21 @@ namespace BuddyLanguage.ChatGPTServiceLib
 
             var answer = await _openAiClient.GetChatCompletions(
                 dialog,
-                model: _config.Model ?? ChatCompletionModels.Gpt3_5_Turbo_16k,
+                model: _model,
                 cancellationToken: cancellationToken);
 
             return answer;
+        }
+
+        public Task<TResult> GetStructuredAnswer<TResult>(
+            string prompt, string userMessage, CancellationToken cancellationToken)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(prompt);
+            ArgumentException.ThrowIfNullOrEmpty(userMessage);
+
+            var dialog = Dialog.StartAsSystem(prompt).ThenUser(userMessage);
+            return _openAiClient.GetStructuredResponse<TResult>(
+                dialog, model: _model, cancellationToken: cancellationToken);
         }
 
         public async Task ResetTopic(Guid userId, CancellationToken cancellationToken)

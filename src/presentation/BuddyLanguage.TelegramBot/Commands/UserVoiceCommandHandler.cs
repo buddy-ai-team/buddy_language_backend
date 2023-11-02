@@ -64,19 +64,27 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                 var (answerBytes, mistakes, words) =
                     await _buddyService.ProcessUserMessage(user, voiceMessage, cancellationToken);
 
-                using var memoryStream = new MemoryStream(answerBytes); // доделать
+                using var memoryStream = new MemoryStream(answerBytes);
                 await _botClient.SendVoiceAsync(
                     chatId: update.Message.Chat.Id,
                     voice: InputFile.FromStream(memoryStream, "answer.ogg"),
                     cancellationToken: cancellationToken);
-                await _botClient.SendTextMessageAsync(
-                    chatId: update.Message.Chat.Id,
-                    text: $"Ваши ошибки: {mistakes}",
-                    cancellationToken: cancellationToken);
-                await _botClient.SendTextMessageAsync(
-                    chatId: update.Message.Chat.Id,
-                    text: $"Слова на изучение: {words}",
-                    cancellationToken: cancellationToken);
+
+                if (mistakes != null)
+                {
+                    await _botClient.SendTextMessageAsync(
+                        chatId: update.Message.Chat.Id,
+                        text: $"Ваши ошибки: {mistakes}",
+                        cancellationToken: cancellationToken);
+                }
+
+                if (words != null)
+                {
+                    await _botClient.SendTextMessageAsync(
+                        chatId: update.Message.Chat.Id,
+                        text: $"Слова на изучение: {words}",
+                        cancellationToken: cancellationToken);
+                }
             }
             else
             {

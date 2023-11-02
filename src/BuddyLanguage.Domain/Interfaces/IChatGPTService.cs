@@ -34,6 +34,9 @@ namespace BuddyLanguage.Domain.Interfaces
         /// <returns>Ответ на сообщение пользователя.</returns>
         Task<string> GetAnswer(string prompt, string userMessage, CancellationToken cancellationToken);
 
+        Task<TResult> GetStructuredAnswer<TResult>(
+            string prompt, string userMessage, CancellationToken cancellationToken);
+
         Task ResetTopic(Guid userId, CancellationToken cancellationToken);
     }
 }
