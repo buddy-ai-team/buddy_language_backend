@@ -61,8 +61,15 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
                 var voiceMessage = voiceStream.ToArray();
 
-                var (answerBytes, mistakes, words) =
+                var (recognizedMessage,  answerText, answerBytes, mistakes, words) =
                     await _buddyService.ProcessUserMessage(user, voiceMessage, cancellationToken);
+
+                await _botClient.SendTextMessageAsync(
+                    update.Message.Chat.Id,
+                    $"Recognized: \n```{recognizedMessage}```",
+                    cancellationToken: cancellationToken);
+                await _botClient.SendTextMessageAsync(
+                    update.Message.Chat.Id, answerText, cancellationToken: cancellationToken);
 
                 using var memoryStream = new MemoryStream(answerBytes);
                 await _botClient.SendVoiceAsync(

@@ -31,7 +31,12 @@ namespace BuddyLanguage.Domain.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public virtual async Task<(byte[] VoiceWavMessage, string? Mistakes, string? Words)>
+        public virtual async Task<(
+                string RecognizedMessage,
+                string BotAnswerMessage,
+                byte[] BotAnswerWavMessage,
+                string? Mistakes,
+                string? Words)>
             ProcessUserMessage(User user, byte[] oggVoiceMessage, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(user);
@@ -49,6 +54,11 @@ namespace BuddyLanguage.Domain.Services
                 oggVoiceMessage, "voice.ogg", cancellationToken);
             _logger.LogWarning("Recognized text: {TextMessage}", userMessage);
 
+            if (string.IsNullOrWhiteSpace(userMessage))
+            {
+                throw new InvalidOperationException("Can`t recognize user message");
+            }
+
             // TODO(Khristina): сделать выполнение параллельным
             var assistantAnswer = await ContinueDialogAndGetAnswer(userMessage, user.Id, cancellationToken);
             var mistakes = await FindGrammarMistakes(userMessage, nativeLanguage,  learnedLanguage, cancellationToken);
@@ -59,11 +69,11 @@ namespace BuddyLanguage.Domain.Services
             _logger.LogDebug("Studied words: {LearningWords}", studiedWords);
 
             //TODO AddWordsToUser
-            var voiceWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
+            var botAnswerWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
                 assistantAnswer, learnedLanguage, Voice.Male, cancellationToken);
 
             var mistakesText = mistakes.MistakesCount > 0 ? mistakes.ToString() : null;
-            return (voiceWavMessage, mistakesText, studiedWords);
+            return (userMessage, assistantAnswer, botAnswerWavMessage, mistakesText, studiedWords);
         }
 
         public async Task<string> ContinueDialogAndGetAnswer(
@@ -97,7 +107,7 @@ namespace BuddyLanguage.Domain.Services
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
 
             //TODO(Khristina): прокинуть языки в промпт
-            var prompt = "This text may contain Russian words. If it is: how many Russian words does this text contain and what are them? Your answer has to be formed strictly in the provided format.";
+            var prompt = "This text may contain Russian words. If it is: how many Russian words does this text contain and what are them?";
             var answer = await _chatGPTService.GetStructuredAnswer<StudiedWordsAnswer>(
                 prompt, textMessage, cancellationToken);
 
