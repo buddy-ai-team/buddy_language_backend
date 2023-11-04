@@ -15,9 +15,9 @@ namespace BuddyLanguage.WebApi.Controllers;
 [ApiController]
 public class WordEntityController : ControllerBase
 {
-    private readonly WordEntityService _wordService;
+    private readonly WordService _wordService;
 
-    public WordEntityController(WordEntityService wordService)
+    public WordEntityController(WordService wordService)
     {
         _wordService = wordService ?? throw new ArgumentNullException(nameof(wordService));
     }

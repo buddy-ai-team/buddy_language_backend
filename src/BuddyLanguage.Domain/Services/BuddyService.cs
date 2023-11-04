@@ -11,14 +11,14 @@ namespace BuddyLanguage.Domain.Services
         private readonly IChatGPTService _chatGPTService;
         private readonly ISpeechRecognitionService _speechRecognitionService;
         private readonly ITextToSpeech _textToSpeechService;
-        private readonly WordEntityService _wordService;
+        private readonly IWordService _wordService;
         private readonly ILogger<BuddyService> _logger;
 
         public BuddyService(
             IChatGPTService chatGPTService,
             ISpeechRecognitionService speechRecognitionService,
             ITextToSpeech textToSpeechService,
-            WordEntityService wordService,
+            IWordService wordService,
             ILogger<BuddyService> logger)
         {
             _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
@@ -31,7 +31,12 @@ namespace BuddyLanguage.Domain.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public virtual async Task<(byte[] VoiceWavMessage, string? Mistakes, string? Words)>
+        public virtual async Task<(
+                string RecognizedMessage,
+                string BotAnswerMessage,
+                byte[] BotAnswerWavMessage,
+                string? Mistakes,
+                string? Words)>
             ProcessUserMessage(User user, byte[] oggVoiceMessage, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(user);
@@ -47,22 +52,66 @@ namespace BuddyLanguage.Domain.Services
 
             var userMessage = await _speechRecognitionService.RecognizeSpeechToTextAsync(
                 oggVoiceMessage, "voice.ogg", cancellationToken);
-            _logger.LogDebug("Recognized text: {TextMessage}", userMessage);
+            _logger.LogWarning("Recognized text: {TextMessage}", userMessage);
+
+            if (string.IsNullOrWhiteSpace(userMessage))
+            {
+                throw new InvalidOperationException("Can`t recognize user message");
+            }
 
             // TODO(Khristina): сделать выполнение параллельным
-            var assistantAnswer = await GetAssistantAnswer(userMessage, user.Id, cancellationToken);
+            var assistantAnswer = await ContinueDialogAndGetAnswer(userMessage, user.Id, cancellationToken);
             var mistakes = await FindGrammarMistakes(userMessage, nativeLanguage,  learnedLanguage, cancellationToken);
-            var learningWords = await FindLearningWords(userMessage, cancellationToken);
+            var studiedWords = await FindLearningWords(userMessage, cancellationToken);
 
             _logger.LogDebug("Assistant answer: {AssistantAnswer}", assistantAnswer);
-            _logger.LogDebug("Grammar mistakes: {Mistakes}", mistakes);
-            _logger.LogDebug("Learning words: {LearningWords}", learningWords);
+            _logger.LogDebug("Grammar mistakes: {@Mistakes}", mistakes);
+            _logger.LogDebug("Studied words: {LearningWords}", studiedWords);
 
             //TODO AddWordsToUser
-            var voiceWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
+            var botAnswerWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
                 assistantAnswer, learnedLanguage, Voice.Male, cancellationToken);
 
-            return (voiceWavMessage, mistakes, learningWords);
+            var mistakesText = mistakes.MistakesCount > 0 ? mistakes.ToString() : null;
+            return (userMessage, assistantAnswer, botAnswerWavMessage, mistakesText, studiedWords);
+        }
+
+        public async Task<string> ContinueDialogAndGetAnswer(
+            string textMessage, Guid userId, CancellationToken cancellationToken)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(textMessage);
+            var answerToQuestion = await _chatGPTService.GetAnswerOnTopic(
+                textMessage, userId, cancellationToken);
+
+            return answerToQuestion;
+        }
+
+        public async Task<MistakesAnswer> FindGrammarMistakes(
+            string textMessage,
+            Language nativeLanguage,
+            Language learnedLanguage,
+            CancellationToken cancellationToken)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(textMessage);
+            var prompt = $"Here is a text in {learnedLanguage} language." +
+                         "Find grammar mistakes in this text. Write the rules for these " +
+                         $"grammar mistakes. Answer in {nativeLanguage}.";
+            var mistakes = await _chatGPTService.GetStructuredAnswer<MistakesAnswer>(
+                prompt, textMessage, cancellationToken);
+
+            return mistakes;
+        }
+
+        public async Task<string?> FindLearningWords(string textMessage, CancellationToken cancellationToken)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(textMessage);
+
+            //TODO(Khristina): прокинуть языки в промпт
+            var prompt = "This text may contain Russian words. If it is: how many Russian words does this text contain and what are them?";
+            var answer = await _chatGPTService.GetStructuredAnswer<StudiedWordsAnswer>(
+                prompt, textMessage, cancellationToken);
+
+            return answer.WordsCount > 0 ? answer.ToString() : null;
         }
 
         public Task ResetTopic(User user, CancellationToken cancellationToken)
@@ -85,44 +134,6 @@ namespace BuddyLanguage.Domain.Services
                 await _wordService.AddWord(
                     userId, word, Language.English, WordEntityStatus.Learning, cancellationToken);
             }
-        }
-
-        private async Task<string> GetAssistantAnswer(
-            string textMessage, Guid userId, CancellationToken cancellationToken)
-        {
-            ArgumentException.ThrowIfNullOrEmpty(textMessage);
-            var answerToQuestion = await _chatGPTService.GetAnswerOnTopic(
-                textMessage, userId, cancellationToken);
-
-            return answerToQuestion;
-        }
-
-        private async Task<string?> FindGrammarMistakes(
-            string textMessage,
-            Language nativeLanguage,
-            Language learnedLanguage,
-            CancellationToken cancellationToken)
-        {
-            ArgumentException.ThrowIfNullOrEmpty(textMessage);
-            var prompt = $"Here is a text in {learnedLanguage} language." +
-                         "Find grammar mistakes in this text. Write the rules for these " +
-                         $"grammar mistakes. Answer in {nativeLanguage}.";
-            var mistakes = await _chatGPTService.GetStructuredAnswer<MistakesAnswer>(
-                prompt, textMessage, cancellationToken);
-
-            return mistakes.MistakesCount > 0 ? mistakes.ToString() : null;
-        }
-
-        private async Task<string?> FindLearningWords(string textMessage, CancellationToken cancellationToken)
-        {
-            ArgumentException.ThrowIfNullOrEmpty(textMessage);
-
-            //TODO(Khristina): прокинуть языки в промпт
-            var prompt = "Find all Russian words in this text and write them.";
-            var answer = await _chatGPTService.GetStructuredAnswer<StudiedWordsAnswer>(
-                prompt, textMessage, cancellationToken);
-
-            return answer.WordsCount > 0 ? answer.ToString() : null;
         }
 
         private async Task<string[]> ConvertStringToArray(string textMessage, CancellationToken cancellationToken)

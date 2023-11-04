@@ -42,8 +42,16 @@ public class TelegramBotUpdatesListener : BackgroundService
             cancellationToken: stoppingToken);
     }
 
-    private Task SendTypingActionAsync(ChatId chatId)
-        => _botClient.SendChatActionAsync(chatId, ChatAction.Typing);
+    private async Task SendDelayedTypingActionAsync(ChatId chatId, CancellationToken ctsTypingToken)
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(200), ctsTypingToken);
+        while (!ctsTypingToken.IsCancellationRequested)
+        {
+            await _botClient.SendChatActionAsync(
+                chatId, ChatAction.Typing, cancellationToken: ctsTypingToken);
+            await Task.Delay(TimeSpan.FromSeconds(3), ctsTypingToken);
+        }
+    }
 
     private async Task UpdateHander(
         ITelegramBotClient telegramBotClient, Update update, CancellationToken cancellationToken)
@@ -73,8 +81,22 @@ public class TelegramBotUpdatesListener : BackgroundService
 
         if (commandHandler != null && update.Message != null)
         {
-            await SendTypingActionAsync(update.Message.Chat.Id); // Показываем, что робот печатает сообщение
-            await commandHandler.HandleAsync(update, cancellationToken);
+            var ctsTyping = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _ = SendDelayedTypingActionAsync(update.Message.Chat.Id, ctsTyping.Token); // Показываем, что робот печатает сообщение
+            try
+            {
+                await commandHandler.HandleAsync(update, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error in command handler {CommandHandler}", commandHandler.GetType().Name);
+                await telegramBotClient.SendTextMessageAsync(
+                    update.Message.Chat.Id,
+                    $"Произошла ошибка: \n```{e.Message}\n{e.StackTrace}```",
+                    cancellationToken: cancellationToken);
+            }
+
+            ctsTyping.Cancel();
         }
         else
         {

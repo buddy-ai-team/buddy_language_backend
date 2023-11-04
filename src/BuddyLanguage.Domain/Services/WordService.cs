@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 
 namespace BuddyLanguage.Domain.Services
 {
-    public class WordEntityService
+    public class WordService : IWordService
     {
-        private readonly ILogger<WordEntityService> _logger;
+        private readonly ILogger<WordService> _logger;
         private readonly IUnitOfWork _uow;
 
-        public WordEntityService(IUnitOfWork uow, ILogger<WordEntityService> logger)
+        public WordService(IUnitOfWork uow, ILogger<WordService> logger)
         {
             _uow = uow ?? throw new ArgumentNullException(nameof(uow));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -25,7 +25,7 @@ namespace BuddyLanguage.Domain.Services
             {
                 throw new WordEntityNotFoundException("Word with given id not found");
             }
-            
+
             return word;
         }
 
@@ -64,7 +64,7 @@ namespace BuddyLanguage.Domain.Services
             WordEntityStatus status,
             CancellationToken cancellationToken)
         {
-            ArgumentException.ThrowIfNullOrEmpty(word, nameof(word));   
+            ArgumentException.ThrowIfNullOrEmpty(word, nameof(word));
 
             var wordVar = new WordEntity(Guid.NewGuid(), accountId, word, language, status);
 

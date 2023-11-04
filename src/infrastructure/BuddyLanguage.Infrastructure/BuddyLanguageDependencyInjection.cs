@@ -97,7 +97,7 @@ public static class BuddyLanguageDependencyInjection
         this IServiceCollection services)
     {
         services.AddScoped<RoleService>();
-        services.AddScoped<WordEntityService>();
+        services.AddScoped<IWordService, WordService>();
         services.AddScoped<UserService>();
         services.AddScoped<BuddyService>();
 
