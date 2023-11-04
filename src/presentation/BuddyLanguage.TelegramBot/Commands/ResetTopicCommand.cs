@@ -10,15 +10,18 @@ public class ResetTopicCommand : IBotCommandHandler
 {
     private readonly ITelegramBotClient _botClient;
     private readonly UserService _userService;
+    private readonly ILogger<ResetTopicCommand> _logger;
     private readonly BuddyService _buddyService;
 
     public ResetTopicCommand(
         ITelegramBotClient botClient,
         UserService userService,
+        ILogger<ResetTopicCommand> logger,
         BuddyService buddyService)
     {
         _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _buddyService = buddyService ?? throw new ArgumentNullException(nameof(buddyService));
     }
 
@@ -26,22 +29,14 @@ public class ResetTopicCommand : IBotCommandHandler
 
     public async Task HandleAsync(Update update, CancellationToken cancellationToken)
     {
-        try
+        ArgumentNullException.ThrowIfNull(update);
+        if (update.Message is { From: not null } message)
         {
-            ArgumentNullException.ThrowIfNull(update);
-            if (update.Message is { From: not null } message)
-            {
-                var telegramId = message.From.Id.ToString();
-                User user = await _userService.GetUserByTelegramId(telegramId, cancellationToken);
-                await _buddyService.ResetTopic(user, cancellationToken);
-                Log.Logger.Information("Reset topic for user {TelegramId}", telegramId);
-                await _botClient.SendTextMessageAsync(
-                    message.Chat.Id, "Тема сброшена", cancellationToken: cancellationToken);
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Error(ex, "Error in ResetTopicCommand: {ErrorMessage}", ex.Message);
+            var telegramId = message.From.Id.ToString();
+            User user = await _userService.GetUserByTelegramId(telegramId, cancellationToken);
+            await _buddyService.ResetTopic(user, cancellationToken);
+            await _botClient.SendTextMessageAsync(
+            message.Chat.Id, "Тема сброшена", cancellationToken: cancellationToken);
         }
     }
 }

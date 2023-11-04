@@ -20,9 +20,6 @@ public class CentralizedExceptionHandlingFilter
         HttpStatusCode statusCode = HttpStatusCode.Conflict;
         if (message != null)
         {
-            Log.Logger.Error(context.Exception, "An error occurred in the application");
-            SentrySdk.CaptureException(context.Exception);
-
             context.Result = new ObjectResult(new ErrorResponse(message, statusCode))
             {
                 StatusCode = 409

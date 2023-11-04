@@ -1,26 +1,13 @@
 using System;
 using BuddyLanguage.Infrastructure;
 using BuddyLanguage.WebApi.Filters;
+using Sentry;
 using Sentry.AspNetCore;
 using Serilog;
 using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Swagger Setup
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-//Domain and Infrastructure services
-builder.Services.AddApplicationServices(builder.Configuration);
-
-//Filters
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<CentralizedExceptionHandlingFilter>(order: 1);
-});
-
-// Setup Serilog and Sentry
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .MinimumLevel.Debug()
@@ -33,14 +20,36 @@ Log.Logger = new LoggerConfiguration()
     })
     .CreateLogger();
 
-builder.Host.UseSerilog();
+builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration).WriteTo.Console());
 
-var app = builder.Build();
+builder.WebHost.UseSentry();
 
-//Swagger Build
-app.UseSwagger();
-app.UseSwaggerUI();
+try
+{
+    //Swagger Setup
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
 
-app.MapControllers();
+    //Domain and Infrastructure services
+    builder.Services.AddApplicationServices(builder.Configuration);
 
-app.Run();
+    //Filters
+    builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<CentralizedExceptionHandlingFilter>(order: 1);
+    });
+
+    var app = builder.Build();
+
+    //Swagger Build
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
+    app.MapControllers();
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Error(ex, "An unhandled exception occurred.");
+}

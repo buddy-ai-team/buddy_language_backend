@@ -24,65 +24,29 @@ public class RoleController : ControllerBase
     [HttpGet("id")]
     public async Task<ActionResult<RoleResponse>> GetRoleById(RoleByIdRequest roleByIdRequest, CancellationToken cancellationToken)
     {
-        try
-        {
-            var role = await _roleService.GetRoleById(roleByIdRequest.Id, cancellationToken);
-            var resp = new RoleResponse(role.Id, role.Name, role.Prompt);
-            return resp;
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Error(ex, "An error occurred in GetRoleById");
-            SentrySdk.CaptureException(ex);
-            return StatusCode(500, "Internal Server Error");
-        }
+        var role = await _roleService.GetRoleById(roleByIdRequest.Id, cancellationToken);
+        var resp = new RoleResponse(role.Id, role.Name, role.Prompt);
+        return resp;
     }
 
     [HttpPost("update")]
     public async Task<ActionResult<UpdateRoleResponse>> UpdateRole(UpdateRoleRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var role = await _roleService.ChangePromptByRoleId(request.Id, request.Name, request.Prompt, cancellationToken);
-            return new UpdateRoleResponse(role.Id, role.Name, role.Prompt);
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Error(ex, "An error occurred when changing the role");
-            SentrySdk.CaptureException(ex);
-            return StatusCode(500, "Internal Server Error");
-        }
+        var role = await _roleService.ChangePromptByRoleId(request.Id, request.Name, request.Prompt, cancellationToken);
+        return new UpdateRoleResponse(role.Id, role.Name, role.Prompt);
     }
 
     [HttpGet("all")]
     public async Task<ActionResult<Role[]>> GetAllRoles(CancellationToken cancellationToken)
     {
-        try
-        {
-            var products = await _roleService.GetAll(cancellationToken);
-            return Ok(products);
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Error(ex, "An error occurred while getting all the roles");
-            SentrySdk.CaptureException(ex);
-            return StatusCode(500, "Internal Server Error");
-        }
+        var products = await _roleService.GetAll(cancellationToken);
+        return Ok(products);
     }
 
     [HttpPost("add")]
     public async Task<ActionResult<UpdateRoleResponse>> AddRole(AddRoleRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var role = await _roleService.AddRole(request.Name, request.Prompt, cancellationToken);
-            return new UpdateRoleResponse(role.Id, role.Name, role.Prompt);
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Error(ex, "An error occurred while adding a role");
-            SentrySdk.CaptureException(ex);
-            return StatusCode(500, "Internal Server Error");
-        }
+        var role = await _roleService.AddRole(request.Name, request.Prompt, cancellationToken);
+        return new UpdateRoleResponse(role.Id, role.Name, role.Prompt);
     }
 }
