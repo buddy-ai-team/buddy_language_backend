@@ -69,8 +69,9 @@ namespace BuddyLanguage.Domain.Services
             _logger.LogDebug("Studied words: {LearningWords}", studiedWords);
 
             //TODO AddWordsToUser
+            //TODO Make the bot grab the voice parameters/language/speed from user preferences
             var botAnswerWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
-                assistantAnswer, learnedLanguage, Voice.Male, cancellationToken);
+                assistantAnswer, learnedLanguage, Voice.Male, TtsSpeed.Medium, cancellationToken);
 
             var mistakesText = mistakes.MistakesCount > 0 ? mistakes.ToString() : null;
             return (userMessage, assistantAnswer, botAnswerWavMessage, mistakesText, studiedWords);

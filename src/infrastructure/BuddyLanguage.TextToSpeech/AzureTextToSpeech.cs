@@ -1,4 +1,5 @@
 ﻿using BuddyLanguage.Domain.Enumerations;
+using BuddyLanguage.Domain.Exceptions.TTS;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
@@ -34,13 +35,12 @@ namespace BuddyLanguage.TextToSpeech
         /// <param name="text">The text to be synthesized into speech.</param>
         /// <param name="language">The language of the voice.</param>
         /// <param name="voice">The desired voice for synthesis.</param>
+        /// <param name="speed">The desired voice speed for synthesis.</param>
         /// <param name="cancellationToken">A CancellationToken for possible cancellation of the operation.</param>
         /// <returns>A byte array containing the synthesized audio.</returns>
-        public async Task<byte[]> TextToWavByteArrayAsync(string text, Language language, Voice voice, CancellationToken cancellationToken)
+        public async Task<byte[]> TextToWavByteArrayAsync(string text, Language language, Voice voice, TtsSpeed speed, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(text);
-            ArgumentNullException.ThrowIfNull(language);
-            ArgumentNullException.ThrowIfNull(voice);
 
             var speechKey = _config.SpeechKey;
             var speechRegion = _config.SpeechRegion;
@@ -48,35 +48,63 @@ namespace BuddyLanguage.TextToSpeech
             var speechConfig = SpeechConfig.FromSubscription(speechKey, speechRegion);
             speechConfig.SpeechSynthesisVoiceName = GetSynthesisVoiceNameFromEnum(language, voice);
 
+            string voicespeed = GetSsmlSpeakingRate(speed);
+
+            // Create SSML with speaking rate adjustment (adjust the rate value as needed)
+            var ssml = $@"<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xml:lang='{language.ToString()}'>
+                    <voice name='{speechConfig.SpeechSynthesisVoiceName}'>
+                        <mstts:express-as type='{voicespeed}'>
+                            {text}
+                        </mstts:express-as>
+                    </voice>
+                </speak>";
+
             using var speechSynthesizer = new SpeechSynthesizer(speechConfig, null);
 
-            var result = await speechSynthesizer.SpeakTextAsync(text).WaitAsync(cancellationToken);
+            var result = await speechSynthesizer.SpeakSsmlAsync(ssml).WaitAsync(cancellationToken);
+
             switch (result.Reason)
             {
                 case ResultReason.SynthesizingAudioCompleted:
                     _logger.LogInformation("Speech synthesized to byte array");
                     return result.AudioData;
                 case ResultReason.Canceled:
-                {
-                    var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
-                    if (cancellation.Reason == CancellationReason.Error)
                     {
-                        _logger.LogError(
-                            "Speech synthesis error. ErrorCode={CancellationErrorCode}, ErrorDetails={CancellationErrorDetails}",
-                            cancellation.ErrorCode,
-                            cancellation.ErrorDetails);
+                        var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
+                        if (cancellation.Reason == CancellationReason.Error)
+                        {
+                            _logger.LogError(
+                                "Speech synthesis error. ErrorCode={CancellationErrorCode}, ErrorDetails={CancellationErrorDetails}",
+                                cancellation.ErrorCode,
+                                cancellation.ErrorDetails);
+                        }
+
+                        throw new SpeechSynthesizingException($"Speech synthesis failed. " +
+                                                            $"Error: {cancellation.ErrorCode} {cancellation.ErrorDetails}");
                     }
 
-                    // TODO: throw SpeechSynthesyzingException
-                    throw new InvalidOperationException($"Speech synthesis failed. " +
-                                                        $"Error: {cancellation.ErrorCode} {cancellation.ErrorDetails}");
-                }
-
                 default:
-                    // TODO: throw SpeechSynthesyzingException
-                    throw new InvalidOperationException($"Speech synthesis failed. " +
+                    throw new SpeechSynthesizingException($"Speech synthesis failed. " +
                                                         $"ResultReason: {result.Reason}");
             }
+        }
+
+        /// <summary>
+        /// Maps a TtsSpeed enumeration value to its corresponding SSML speaking rate adjustment value.
+        /// </summary>
+        /// <param name="speed">The TtsSpeed value to map to an SSML speaking rate adjustment value.</param>
+        /// <returns>The SSML speaking rate adjustment value corresponding to the provided TtsSpeed.</returns>
+        private string GetSsmlSpeakingRate(TtsSpeed speed)
+        {
+            return speed switch
+            {
+                TtsSpeed.Xslow => "x-slow",
+                TtsSpeed.Slow => "slow",
+                TtsSpeed.Medium => "medium",
+                TtsSpeed.Fast => "fast",
+                TtsSpeed.Xfast => "x-fast",
+                _ => throw new NotSupportedException("The provided TtsSpeed is not supported.")
+            };
         }
 
         /// <summary>
@@ -85,12 +113,9 @@ namespace BuddyLanguage.TextToSpeech
         /// <param name="language">The language of the voice.</param>
         /// <param name="voice">The desired voice for synthesis.</param>
         /// <returns>The Azure Cognitive Services voice name corresponding to the given language and voice type.</returns>
-        public string GetSynthesisVoiceNameFromEnum(Language language, Voice voice)
+        private string GetSynthesisVoiceNameFromEnum(Language language, Voice voice)
         {
-            ArgumentNullException.ThrowIfNull(language);
-            ArgumentNullException.ThrowIfNull(voice);
-
-            string voiceName = (language, voice) switch
+            return (language, voice) switch
             {
                 (Russian, Female) => "ru-RU-SvetlanaNeural",
                 (Russian, Male) => "ru-RU-DmitryNeural",
@@ -98,8 +123,6 @@ namespace BuddyLanguage.TextToSpeech
                 (English, Male) => "en-US-GuyNeural",
                 _ => throw new NotSupportedException("The Language/Voice You Provided Is Not Currently Supported By Our Project!")
             };
-
-            return voiceName;
         }
     }
 }
