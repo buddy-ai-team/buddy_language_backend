@@ -8,10 +8,13 @@ namespace BuddyLanguage.HttpModels.Requests.WordEntity
     public class AddWordEntityRequest
     {
         [Required]
+        public Guid AccountId { get; init; }
+
+        [Required]
         public string Word { get; set; }
 
         [Required]
-        public Guid AccountId { get; init; }
+        public Language Language { get; set; }
 
         [Required]
         public WordEntityStatus Status { get; set; }

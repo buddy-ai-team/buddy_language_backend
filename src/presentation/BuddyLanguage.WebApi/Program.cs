@@ -3,8 +3,12 @@ using BuddyLanguage.WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Swagger Setup
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 //Domain and Infrastructure services
-builder.Services.AddServiceCollection(builder.Configuration);
+builder.Services.AddApplicationServices(builder.Configuration);
 
 //Filters
 builder.Services.AddControllers(options =>
@@ -13,6 +17,10 @@ builder.Services.AddControllers(options =>
 });
 
 var app = builder.Build();
+
+//Swagger Build
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapControllers();
 

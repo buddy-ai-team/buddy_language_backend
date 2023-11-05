@@ -1,0 +1,39 @@
+name: Publish WebAPI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+
+env:
+  AZURE_WEBAPP_NAME: buddylanguage
+  AZURE_WEBAPP_PACKAGE_PATH: "./publish"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'
+          
+      - name: Restore
+        run: dotnet restore ./src/presentation/BuddyLanguage.WebApi/BuddyLanguage.WebApi.csproj
+        
+      - name: Build
+        run: dotnet build ./src/presentation/BuddyLanguage.WebApi/BuddyLanguage.WebApi.csproj --configuration Release --no-restore
+        
+      - name: Publish
+        run: dotnet publish ./src/presentation/BuddyLanguage.WebApi/BuddyLanguage.WebApi.csproj --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+        
+      - name: Deployment
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPI_PUBLISH_PROFILE }}
+          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"

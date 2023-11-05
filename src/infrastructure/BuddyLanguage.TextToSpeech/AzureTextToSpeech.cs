@@ -1,8 +1,11 @@
 ﻿using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.CognitiveServices.Speech;
+using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using static BuddyLanguage.Domain.Enumerations.Language;
+using static BuddyLanguage.Domain.Enumerations.Voice;
 
 namespace BuddyLanguage.TextToSpeech
 {
@@ -45,16 +48,17 @@ namespace BuddyLanguage.TextToSpeech
             var speechConfig = SpeechConfig.FromSubscription(speechKey, speechRegion);
             speechConfig.SpeechSynthesisVoiceName = GetSynthesisVoiceNameFromEnum(language, voice);
 
-            using var synthesizer = new SpeechSynthesizer(speechConfig);
-            using var resultTask = await synthesizer.SpeakTextAsync(text).WaitAsync(cancellationToken);
-            switch (resultTask.Reason)
+            using var speechSynthesizer = new SpeechSynthesizer(speechConfig, null);
+
+            var result = await speechSynthesizer.SpeakTextAsync(text).WaitAsync(cancellationToken);
+            switch (result.Reason)
             {
                 case ResultReason.SynthesizingAudioCompleted:
                     _logger.LogInformation("Speech synthesized to byte array");
-                    return resultTask.AudioData;
+                    return result.AudioData;
                 case ResultReason.Canceled:
                 {
-                    var cancellation = SpeechSynthesisCancellationDetails.FromResult(resultTask);
+                    var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
                     if (cancellation.Reason == CancellationReason.Error)
                     {
                         _logger.LogError(
@@ -71,7 +75,7 @@ namespace BuddyLanguage.TextToSpeech
                 default:
                     // TODO: throw SpeechSynthesyzingException
                     throw new InvalidOperationException($"Speech synthesis failed. " +
-                                                        $"ResultReason: {resultTask.Reason}");
+                                                        $"ResultReason: {result.Reason}");
             }
         }
 
@@ -88,10 +92,10 @@ namespace BuddyLanguage.TextToSpeech
 
             string voiceName = (language, voice) switch
             {
-                (Language.Russian, Voice.Female) => "ru-RU-SvetlanaNeural",
-                (Language.Russian, Voice.Male) => "ru-RU-DmitryNeural",
-                (Language.English, Voice.Female) => "en-US-JennyNeural",
-                (Language.English, Voice.Male) => "en-US-GuyNeural",
+                (Russian, Female) => "ru-RU-SvetlanaNeural",
+                (Russian, Male) => "ru-RU-DmitryNeural",
+                (English, Female) => "en-US-JennyNeural",
+                (English, Male) => "en-US-GuyNeural",
                 _ => throw new NotSupportedException("The Language/Voice You Provided Is Not Currently Supported By Our Project!")
             };
 

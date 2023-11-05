@@ -8,6 +8,7 @@ using BuddyLanguage.TextToSpeech;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenAI.ChatGpt.EntityFrameworkCore;
 using OpenAI.ChatGpt.EntityFrameworkCore.Extensions;
 using OpenAI.Extensions;
 
@@ -15,7 +16,7 @@ namespace BuddyLanguage.Infrastructure;
 
 public static class BuddyLanguageDependencyInjection
 {
-    public static IServiceCollection AddServiceCollection(
+    public static IServiceCollection AddApplicationServices(
         this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -37,38 +38,55 @@ public static class BuddyLanguageDependencyInjection
             .ValidateOnStart();
 
         // Definition of database file name and connection of it as a service
-        services.AddOptions<NpgsqlConnectionStringOptions>()
-            .BindConfiguration("NpgsqlConnectionStringOptions")
+        services.AddOptions<MySqlConnectionStringOptions>()
+            .BindConfiguration("MySqlConnectionStringOptions")
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
         var config = configuration
-            .GetRequiredSection("NpgsqlConnectionStringOptions")
-            .Get<NpgsqlConnectionStringOptions>();
+            .GetRequiredSection("MySqlConnectionStringOptions")
+            .Get<MySqlConnectionStringOptions>();
+
+        var mySqlServerVersion = new MySqlServerVersion(new Version(8, 0));
 
         // Подключение репозитория для работы с Ролями
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         services.AddScoped<IRoleRepository, RoleRepositoryEf>();
         services.AddScoped<IWordEntityRepository, WordEntityRepositoryEf>();
+        services.AddScoped<IUserRepository, UserRepositoryEf>();
         services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
 
+        if (config is null || string.IsNullOrEmpty(config.ConnectionString))
+        {
+            throw new InvalidOperationException("MySqlConnectionStringOptions is missing or invalid in configuration.");
+        }
+
         services.AddDbContext<AppDbContext>(
-            optionsAction: options => options.UseNpgsql(config!.ConnectionString));
+            optionsAction: options => options.UseMySql(config.ConnectionString, mySqlServerVersion));
+
+        services.AddDbContext<ChatGptDbContextTmp>(
+            options => options.UseMySql(config.ConnectionString, mySqlServerVersion));
 
         services.AddChatGptEntityFrameworkIntegration(
-            op => op.UseNpgsql(config!.ConnectionString));
+            op => op.UseMySql(
+                config.ConnectionString,
+                mySqlServerVersion,
+                builder =>
+                {
+                    builder.MigrationsAssembly(typeof(ChatGptDbContext).Assembly.FullName);
+                }));
 
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
         services.AddOpenAIService(
         settings =>
         {
-            settings.ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")
-                              ?? throw new InvalidOperationException(
+            settings.ApiKey = configuration["OPENAI_API_KEY"] ?? throw new InvalidOperationException(
                                   "OPENAI_API_KEY environment variable is not set");
         });
 
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
+        services.AddScoped<ITextToSpeech, AzureTextToSpeech>();
 
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
@@ -79,7 +97,9 @@ public static class BuddyLanguageDependencyInjection
         this IServiceCollection services)
     {
         services.AddScoped<RoleService>();
-        services.AddScoped<WordEntityService>();
+        services.AddScoped<IWordService, WordService>();
+        services.AddScoped<UserService>();
+        services.AddScoped<BuddyService>();
 
         return services;
     }
