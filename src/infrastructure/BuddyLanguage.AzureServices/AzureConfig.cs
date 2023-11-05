@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BuddyLanguage.TextToSpeech
+namespace BuddyLanguage.AzureServices
 {
     // ReSharper disable once InconsistentNaming
-    public class AzureTTSConfig
+    public class AzureConfig
     {
         [Required]
         public string SpeechKey { get; set; } = null!;

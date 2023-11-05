@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.ChatGPTServic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.OpenAIWhisperSpeechRecognitionService", "src\infrastructure\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj", "{64D89577-D3E9-40AF-A9FB-03EA41F7356C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.TextToSpeech", "src\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj", "{158B5246-FBDC-4D78-86A6-A5AA9202E445}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.AzureServices", "src\infrastructure\BuddyLanguage.AzureServices\BuddyLanguage.AzureServices.csproj", "{158B5246-FBDC-4D78-86A6-A5AA9202E445}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.Architecture.Test", "tests\BuddyLanguage.Architecture.Test\BuddyLanguage.Architecture.Test.csproj", "{781AD5FE-86F4-47FD-B7F7-F6161541C82E}"
 EndProject

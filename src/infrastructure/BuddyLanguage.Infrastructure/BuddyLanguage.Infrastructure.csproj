@@ -17,7 +17,7 @@
       <ProjectReference Include="..\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj" />
       <ProjectReference Include="..\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj" />
       <ProjectReference Include="..\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj" />
-      <ProjectReference Include="..\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj" />
+      <ProjectReference Include="..\BuddyLanguage.AzureServices\BuddyLanguage.AzureServices.csproj" />
     </ItemGroup>
 
 </Project>

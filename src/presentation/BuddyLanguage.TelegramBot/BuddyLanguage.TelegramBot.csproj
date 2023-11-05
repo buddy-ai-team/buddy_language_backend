@@ -20,7 +20,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
       <ProjectReference Include="..\..\infrastructure\BuddyLanguage.Infrastructure\BuddyLanguage.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj" />
+      <ProjectReference Include="..\..\infrastructure\BuddyLanguage.AzureServices\BuddyLanguage.AzureServices.csproj" />
     </ItemGroup>
 
     <ItemGroup>
