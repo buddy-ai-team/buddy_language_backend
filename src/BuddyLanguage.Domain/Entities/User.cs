@@ -1,4 +1,6 @@
-﻿namespace BuddyLanguage.Domain.Entities
+﻿using BuddyLanguage.Domain.Enumerations;
+
+namespace BuddyLanguage.Domain.Entities
 {
     public class User : IEntity
     {
@@ -6,13 +8,14 @@
         private string? _lastName;
         private string _telegramId;
 
-        public User(Guid id, string firstName, string lastName, string telegramId)
+        public User(Guid id, string firstName, string lastName, string telegramId, Preferences userPreferences)
         {
             Id = id;
             _firstName = firstName ?? throw new ArgumentNullException(nameof(firstName));
             _lastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
             _telegramId = telegramId ?? throw new ArgumentNullException(nameof(telegramId));
             WordEntities = new List<WordEntity>();
+            UserPreferences = userPreferences;
         }
 
         public Guid Id { get; init; }
@@ -61,6 +64,17 @@
 
                 _telegramId = value;
             }
+        }
+
+        public Preferences UserPreferences { get; set; }
+
+        public class Preferences
+        {
+            public Language NativeLanguage { get; set; }
+
+            public Language LearnedLanguage { get; set; }
+
+            public Voice SelectedVoice { get; set; }
         }
     }
 }

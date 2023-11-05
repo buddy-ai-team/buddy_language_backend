@@ -26,5 +26,14 @@ public class AppDbContext : DbContext
             .HasMany(user => user.WordEntities)
             .WithOne(wordEntity => wordEntity.User)
             .HasForeignKey(wordEntity => wordEntity.UserId);
+
+        // Configure UserPreferences as an owned type
+        modelBuilder.Entity<User>()
+            .OwnsOne(user => user.UserPreferences, preferences =>
+            {
+                preferences.Property(p => p.NativeLanguage).HasConversion<string>();
+                preferences.Property(p => p.LearnedLanguage).HasConversion<string>();
+                preferences.Property(p => p.SelectedVoice).HasConversion<string>();
+            });
     }
 }
