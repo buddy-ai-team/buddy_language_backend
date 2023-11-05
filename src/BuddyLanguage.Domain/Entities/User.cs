@@ -8,7 +8,7 @@ namespace BuddyLanguage.Domain.Entities
         private string? _lastName;
         private string _telegramId;
 
-        public User(Guid id, string firstName, string lastName, string telegramId, Preferences userPreferences)
+        public User(Guid id, string firstName, string lastName, string telegramId)
         {
             Id = id;
             _firstName = firstName ?? throw new ArgumentNullException(nameof(firstName));
