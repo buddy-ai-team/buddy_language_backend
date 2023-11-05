@@ -15,7 +15,7 @@ namespace BuddyLanguage.Domain.Entities
             _lastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
             _telegramId = telegramId ?? throw new ArgumentNullException(nameof(telegramId));
             WordEntities = new List<WordEntity>();
-            UserPreferences = userPreferences;
+            UserPreferences = new Preferences();
         }
 
         public Guid Id { get; init; }
