@@ -31,7 +31,8 @@ namespace BuddyLanguage.TelegramBot
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested) //пока не запрошена отмена задачи
+            //пока не запрошена отмена задачи
+            while (!cancellationToken.IsCancellationRequested) 
             {
                 await CheckAndSendReminder(cancellationToken); //метод проверяет время последнего сообщения и отправляет напоминание
 
@@ -54,7 +55,9 @@ namespace BuddyLanguage.TelegramBot
             var lastMessageTime = messages.Last().CreatedAt;
             var currentTime = DateTime.Now;
             var afterLastMessageIntervalHours = (currentTime - lastMessageTime).TotalHours; //считаем сколько часов прошло после последнего сообщения
-            if (afterLastMessageIntervalHours >= _reminderIntervalHours) //если прошло 24 часа и больше
+
+            //если прошло 24 часа и больше
+            if (afterLastMessageIntervalHours >= _reminderIntervalHours) 
             {
                 var reminder = await _chatGPTSevice.GetAnswer(_prompt, cancellationToken); //отправляем чату GPT запрос на напоминание
                 await _botClient.SendTextMessageAsync(//отправляем напоминание пользователю
