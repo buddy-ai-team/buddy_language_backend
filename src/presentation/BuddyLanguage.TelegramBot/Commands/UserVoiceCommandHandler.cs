@@ -67,7 +67,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
                 await _botClient.SendTextMessageAsync(
                     update.Message.Chat.Id,
-                    $"Recognized: \n```{recognizedMessage}```",
+                    $"Recognized: \n```\n{recognizedMessage}\n```",
                     cancellationToken: cancellationToken);
                 await _botClient.SendTextMessageAsync(
                     update.Message.Chat.Id, answerText, cancellationToken: cancellationToken);
