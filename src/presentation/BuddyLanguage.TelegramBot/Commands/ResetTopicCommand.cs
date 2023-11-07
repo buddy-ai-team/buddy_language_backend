@@ -36,7 +36,7 @@ public class ResetTopicCommand : IBotCommandHandler
             User user = await _userService.GetUserByTelegramId(telegramId, cancellationToken);
             await _buddyService.ResetTopic(user, cancellationToken);
             await _botClient.SendTextMessageAsync(
-            message.Chat.Id, "Тема сброшена", cancellationToken: cancellationToken);
+                message.Chat.Id, "Тема сброшена", cancellationToken: cancellationToken);
         }
     }
 }
