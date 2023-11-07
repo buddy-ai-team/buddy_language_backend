@@ -7,10 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LangChain" Version="0.11.0-preview.0.121" />
-    <PackageReference Include="LangChain.Extensions.DependencyInjection" Version="0.11.0-preview.0.121" />
-    <PackageReference Include="LangChain.Providers.OpenAI" Version="0.11.0-preview.0.121" />
-    <PackageReference Include="OpenAI.ChatGPT.EntityFrameworkCore" Version="2.9.1" />
+    <PackageReference Include="OpenAI.ChatGPT.EntityFrameworkCore" Version="2.9.2" />
   </ItemGroup>
 
   <ItemGroup>

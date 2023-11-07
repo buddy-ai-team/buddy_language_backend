@@ -13,7 +13,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
         private readonly ChatGPTFactory _chatGptFactory;
         private readonly IOpenAiClient _openAiClient;
         private readonly ChatGPTConfig _config; // TODO ChatGPTModelsConfig
-        private readonly string _model = ChatCompletionModels.Gpt3_5_Turbo;
+        private readonly string _model = ChatCompletionModels.Gpt4Turbo;
 
         public ChatGPTService(
             ChatGPTFactory chatGptFactory,
