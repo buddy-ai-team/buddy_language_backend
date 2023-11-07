@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 using OpenAI;
 using OpenAI.ChatGpt;
 using OpenAI.ChatGpt.AspNetCore;
-using OpenAI.ChatGpt.AspNetCore.Models;
 using OpenAI.ChatGpt.Interfaces;
 using OpenAI.ChatGpt.Internal;
 using OpenAI.ChatGpt.Models;
@@ -16,8 +15,6 @@ using OpenAI.Managers;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest
 {
-
-
     public class PocTest
     {
         [Fact]
@@ -33,8 +30,9 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
 
             WhisperSpeechRecognitionService speechRecognitionService = new(openAIService);
             var chatGptConfig = new ChatGPTConfig();
-            var chatGptFactory = new ChatGPTFactory(new HttpClientFactory(), Options.Create(new OpenAICredentials()), Options.Create(chatGptConfig), new ChatHistoryStorage(), new TimeProviderUtc());
-            var chatGptService = new ChatGPTService(chatGptFactory, new OpenAiClient(openAiOptions.ApiKey), (IOptionsSnapshot<ChatGPTConfig>)Options.Create(chatGptConfig));
+            IOpenAiClient openAiClient = new OpenAiClient(openAiOptions.ApiKey);
+            var chatGptFactory = new ChatGPTFactory(openAiClient, Options.Create(chatGptConfig), new ChatHistoryStorage(), new TimeProviderUtc());
+            var chatGptService = new ChatGPTService(chatGptFactory, openAiClient, (IOptionsSnapshot<ChatGPTConfig>)Options.Create(chatGptConfig));
 
             var logger = new LoggerFactory().CreateLogger<AzureTextToSpeech>();
             var options = Options.Create(new AzureTTSConfig()
@@ -74,16 +72,6 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
             var userMessage1 = "Hello";
             var chatbotResponseWithContext1 = await chatGptService.GetAnswerOnTopic(userMessage1, userId, default);
             Assert.Contains("Hello! How can i help you today?", chatbotResponseWithContext1);
-
-            // Дополнительные проверки 
-
-            // Проверка 7: Проверим, что бот обрабатывает ошибки и возвращает информацию об ошибках (если применимо)
-            // Пример: var errorMessage = await chatGptService.GetAnswerFromChatGPT("This is invalid input", userId, default);
-            // Assert.Contains("Invalid input:", errorMessage, "Бот должен сообщить об ошибке ввода.");
-
-            // Проверка 8: Проверим, что бот корректно работает в разных языках и возвращает соответствующие ответы (если применимо)
-            // Пример: var russianMessage = await chatGptService.GetAnswerFromChatGPT("Привет", userId, default);
-            // Assert.Contains("Здравствуйте!", russianMessage, "Бот должен корректно работать на русском языке.");       
         }
 
         private string GetKeyFromEnvironment(string keyName)
@@ -100,15 +88,6 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
             }
 
             return value;
-        }
-
-        private class HttpClientFactory : IHttpClientFactory
-        {
-            public HttpClient CreateClient(string name)
-            {
-                // Возвращаем новый экземпляр HttpClient
-                return new HttpClient();
-            }
         }
 
         private class ChatHistoryStorage : IChatHistoryStorage
