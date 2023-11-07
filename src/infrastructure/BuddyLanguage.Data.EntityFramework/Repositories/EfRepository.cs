@@ -19,6 +19,9 @@ public class EfRepository<TEntity> : IRepository<TEntity>
     public virtual async Task<TEntity> GetById(Guid id, CancellationToken cancellationToken)
         => await Entities.FirstAsync(it => it.Id == id, cancellationToken);
 
+    public virtual async Task<IReadOnlyList<TEntity>> GetAll(CancellationToken cancellationToken)
+            => await Entities.ToListAsync(cancellationToken);
+
     public virtual async Task Add(TEntity entity, CancellationToken cancellationToken)
     {
         if (entity == null)

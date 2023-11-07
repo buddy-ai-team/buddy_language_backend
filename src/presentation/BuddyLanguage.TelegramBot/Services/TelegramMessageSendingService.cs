@@ -28,27 +28,27 @@ namespace BuddyLanguage.TelegramBot.Services
 
         public async Task CheckAndSendReminder(int reminderIntervalHours, CancellationToken cancellationToken)
         {
-            var me = await _botClient.GetMeAsync(cancellationToken);
-            string telegramUserId = me.Id.ToString();
-            var user = await _userRepository.GetUserByTelegramId(telegramUserId, cancellationToken);
-            var lastTopic = await _chatHistoryStorage.GetMostRecentTopicOrNull(user.Id.ToString(), cancellationToken);
-            if (lastTopic == null)
+            var users = await _userRepository.GetAll(cancellationToken);
+            foreach (var user in users)
             {
-                return;
-            }
+                var lastTopic = await _chatHistoryStorage.GetMostRecentTopicOrNull(user.Id.ToString(), cancellationToken);
+                if (lastTopic == null)
+                {
+                    return;
+                }
 
-            var messages = await _chatHistoryStorage.GetMessages(user.Id.ToString(), lastTopic.Id, cancellationToken);
-            var lastMessageTime = messages.Last().CreatedAt;
-            var currentTime = DateTime.Now;
-            var afterLastMessageIntervalHours = (currentTime - lastMessageTime).TotalHours; //считаем сколько часов прошло после последнего сообщения
+                var messages = await _chatHistoryStorage.GetMessages(user.Id.ToString(), lastTopic.Id, cancellationToken);
+                var lastMessageTime = messages.Last().CreatedAt;
+                var currentTime = DateTime.Now;
+                var afterLastMessageIntervalHours = (currentTime - lastMessageTime).TotalHours;
 
-            //если прошло 24 часа и больше
-            if (afterLastMessageIntervalHours >= reminderIntervalHours)
-            {
-                var reminder = await _chatGPTSevice.GetAnswer(_prompt, cancellationToken); //отправляем чату GPT запрос на напоминание
-                await _botClient.SendTextMessageAsync(//отправляем напоминание пользователю
-                    chatId: telegramUserId,
-                    text: reminder);
+                if (afterLastMessageIntervalHours >= reminderIntervalHours)
+                {
+                    var reminder = await _chatGPTSevice.GetAnswer(_prompt, cancellationToken);
+                    await _botClient.SendTextMessageAsync(
+                        chatId: user.Id.ToString(),
+                        text: reminder);
+                }
             }
         }
     }

@@ -13,12 +13,11 @@ namespace BuddyLanguage.TelegramBot
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            //пока не запрошена отмена задачи
             while (!cancellationToken.IsCancellationRequested) 
             {
                 await _telegramMessageSendingService.CheckAndSendReminder(24, cancellationToken);
 
-                await Task.Delay(TimeSpan.FromMinutes(15)); //делаем это каждые 15 минут
+                await Task.Delay(TimeSpan.FromMinutes(15));
             }
         }
     }
