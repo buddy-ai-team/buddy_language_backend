@@ -56,6 +56,7 @@ namespace BuddyLanguage.Domain.Services
 
             if (string.IsNullOrWhiteSpace(userMessage))
             {
+                //TODO: сделать эксепшн RecognizedTextIsEmptyException
                 throw new InvalidOperationException("Can`t recognize user message");
             }
 
