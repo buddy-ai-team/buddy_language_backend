@@ -36,7 +36,7 @@ public class PronunciationAssessmentTest
     }
 
     [Fact]
-    public async Task Azure_config_is_valid()
+    public async Task Result_of_assessment_calculated()
     {
         // Arrange{
         const string fileName = "assets/Pronunciation.wav";
