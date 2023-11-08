@@ -51,7 +51,7 @@ namespace BuddyLanguage.Domain.Services
             }
 
             var userMessage = await _speechRecognitionService.RecognizeSpeechToTextAsync(
-                oggVoiceMessage, "voice.ogg", cancellationToken);
+                oggVoiceMessage, AudioFormat.Ogg, nativeLanguage, learnedLanguage, cancellationToken);
             _logger.LogWarning("Recognized text: {TextMessage}", userMessage);
 
             if (string.IsNullOrWhiteSpace(userMessage))
