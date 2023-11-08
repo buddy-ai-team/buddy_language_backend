@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BuddyLanguage.Domain.Interfaces
+﻿namespace BuddyLanguage.Domain.Interfaces
 {
+    // Rating: https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard
     public interface IChatGPTService
     {
         /// <summary>
