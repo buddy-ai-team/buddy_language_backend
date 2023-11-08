@@ -1,4 +1,5 @@
 ﻿using BuddyLanguage.Domain.Entities;
+using BuddyLanguage.Domain.Exceptions.AzureService;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
@@ -11,7 +12,6 @@ namespace BuddyLanguage.AzureServices;
 public class PronunciationAssessmentService : IPronunciationAssessmentService
 {
     private readonly ILogger<PronunciationAssessmentService> _logger;
-    private readonly AzureConfig _config;
     private readonly PronunciationAssessmentConfig _pronunciationAssessmentConfig;
     private readonly SpeechConfig _speechConfig;
 
@@ -20,7 +20,7 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         ILogger<PronunciationAssessmentService> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _config = config.Value ?? throw new ArgumentNullException(nameof(config));
+        AzureConfig azureConfig = config.Value ?? throw new ArgumentNullException(nameof(config));
 
         // Объявление конфигурации сервиса оценки произношения
         _pronunciationAssessmentConfig = new PronunciationAssessmentConfig(
@@ -29,7 +29,9 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
             granularity: Granularity.Phoneme,
             enableMiscue: false) { NBestPhonemeCount = 5 };
 
-        _speechConfig = SpeechConfig.FromSubscription(_config.SpeechKey, _config.SpeechRegion);
+        _speechConfig = SpeechConfig.FromSubscription(
+            azureConfig.SpeechKey,
+            azureConfig.SpeechRegion);
         _speechConfig.SpeechRecognitionLanguage = "en-US";
     }
 
@@ -55,8 +57,9 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         }
 
         // Подготовка потока данных к обработке сервисом
-        PushAudioInputStream audioConfigStream = AudioInputStream.CreatePushStream();
-        audioConfigStream.Write(voiceMessage, voiceMessage.Length);
+        PushAudioInputStream audioConfigStream =
+            AudioInputStream.CreatePushStream();
+        audioConfigStream.Write(voiceMessage);
         var audioConfig = AudioConfig.FromStreamInput(audioConfigStream);
 
         var speechRecognizer = new SpeechRecognizer(_speechConfig, audioConfig);
@@ -65,6 +68,11 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         // Запуск обработки потока данных
         SpeechRecognitionResult speechRecognitionResult =
             await speechRecognizer.RecognizeOnceAsync();
+
+        if (speechRecognitionResult.Reason != ResultReason.RecognizedSpeech)
+        {
+            throw new SpeechNotRecognizedException("Сообщение не удалось распознать.");
+        }
 
         // Получение результата оценки произношения
         var pronunciationAssessmentResult =
