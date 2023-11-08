@@ -47,7 +47,7 @@ public class BuddyServiceTests
 
         // Assert
         mistakes.Should().NotBeNull();
-        mistakes.MistakesCount.Should().Be(1);
+        mistakes!.MistakesCount.Should().Be(1);
         mistakes.Mistakes.Should().NotBeNull();
         mistakes.Mistakes.Should().HaveCount(1);
         mistakes.Mistakes.Should().ContainMatch("*am*");
