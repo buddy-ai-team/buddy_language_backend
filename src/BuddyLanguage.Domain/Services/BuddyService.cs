@@ -95,7 +95,7 @@ namespace BuddyLanguage.Domain.Services
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
             var prompt = $"Here is a text in {learnedLanguage} language." +
-                         "Find grammar mistakes in this text. Write the rules for these " +
+                         $"Find grammar mistakes in this text. Also, this text may include {nativeLanguage} words, just ignore them. Write the rules for these " +
                          $"grammar mistakes. Answer in {nativeLanguage}.";
             var mistakes = await _chatGPTService.GetStructuredAnswer<MistakesAnswer>(
                 prompt, textMessage, cancellationToken);
