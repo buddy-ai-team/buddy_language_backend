@@ -3,8 +3,6 @@ using BuddyLanguage.Domain.Services;
 using BuddyLanguage.HttpModels.Requests.Role;
 using BuddyLanguage.HttpModels.Responses.Role;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
-using Serilog;
 
 #pragma warning disable CS8604
 

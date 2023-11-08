@@ -2,16 +2,12 @@ using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
 using BuddyLanguage.TelegramBot.Commands;
 using BuddyLanguage.TelegramBot.Services;
-using OpenAI.ChatGpt;
-using Polly;
-using Sentry.AspNetCore;
 using Serilog;
 using Serilog.Events;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Настройка логирования с Serilog и Sentry
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .MinimumLevel.Debug()
@@ -66,4 +62,9 @@ try
 catch (Exception ex)
 {
     Log.Error(ex, "An unhandled exception occurred.");
+}
+finally
+{
+    Log.Information("Shut down complete");
+    Log.CloseAndFlush();
 }

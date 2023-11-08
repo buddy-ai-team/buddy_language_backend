@@ -4,8 +4,6 @@ using BuddyLanguage.Domain.Services;
 using BuddyLanguage.HttpModels.Requests.WordEntity;
 using BuddyLanguage.HttpModels.Responses.WordEntity;
 using Microsoft.AspNetCore.Mvc;
-using Sentry;
-using Serilog;
 
 #pragma warning disable CS8604
 

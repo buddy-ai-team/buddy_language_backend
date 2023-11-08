@@ -1,5 +1,4 @@
 ﻿using BuddyLanguage.Domain.Services;
-using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 

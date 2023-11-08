@@ -2,8 +2,6 @@
 using BuddyLanguage.TelegramBot.Commands;
 using BuddyLanguage.TelegramBot.Services;
 using OpenAI.ChatGpt.Interfaces;
-using Sentry;
-using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;

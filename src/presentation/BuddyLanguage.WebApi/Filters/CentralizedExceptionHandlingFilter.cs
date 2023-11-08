@@ -4,8 +4,6 @@ using BuddyLanguage.Domain.Exceptions.Role;
 using BuddyLanguage.HttpModels.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Sentry;
-using Serilog;
 
 namespace BuddyLanguage.WebApi.Filters;
 

@@ -53,3 +53,8 @@ catch (Exception ex)
 {
     Log.Error(ex, "An unhandled exception occurred.");
 }
+finally
+{
+    Log.Information("Shut down complete");
+    Log.CloseAndFlush();
+}
