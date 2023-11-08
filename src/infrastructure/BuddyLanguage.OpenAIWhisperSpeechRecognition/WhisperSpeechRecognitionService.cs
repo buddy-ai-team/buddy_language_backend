@@ -1,4 +1,5 @@
-﻿using BuddyLanguage.Domain.Exceptions;
+﻿using BuddyLanguage.Domain.Enumerations;
+using BuddyLanguage.Domain.Exceptions;
 using BuddyLanguage.Domain.Interfaces;
 using OpenAI.Interfaces;
 using OpenAI.ObjectModels;
@@ -15,14 +16,23 @@ namespace BuddyLanguage.OpenAIWhisperSpeechRecognitionService
             _openAIService = openAIService ?? throw new ArgumentNullException(nameof(openAIService));
         }
 
+        /// <inheritdoc cref="ISpeechRecognitionService.RecognizeSpeechToTextAsync" />
         public async Task<string> RecognizeSpeechToTextAsync(
-            byte[] voiceMessage, string fileName, CancellationToken cancellationToken)
+            byte[] voiceMessage,
+            AudioFormat format,
+            Language nativeLanguage,
+            Language studiedLanguage,
+            CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(voiceMessage);
-            ArgumentNullException.ThrowIfNull(fileName);
-            if (voiceMessage.Length <= 0)
+            if (voiceMessage.Length == 0)
             {
-                throw new ArgumentException(nameof(voiceMessage));
+                throw new ArgumentException("Voice message is empty", nameof(voiceMessage));
+            }
+
+            if (nativeLanguage == studiedLanguage)
+            {
+                throw new ArgumentException("Native language and studied language are the same");
             }
 
             var response = await _openAIService
@@ -30,16 +40,18 @@ namespace BuddyLanguage.OpenAIWhisperSpeechRecognitionService
                 .CreateTranscription(
                     new AudioCreateTranscriptionRequest()
                 {
-                    FileName = fileName,
+                    FileName = $"voice.{format.ToString().ToLower()}",
                     File = voiceMessage,
                     Model = Models.WhisperV1,
-                    ResponseFormat = StaticValues.AudioStatics.ResponseFormat.VerboseJson
+                    ResponseFormat = StaticValues.AudioStatics.ResponseFormat.VerboseJson,
+                    Prompt = $"In this audio, you will hear both {studiedLanguage} and {nativeLanguage} languages. Please transcribe exactly as spoken, including any filler words, without altering or omitting any part of the speech. It is crucial for the language learning application that each word, including those in Russian, is transcribed precisely as it is pronounced, maintaining all original features of the spoken content."
                 },
                     cancellationToken);
 
             if (!response.Successful)
             {
-                throw new InvalidSpeechRecognitionException("Can`t recognize speech to text!");
+                throw new InvalidSpeechRecognitionException(
+                    "Error while recognizing speech: " + response.Error?.Message);
             }
 
             var textMessage = string.Join("\n", response.Text);
