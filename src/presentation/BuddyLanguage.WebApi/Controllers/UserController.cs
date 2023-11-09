@@ -38,7 +38,7 @@ namespace BuddyLanguage.WebApi.Controllers
             var userVar = await _userService.UpdateUserById(
                 request.Id,
                 request.FirstName,
-                request.LastName, 
+                request.LastName,
                 request.TelegramId,
                 cancellationToken);
             return new UserResponse(userVar.Id, userVar.FirstName, userVar.LastName, userVar.TelegramId);
