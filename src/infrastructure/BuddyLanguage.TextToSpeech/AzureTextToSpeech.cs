@@ -50,6 +50,9 @@ namespace BuddyLanguage.TextToSpeech
 
             string voicespeed = GetSsmlSpeakingRate(speed);
 
+            //Make sure text doesn't have any dangerous symbols
+            text = SanitizeTextForSSML(text);
+
             // Create SSML with speaking rate adjustment (adjust the rate value as needed)
             var ssml = $@"<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xml:lang='{language.ToString()}'>
                     <voice name='{speechConfig.SpeechSynthesisVoiceName}'>
@@ -123,6 +126,43 @@ namespace BuddyLanguage.TextToSpeech
                 (English, Male) => "en-US-GuyNeural",
                 _ => throw new NotSupportedException("The Language/Voice You Provided Is Not Currently Supported By Our Project!")
             };
+        }
+
+        /// <summary>
+        /// Replaces special characters in the input text with safe equivalents or their respective XML entities to sanitize it for SSML (Speech Synthesis Markup Language).
+        /// </summary>
+        /// <param name="text">The input text that needs to be sanitized for SSML.</param>
+        /// <returns>The sanitized text ready for use in SSML.</returns>
+        private string SanitizeTextForSSML(string text)
+        {
+            // Replace special characters with safe equivalents or their respective XML entities
+            text = text
+                .Replace("&", "and")   
+                .Replace("<", "&lt;") 
+                .Replace(">", "&gt;")  
+                .Replace("\"", "&quot;")
+                .Replace("'", "&apos;")  
+                .Replace("!", "&#33;")  
+                .Replace("#", "&#35;") 
+                .Replace("$", "&#36;")  
+                .Replace("%", "&#37;")  
+                .Replace("(", "&#40;")   
+                .Replace(")", "&#41;")   
+                .Replace("*", "&#42;") 
+                .Replace("+", "&#43;")   
+                .Replace(",", "&#44;")   
+                .Replace("/", "&#47;") 
+                .Replace(":", "&#58;") 
+                .Replace(";", "&#59;") 
+                .Replace("=", "&#61;") 
+                .Replace("?", "&#63;")
+                .Replace("[", "&#91;") 
+                .Replace("\\", "&#92;") 
+                .Replace("]", "&#93;") 
+                .Replace("^", "&#94;")
+                .Replace("_", "&#95;");  
+
+            return text;
         }
     }
 }
