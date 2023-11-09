@@ -10,7 +10,4 @@ public class RoleRepositoryEf : EfRepository<Role>, IRoleRepository
         : base(dbContext)
     {
     }
-
-    public async Task<IReadOnlyList<Role>> GetAll(CancellationToken cancellationToken)
-        => await Entities.ToListAsync(cancellationToken);
 }
