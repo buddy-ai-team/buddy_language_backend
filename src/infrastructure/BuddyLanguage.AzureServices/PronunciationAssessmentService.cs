@@ -71,7 +71,9 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
 
         if (speechRecognitionResult.Reason != ResultReason.RecognizedSpeech)
         {
-            throw new SpeechNotRecognizedException("Сообщение не удалось распознать.");
+            throw new SpeechNotRecognizedException(
+                $"Не удалось распознать речь. Ошибка: {speechRecognitionResult.Reason} " +
+                $"Детали: {speechRecognitionResult}");
         }
 
         // Получение результата оценки произношения
