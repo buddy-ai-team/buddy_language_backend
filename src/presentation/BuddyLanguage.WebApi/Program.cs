@@ -1,5 +1,7 @@
 using System;
+using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Infrastructure;
+using BuddyLanguage.WebApi;
 using BuddyLanguage.WebApi.Filters;
 using Sentry;
 using Sentry.AspNetCore;

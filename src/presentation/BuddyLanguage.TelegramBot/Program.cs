@@ -1,3 +1,4 @@
+using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
 using BuddyLanguage.TelegramBot.Commands;
