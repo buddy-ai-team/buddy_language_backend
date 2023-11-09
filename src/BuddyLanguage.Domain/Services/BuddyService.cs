@@ -51,11 +51,12 @@ namespace BuddyLanguage.Domain.Services
             }
 
             var userMessage = await _speechRecognitionService.RecognizeSpeechToTextAsync(
-                oggVoiceMessage, "voice.ogg", cancellationToken);
+                oggVoiceMessage, AudioFormat.Ogg, nativeLanguage, learnedLanguage, cancellationToken);
             _logger.LogWarning("Recognized text: {TextMessage}", userMessage);
 
             if (string.IsNullOrWhiteSpace(userMessage))
             {
+                //TODO: сделать эксепшн RecognizedTextIsEmptyException
                 throw new InvalidOperationException("Can`t recognize user message");
             }
 
@@ -69,8 +70,9 @@ namespace BuddyLanguage.Domain.Services
             _logger.LogDebug("Studied words: {LearningWords}", studiedWords);
 
             //TODO AddWordsToUser
+            //TODO Make the bot grab the voice parameters/language/speed from user preferences
             var botAnswerWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
-                assistantAnswer, learnedLanguage, Voice.Male, cancellationToken);
+                assistantAnswer, learnedLanguage, Voice.Male, TtsSpeed.Medium, cancellationToken);
 
             var mistakesText = mistakes.MistakesCount > 0 ? mistakes.ToString() : null;
             return (userMessage, assistantAnswer, botAnswerWavMessage, mistakesText, studiedWords);
@@ -94,7 +96,7 @@ namespace BuddyLanguage.Domain.Services
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
             var prompt = $"Here is a text in {learnedLanguage} language." +
-                         "Find grammar mistakes in this text. Write the rules for these " +
+                         $"Find grammar mistakes in this text. Also, this text may include {nativeLanguage} words, just ignore them. Write the rules for these " +
                          $"grammar mistakes. Answer in {nativeLanguage}.";
             var mistakes = await _chatGPTService.GetStructuredAnswer<MistakesAnswer>(
                 prompt, textMessage, cancellationToken);
