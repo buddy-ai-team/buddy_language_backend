@@ -32,8 +32,9 @@ public class AppDbContext : DbContext
             .OwnsOne(user => user.UserPreferences, preferences =>
             {
                 preferences.Property(p => p.NativeLanguage).HasConversion<string>();
-                preferences.Property(p => p.LearnedLanguage).HasConversion<string>();
+                preferences.Property(p => p.TargetLanguage).HasConversion<string>();
                 preferences.Property(p => p.SelectedVoice).HasConversion<string>();
+                preferences.Property(p => p.SelectedSpeed).HasConversion<string>();
             });
     }
 }

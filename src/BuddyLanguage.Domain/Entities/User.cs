@@ -15,7 +15,13 @@ namespace BuddyLanguage.Domain.Entities
             _lastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
             _telegramId = telegramId ?? throw new ArgumentNullException(nameof(telegramId));
             WordEntities = new List<WordEntity>();
-            UserPreferences = new Preferences();
+            UserPreferences = new Preferences() //Temporary Default Values
+            {
+                NativeLanguage = Language.Russian,
+                TargetLanguage = Language.English,
+                SelectedVoice = Voice.Male,
+                SelectedSpeed = TtsSpeed.Medium
+            };
         }
 
         public Guid Id { get; init; }
@@ -72,9 +78,11 @@ namespace BuddyLanguage.Domain.Entities
         {
             public Language NativeLanguage { get; set; }
 
-            public Language LearnedLanguage { get; set; }
+            public Language TargetLanguage { get; set; }
 
             public Voice SelectedVoice { get; set; }
+
+            public TtsSpeed SelectedSpeed { get; set; }
         }
     }
 }
