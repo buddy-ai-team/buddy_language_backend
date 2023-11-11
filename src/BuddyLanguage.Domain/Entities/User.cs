@@ -1,4 +1,6 @@
-﻿namespace BuddyLanguage.Domain.Entities
+﻿using BuddyLanguage.Domain.Enumerations;
+
+namespace BuddyLanguage.Domain.Entities
 {
     public class User : IEntity
     {
@@ -13,6 +15,13 @@
             _lastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
             _telegramId = telegramId ?? throw new ArgumentNullException(nameof(telegramId));
             WordEntities = new List<WordEntity>();
+            UserPreferences = new Preferences() //Temporary Default Values
+            {
+                NativeLanguage = Language.Russian,
+                TargetLanguage = Language.English,
+                SelectedVoice = Voice.Male,
+                SelectedSpeed = TtsSpeed.Medium
+            };
         }
 
         public Guid Id { get; init; }
@@ -61,6 +70,19 @@
 
                 _telegramId = value;
             }
+        }
+
+        public Preferences UserPreferences { get; set; }
+
+        public class Preferences
+        {
+            public Language NativeLanguage { get; set; }
+
+            public Language TargetLanguage { get; set; }
+
+            public Voice SelectedVoice { get; set; }
+
+            public TtsSpeed SelectedSpeed { get; set; }
         }
     }
 }
