@@ -4,6 +4,8 @@ using FluentAssertions;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest;
 
@@ -35,18 +37,63 @@ public class PronunciationAssessmentTest
         _logger = new LoggerFactory().CreateLogger<PronunciationAssessmentService>();
     }
 
+    public static byte[] ToArray(Stream stream)
+    {
+        byte[] buffer = new byte[4096];
+        int reader = 0;
+        MemoryStream memoryStream = new MemoryStream();
+        while ((reader = stream.Read(buffer, 0, buffer.Length)) != 0)
+        {
+            memoryStream.Write(buffer, 0, reader);
+        }
+
+        return memoryStream.ToArray();
+    }
+
     [Fact]
     public async Task Result_of_assessment_calculated()
     {
-        // Arrange{
-        const string fileName = "assets/Pronunciation.wav";
-        byte[] bytes = await File.ReadAllBytesAsync(fileName);
+        var inputReader = new AudioFileReader("assets/Pronunciation.wav");
+        var sampleStream = new WaveToSampleProvider(inputReader);
+        var mono = new StereoToMonoSampleProvider(sampleStream)
+            {
+                LeftVolume = 0.0f,
+                RightVolume = 1.0f
+            };
 
+        // var reader = new WaveFileReader("assets/Pronunciation.wav");
+        // var mono1 = new StereoToMonoProvider16(mono);
+
+        // Downsample to 8000 filter.
+        var resamplingProvider = new WdlResamplingSampleProvider(mono, 8000);
+
+        var waveProvider = new SampleToWaveProvider16(resamplingProvider);
+
+        var outputDevice = new WaveOutEvent();
+        outputDevice.Init(waveProvider);
+        outputDevice.Play();
+        while (outputDevice.PlaybackState == PlaybackState.Playing)
+        {
+            Thread.Sleep(1000);
+        }
+
+        var outputStream = new MemoryStream();
+        var waveFileWriter = new WaveFileWriter(outputStream, waveProvider.WaveFormat);
+        byte[] buffer = new byte[waveProvider.WaveFormat.AverageBytesPerSecond];
+        int read;
+        while ((read = waveProvider.Read(buffer, 0, buffer.Length)) > 0)
+        {
+#pragma warning disable VSTHRD103
+            waveFileWriter.Write(buffer, 0, read);
+#pragma warning restore VSTHRD103
+        }
+
+        // await waveFileWriter.FlushAsync();
         var service = new PronunciationAssessmentService(_config, _logger);
 
         //Act
         IReadOnlyList<WordPronunciationAssessment> result =
-            await service.GetSpeechAssessmentAsync(bytes, default);
+            await service.GetSpeechAssessmentAsync(outputStream.GetBuffer(), default);
 
         // Assert
         result.Count.Should().NotBe(0);
