@@ -7,5 +7,9 @@ public class MistakesAnswer
 
     public string[] Mistakes { get; set; }
 
-    public override string ToString() => string.Join(", ", Mistakes);
+    public int WordsCount { get; set; }
+
+    public string[] Words { get; set; }
+
+    public override string ToString() => string.Join(", ", Mistakes, Words);
 }
