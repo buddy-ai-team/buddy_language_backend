@@ -32,7 +32,8 @@ public class BuddyServiceTests
         var chatGptService = new ChatGPTService(
             ChatGPTFactory.CreateInMemory(openaiKey),
             openaiClient,
-            mockOptions.Object);
+            mockOptions.Object,
+            Mock.Of<ILogger<ChatGPTService>>());
 
         var buddyService = new BuddyService(
             chatGptService,

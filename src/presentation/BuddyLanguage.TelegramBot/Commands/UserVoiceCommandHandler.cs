@@ -40,6 +40,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
             update.Message!.Chat.Id, "Thinking...", cancellationToken: cancellationToken);
 
         var user = await _userService.GetUserByTelegramId(telegramUserId, cancellationToken);
+        _logger.LogInformation("Processing UserVoiceCommand...");
 
         if (voice != null && update.Message != null)
         {
@@ -76,7 +77,6 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                     chatId: update.Message.Chat.Id,
                     voice: InputFile.FromStream(memoryStream, "answer.ogg"),
                     cancellationToken: cancellationToken);
-
                 if (mistakes != null)
                 {
                     await _botClient.SendTextMessageAsync(
@@ -95,9 +95,8 @@ public class UserVoiceCommandHandler : IBotCommandHandler
             }
             else
             {
-                // Голосовое сообщение длится более 30 минут
                 string text = "Превышена допустимая длительность голосового сообщения. " +
-                                "Максимальная длительность: 30 минут.";
+                                    "Максимальная длительность: 30 минут.";
                 await _botClient.SendTextMessageAsync(
                     chatId: update.Message.Chat.Id,
                     text: text,

@@ -84,13 +84,9 @@ namespace BuddyLanguage.Domain.Services
             _logger.LogDebug("Grammar mistakes: {@Mistakes}", mistakes);
             _logger.LogDebug("Studied words: {LearningWords}", studiedWords);
 
-            if (studiedWordsAnswer is not null)
-            {
-                await AddWordsToUser(studiedWordsAnswer.Words, user.Id, cancellationToken);
-            }
-
+            //TODO AddWordsToUser
             var botAnswerWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
-                assistantAnswer, learnedLanguage, Voice.Male, cancellationToken);
+                assistantAnswer, learnedLanguage, Voice.Male, TtsSpeed.Medium, cancellationToken);
 
             return (userMessage, assistantAnswer, botAnswerWavMessage, mistakes, studiedWords);
         }

@@ -31,7 +31,6 @@ public class RoleController : ControllerBase
     public async Task<ActionResult<UpdateRoleResponse>> UpdateRole(UpdateRoleRequest request, CancellationToken cancellationToken)
     {
         var role = await _roleService.ChangePromptByRoleId(request.Id, request.Name, request.Prompt, cancellationToken);
-
         return new UpdateRoleResponse(role.Id, role.Name, role.Prompt);
     }
 
@@ -46,7 +45,6 @@ public class RoleController : ControllerBase
     public async Task<ActionResult<UpdateRoleResponse>> AddRole(AddRoleRequest request, CancellationToken cancellationToken)
     {
         var role = await _roleService.AddRole(request.Name, request.Prompt, cancellationToken);
-
         return new UpdateRoleResponse(role.Id, role.Name, role.Prompt);
     }
 }
