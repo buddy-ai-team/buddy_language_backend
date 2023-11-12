@@ -39,7 +39,7 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
     /// Получить оценку произношения
     /// </summary>
     /// <param name="voiceMessage">Голосовое сообщение в виде набора бойт.
-    /// Поддерживаемые форматы: ogg, wav
+    /// Поддерживаемые форматы: wav
     /// </param>
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Оценка произношения для каждого слова</returns>
@@ -57,17 +57,13 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         }
 
         // Подготовка потока данных к обработке сервисом
-        PushAudioInputStream audioConfigStream =
-            AudioInputStream.CreatePushStream();
-        audioConfigStream.Write(voiceMessage);
-        var audioConfig = AudioConfig.FromStreamInput(audioConfigStream);
-
-        var speechRecognizer = new SpeechRecognizer(_speechConfig, audioConfig);
+        using var audioConfigStream = AudioInputStream.CreatePushStream();
+        using var audioConfig = AudioConfig.FromStreamInput(audioConfigStream);
+        using var speechRecognizer = new SpeechRecognizer(_speechConfig, audioConfig);
         _pronunciationAssessmentConfig.ApplyTo(speechRecognizer);
+        audioConfigStream.Write(voiceMessage, voiceMessage.Length);
 
-        // Запуск обработки потока данных
-        SpeechRecognitionResult speechRecognitionResult =
-            await speechRecognizer.RecognizeOnceAsync();
+        var speechRecognitionResult = await speechRecognizer.RecognizeOnceAsync();
 
         if (speechRecognitionResult.Reason != ResultReason.RecognizedSpeech)
         {

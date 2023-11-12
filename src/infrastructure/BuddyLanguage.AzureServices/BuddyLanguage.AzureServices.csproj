@@ -15,4 +15,10 @@
     <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="assets\Pronunciation.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
