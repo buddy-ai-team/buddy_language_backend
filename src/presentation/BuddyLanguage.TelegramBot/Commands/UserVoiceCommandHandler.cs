@@ -62,7 +62,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
                 var voiceMessage = voiceStream.ToArray();
 
-                var (recognizedMessage,  answerText, answerBytes, mistakes, words) =
+                var (recognizedMessage,  answerText, answerBytes, mistakes) =
                     await _buddyService.ProcessUserMessage(user, voiceMessage, cancellationToken);
 
                 await _botClient.SendTextMessageAsync(
@@ -82,14 +82,6 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                     await _botClient.SendTextMessageAsync(
                         chatId: update.Message.Chat.Id,
                         text: $"Ваши ошибки: {mistakes}",
-                        cancellationToken: cancellationToken);
-                }
-
-                if (words != null)
-                {
-                    await _botClient.SendTextMessageAsync(
-                        chatId: update.Message.Chat.Id,
-                        text: $"Слова на изучение: {words}",
                         cancellationToken: cancellationToken);
                 }
             }
