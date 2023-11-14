@@ -43,7 +43,7 @@ public class BuddyServiceTests
             Mock.Of<ILogger<BuddyService>>());
 
         // Act
-        var mistakes = await buddyService.FindGrammarMistakes(
+        var mistakes = await buddyService.FindGrammarMistakesAndLearningWords(
             "I ready", Language.Russian, Language.English, CancellationToken.None);
 
         // Assert
