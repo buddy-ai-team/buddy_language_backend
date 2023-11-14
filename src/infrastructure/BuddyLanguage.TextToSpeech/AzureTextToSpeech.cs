@@ -135,32 +135,13 @@ namespace BuddyLanguage.TextToSpeech
         /// <returns>The sanitized text ready for use in SSML.</returns>
         private string SanitizeTextForSSML(string text)
         {
-            // Replace special characters with safe equivalents or their respective XML entities
+            // Replace special characters with their respective XML entities
             text = text
-                .Replace("&", "and")
-                .Replace("<", "&lt;")
-                .Replace(">", "&gt;")
-                .Replace("\"", "&quot;")
-                .Replace("'", "&apos;")
-                .Replace("!", "&#33;")
-                .Replace("#", "&#35;")
-                .Replace("$", "&#36;")
-                .Replace("%", "&#37;")
-                .Replace("(", "&#40;")
-                .Replace(")", "&#41;")
-                .Replace("*", "&#42;")
-                .Replace("+", "&#43;")
-                .Replace(",", "&#44;")
-                .Replace("/", "&#47;")
-                .Replace(":", "&#58;")
-                .Replace(";", "&#59;")
-                .Replace("=", "&#61;")
-                .Replace("?", "&#63;")
-                .Replace("[", "&#91;")
-                .Replace("\\", "&#92;")
-                .Replace("]", "&#93;")
-                .Replace("^", "&#94;")
-                .Replace("_", "&#95;");
+                .Replace("&", "&amp;") // Ampersand
+                .Replace("<", "&lt;") // Less than
+                .Replace(">", "&gt;") // Greater than
+                .Replace("\"", "&quot;") // Double quotes
+                .Replace("'", "&apos;"); // Single quote
 
             return text;
         }
