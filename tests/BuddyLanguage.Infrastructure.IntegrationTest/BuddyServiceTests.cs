@@ -52,5 +52,8 @@ public class BuddyServiceTests
         mistakes.Mistakes.Should().NotBeNull();
         mistakes.Mistakes.Should().HaveCount(1);
         mistakes.Mistakes.Should().ContainMatch("*am*");
+        mistakes!.WordsCount.Should().Be(0);
+        mistakes.Words.Should().BeNull();
+        mistakes.Words.Should().HaveCount(0);
     }
 }
