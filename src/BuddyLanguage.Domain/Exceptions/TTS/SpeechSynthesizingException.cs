@@ -22,10 +22,5 @@ namespace BuddyLanguage.Domain.Exceptions.TTS
             : base(message, innerException)
         {
         }
-
-        protected SpeechSynthesizingException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 }

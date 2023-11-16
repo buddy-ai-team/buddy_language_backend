@@ -97,7 +97,7 @@ public class TelegramBotUpdatesListener : BackgroundService
                     cancellationToken: cancellationToken);
             }
 
-            ctsTyping.Cancel();
+            await ctsTyping.CancelAsync();
         }
         else
         {

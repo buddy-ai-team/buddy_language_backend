@@ -17,9 +17,4 @@ public class RoleNotFoundException : DomainException
         : base(message, innerException)
     {
     }
-
-    protected RoleNotFoundException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-    }
 }

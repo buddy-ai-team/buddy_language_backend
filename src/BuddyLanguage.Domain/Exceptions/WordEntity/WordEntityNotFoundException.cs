@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-
-namespace BuddyLanguage.Domain.Exceptions.WordEntity
+﻿namespace BuddyLanguage.Domain.Exceptions.WordEntity
 {
     public class WordEntityNotFoundException : DomainException
     {
@@ -18,11 +13,6 @@ namespace BuddyLanguage.Domain.Exceptions.WordEntity
 
         public WordEntityNotFoundException(string? message, Exception? innerException)
             : base(message, innerException)
-        {
-        }
-
-        protected WordEntityNotFoundException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
     }
