@@ -22,10 +22,5 @@ namespace BuddyLanguage.Domain.Exceptions.User
             : base(message, innerException)
         {
         }
-
-        protected UserNotFoundException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 }

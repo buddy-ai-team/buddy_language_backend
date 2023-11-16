@@ -35,13 +35,13 @@ public static class BuddyLanguageDependencyInjection
         services.AddOptions<AzureTTSConfig>()
             .BindConfiguration("AzureTTSConfig")
             .ValidateDataAnnotations()
-            .ValidateOnStart();
+            ; //.ValidateOnStart()
 
         // Definition of database file name and connection of it as a service
         services.AddOptions<MySqlConnectionStringOptions>()
             .BindConfiguration("MySqlConnectionStringOptions")
             .ValidateDataAnnotations()
-            .ValidateOnStart();
+            ; //.ValidateOnStart()
 
         var config = configuration
             .GetRequiredSection("MySqlConnectionStringOptions")

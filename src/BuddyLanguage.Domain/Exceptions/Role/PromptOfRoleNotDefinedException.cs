@@ -17,9 +17,4 @@ public class PromptOfRoleNotDefinedException : DomainException
         : base(message, innerException)
     {
     }
-
-    protected PromptOfRoleNotDefinedException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-    }
 }
