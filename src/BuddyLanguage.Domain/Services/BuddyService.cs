@@ -36,7 +36,8 @@ namespace BuddyLanguage.Domain.Services
                 string RecognizedMessage,
                 string BotAnswerMessage,
                 byte[] BotAnswerWavMessage,
-                string? Mistakes)>
+                string[]? Mistakes,
+                string[]? Words)>
             ProcessUserMessage(
                 User user,
                 byte[] oggVoiceMessage,
@@ -65,18 +66,17 @@ namespace BuddyLanguage.Domain.Services
 
             var assistantTask = ContinueDialogAndGetAnswer(
                 userMessage, user.Id, cancellationToken);
-            var mistakesTask = FindGrammarMistakesAndLearningWords(
-                userMessage, nativeLanguage, targetLanguage, cancellationToken); 
+            var mistakesTask = GetGrammarMistakesAndLearningWords(
+                userMessage, nativeLanguage, targetLanguage, cancellationToken);
 
             await Task.WhenAll(assistantTask, mistakesTask);
 
             var assistantAnswer = await assistantTask;
-            MistakesAnswer? mistakes = await mistakesTask;
+            var mistakes = await mistakesTask;
 
             _logger.LogDebug("Assistant answer: {AssistantAnswer}", assistantAnswer);
-            _logger.LogDebug("Grammar mistakes: {@Mistakes}", mistakes?.ToString());
 
-            if (mistakes?.WordsCount > 0)
+            if (mistakes!.WordsCount > 0)
             {
                 await AddWordsToUser(mistakes.Words, user.Id, cancellationToken);
             }
@@ -85,7 +85,7 @@ namespace BuddyLanguage.Domain.Services
                 assistantAnswer, targetLanguage, voice, speed, cancellationToken);
 
             return (
-                userMessage, assistantAnswer, botAnswerWavMessage, mistakes?.ToString());
+                userMessage, assistantAnswer, botAnswerWavMessage, mistakes.GrammaMistakes, mistakes.Words);
         }
 
         public async Task<string> ContinueDialogAndGetAnswer(
@@ -96,27 +96,27 @@ namespace BuddyLanguage.Domain.Services
                 textMessage, userId, cancellationToken);
         }
 
-        public async Task<MistakesAnswer?> FindGrammarMistakesAndLearningWords(
+        public async Task<MistakesAnswer> GetGrammarMistakesAndLearningWords(
             string textMessage,
             Language nativeLanguage,
             Language learnedLanguage,
             CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
+
             var prompt = $"Here's the text in {learnedLanguage}, it may contain {nativeLanguage} " +
                 $"words. Imagine that you are my {learnedLanguage} teacher. " +
                 $"After analyzing this text in {learnedLanguage}, highlight 2-3 gross grammatical " +
                 $"errors yourself, if any, and write down the rules for these errors in the " +
-                $"corresponding Mistakes field in {nativeLanguage}, as well as record the number " +
-                $"of these errors in the MistakesCount field. " +
+                $"corresponding \"Mistakes\" field in {nativeLanguage}, as well as record the number " +
+                $"of these errors in the \"MistakesCount\" field. " +
                 $"Also, {nativeLanguage} words may also be present in this text, " +
                 $"please do not count them for grammatical errors, count the number of " +
-                $"{nativeLanguage} words and write them in the WordsCount field," +
-                $"and the words themselves should be written in the Words field.";
-            var mistakes = await _chatGPTService.GetStructuredAnswer<MistakesAnswer>(
-                prompt, textMessage, cancellationToken);
+                $"{nativeLanguage} words and write them in the \"WordsCount\" field," +
+                $"and the words themselves should be written in the \"Words\" field in {learnedLanguage}.";
 
-            return mistakes.MistakesCount > 0 && mistakes.WordsCount > 0 ? mistakes : null; 
+            return await _chatGPTService.GetStructuredAnswer<MistakesAnswer>(
+                prompt, textMessage, cancellationToken);
         }
 
         public Task ResetTopic(User user, CancellationToken cancellationToken)
