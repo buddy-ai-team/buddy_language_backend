@@ -53,7 +53,7 @@ public class BuddyServiceTests
         mistakes.GrammaMistakes.Should().HaveCount(1);
         mistakes.GrammaMistakes.Should().ContainMatch("*am*");
         mistakes.WordsCount.Should().Be(0);
-        mistakes.Words.Should().BeNull();
+        mistakes.Words.Should().BeNullOrEmpty();
         mistakes.Words.Should().HaveCount(0);
     }
 
@@ -95,7 +95,7 @@ public class BuddyServiceTests
         // Assert
         mistakes.Should().NotBeNull();
         mistakes.GrammaMistakesCount.Should().Be(0);
-        mistakes.GrammaMistakes.Should().BeNull();
+        mistakes.GrammaMistakes.Should().BeNullOrEmpty();
         mistakes.GrammaMistakes.Should().HaveCount(0);
         mistakes.WordsCount.Should().Be(1);
         mistakes.Words.Should().NotBeNull();
