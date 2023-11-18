@@ -1,10 +1,5 @@
-using System;
-using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Infrastructure;
-using BuddyLanguage.WebApi;
 using BuddyLanguage.WebApi.Filters;
-using Sentry;
-using Sentry.AspNetCore;
 using Serilog;
 using Serilog.Events;
 
@@ -54,11 +49,6 @@ try
 catch (Exception ex) when (ex is not HostAbortedException)
 {
     Log.Fatal(ex, "Unhandled exception on server startup");
-    throw;
-}
-catch (Exception ex)
-{
-    Log.Error(ex, "An unhandled exception occurred.");
 }
 finally
 {

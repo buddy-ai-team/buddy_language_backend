@@ -38,16 +38,19 @@ public static class BuddyLanguageDependencyInjection
             ; //.ValidateOnStart()
 
         // Definition of database file name and connection of it as a service
-        services.AddOptions<MySqlConnectionStringOptions>()
-            .BindConfiguration("MySqlConnectionStringOptions")
+        services.AddOptions<SqlConnectionStringOptions>()
+            .BindConfiguration("AzureSqlConnectionStringOptions")
             .ValidateDataAnnotations()
             ; //.ValidateOnStart()
 
         var config = configuration
-            .GetRequiredSection("MySqlConnectionStringOptions")
-            .Get<MySqlConnectionStringOptions>();
+            .GetRequiredSection("AzureSqlConnectionStringOptions")
+            .Get<SqlConnectionStringOptions>();
 
-        var mySqlServerVersion = new MySqlServerVersion(new Version(8, 0));
+        if (config is null || string.IsNullOrEmpty(config.ConnectionString))
+        {
+            throw new InvalidOperationException("AzureSqlConnectionStringOptions is missing or invalid in configuration.");
+        }
 
         // Подключение репозитория для работы с Ролями
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
@@ -56,24 +59,20 @@ public static class BuddyLanguageDependencyInjection
         services.AddScoped<IUserRepository, UserRepositoryEf>();
         services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
 
-        if (config is null || string.IsNullOrEmpty(config.ConnectionString))
-        {
-            throw new InvalidOperationException("MySqlConnectionStringOptions is missing or invalid in configuration.");
-        }
-
         services.AddDbContext<AppDbContext>(
-            optionsAction: options => options.UseMySql(config.ConnectionString, mySqlServerVersion));
-
-        services.AddDbContext<ChatGptDbContextTmp>(
-            options => options.UseMySql(config.ConnectionString, mySqlServerVersion));
-
-        services.AddChatGptEntityFrameworkIntegration(
-            op => op.UseMySql(
+            options => options.UseSqlServer(
                 config.ConnectionString,
-                mySqlServerVersion,
                 builder =>
                 {
-                    builder.MigrationsAssembly(typeof(ChatGptDbContext).Assembly.FullName);
+                    builder.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                }));
+
+        services.AddChatGptEntityFrameworkIntegration(
+            options => options.UseSqlServer(
+                config.ConnectionString,
+                builder =>
+                {
+                    builder.MigrationsAssembly(typeof(Stub).Assembly.FullName);
                 }));
 
         services.AddScoped<IChatGPTService, ChatGPTService>();

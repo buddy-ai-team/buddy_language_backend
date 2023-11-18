@@ -7,30 +7,30 @@ on:
     - main
 
 env:
-  AZURE_WEBAPP_NAME: buddlanguageTGBOT
+  AZURE_WEBAPP_NAME: BuddyLanguageTG
   AZURE_WEBAPP_PACKAGE_PATH: "./publish"
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'
-          
+          dotnet-version: ${{ vars.APP_DOTNET_VERSION }}
+
       - name: Restore
         run: dotnet restore ./src/presentation/BuddyLanguage.TelegramBot/BuddyLanguage.TelegramBot.csproj
-        
+
       - name: Build
         run: dotnet build ./src/presentation/BuddyLanguage.TelegramBot/BuddyLanguage.TelegramBot.csproj --configuration Release --no-restore
-        
+
       - name: Publish
         run: dotnet publish ./src/presentation/BuddyLanguage.TelegramBot/BuddyLanguage.TelegramBot.csproj --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
-        
+
       - name: Deployment
         uses: azure/webapps-deploy@v2
         with:

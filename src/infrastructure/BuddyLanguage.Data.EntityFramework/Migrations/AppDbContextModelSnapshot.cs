@@ -3,6 +3,7 @@ using System;
 using BuddyLanguage.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -16,20 +17,22 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.12")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("BuddyLanguage.Domain.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Prompt")
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -40,16 +43,16 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TelegramId")
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -60,17 +63,17 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Language")
                         .HasColumnType("int");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Word")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WordStatus")
                         .HasColumnType("int");
@@ -87,23 +90,23 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                     b.OwnsOne("BuddyLanguage.Domain.Entities.User+Preferences", "UserPreferences", b1 =>
                         {
                             b1.Property<Guid>("UserId")
-                                .HasColumnType("char(36)");
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("NativeLanguage")
                                 .IsRequired()
-                                .HasColumnType("longtext");
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("SelectedSpeed")
                                 .IsRequired()
-                                .HasColumnType("longtext");
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("SelectedVoice")
                                 .IsRequired()
-                                .HasColumnType("longtext");
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("TargetLanguage")
                                 .IsRequired()
-                                .HasColumnType("longtext");
+                                .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("UserId");
 
