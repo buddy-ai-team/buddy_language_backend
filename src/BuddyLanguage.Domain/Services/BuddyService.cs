@@ -110,8 +110,8 @@ namespace BuddyLanguage.Domain.Services
                 $"errors yourself, if any, and write down the rules for these errors in the " +
                 $"corresponding \"Mistakes\" field in {nativeLanguage}, as well as record the number " +
                 $"of these errors in the \"MistakesCount\" field. " +
-                $"Also, {nativeLanguage} words may also be present in this text, " +
-                $"please do not count them for grammatical errors, count the number of " +
+                $"Also, this text may include {nativeLanguage} words, just ignore them." +
+                $"Count the number of " +
                 $"{nativeLanguage} words and write them in the \"WordsCount\" field," +
                 $"and the words themselves should be written in the \"Words\" field in {learnedLanguage}.";
 
