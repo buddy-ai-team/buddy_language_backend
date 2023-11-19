@@ -57,11 +57,19 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         }
 
         // Подготовка потока данных к обработке сервисом
+        using var ms = new MemoryStream(voiceMessage);
+        using var reader = new BinaryReader(ms);
         using var audioConfigStream = AudioInputStream.CreatePushStream();
         using var audioConfig = AudioConfig.FromStreamInput(audioConfigStream);
         using var speechRecognizer = new SpeechRecognizer(_speechConfig, audioConfig);
         _pronunciationAssessmentConfig.ApplyTo(speechRecognizer);
-        audioConfigStream.Write(voiceMessage, voiceMessage.Length);
+        byte[] readBytes;
+        do
+        {
+            readBytes = reader.ReadBytes(1024);
+            audioConfigStream.Write(readBytes, readBytes.Length);
+        }
+        while (readBytes.Length > 0);
 
         var speechRecognitionResult = await speechRecognizer.RecognizeOnceAsync();
 
@@ -76,12 +84,12 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         var pronunciationAssessmentResult =
             PronunciationAssessmentResult.FromResult(speechRecognitionResult);
 
-        var result =
+        var totalResult =
             pronunciationAssessmentResult
             .Words
             .Select(word => new WordPronunciationAssessment(word.Word, word.AccuracyScore))
             .ToList();
 
-        return result;
+        return totalResult;
     }
 }
