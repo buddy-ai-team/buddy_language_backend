@@ -13,9 +13,10 @@ namespace BuddyLanguage.Domain.Interfaces
         /// <param name="text">The text to be synthesized into speech.</param>
         /// <param name="language">The language of the voice.</param>
         /// <param name="voice">The desired voice for synthesis.</param>
+        /// <param name="speed">The desired voice speed for synthesis.</param>
         /// <param name="cancellationToken">A CancellationToken for possible cancellation of the operation.</param>
         /// <exception cref="SpeechSynthesizingException">Thrown when an error occurs during speech synthesis.</exception>
         /// <returns>A Task representing the asynchronous operation, returning a byte array containing the synthesized audio.</returns>
-        Task<byte[]> TextToWavByteArrayAsync(string text, Language language, Voice voice, CancellationToken cancellationToken);
+        Task<byte[]> TextToWavByteArrayAsync(string text, Language language, Voice voice, TtsSpeed speed, CancellationToken cancellationToken);
     }
 }

@@ -5,20 +5,20 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BuddyLanguage.Domain.Exceptions.User
+namespace BuddyLanguage.Domain.Exceptions.TTS
 {
-    public class UserNotFoundException : DomainException
+    public class SpeechSynthesizingException : DomainException
     {
-        public UserNotFoundException()
+        public SpeechSynthesizingException()
         {
         }
 
-        public UserNotFoundException(string? message)
+        public SpeechSynthesizingException(string? message)
             : base(message)
         {
         }
 
-        public UserNotFoundException(string? message, Exception? innerException)
+        public SpeechSynthesizingException(string? message, Exception? innerException)
             : base(message, innerException)
         {
         }

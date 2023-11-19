@@ -58,7 +58,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
                 var cancellationToken = CancellationToken.None;
 
                 // Act
-                var audioData = await textToSpeechClient.TextToWavByteArrayAsync(text, language, voice, cancellationToken);
+                var audioData = await textToSpeechClient.TextToWavByteArrayAsync(text, language, voice, TtsSpeed.Medium, cancellationToken);
 
                 // Assert
                 audioData.Should().NotBeNullOrEmpty($"Audio Data For Language: {language} and Voice: {voice} combination was null/empty!");

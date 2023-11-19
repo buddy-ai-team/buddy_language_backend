@@ -1,27 +1,57 @@
 using BuddyLanguage.Infrastructure;
 using BuddyLanguage.WebApi.Filters;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Swagger Setup
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.Sentry(o =>
+    {
+        o.Dsn = builder.Configuration["Sentry:Dsn"];
+        o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+        o.MinimumEventLevel = LogEventLevel.Error;
+    })
+    .CreateLogger();
 
-//Domain and Infrastructure services
-builder.Services.AddApplicationServices(builder.Configuration);
+builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration).WriteTo.Console());
 
-//Filters
-builder.Services.AddControllers(options =>
+builder.WebHost.UseSentry();
+
+try
 {
-    options.Filters.Add<CentralizedExceptionHandlingFilter>(order: 1);
-});
+    //Swagger Setup
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
+    //Domain and Infrastructure services
+    builder.Services.AddApplicationServices(builder.Configuration);
 
-//Swagger Build
-app.UseSwagger();
-app.UseSwaggerUI();
+    //Filters
+    builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<CentralizedExceptionHandlingFilter>(order: 1);
+    });
 
-app.MapControllers();
+    var app = builder.Build();
 
-app.Run();
+    //Swagger Build
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
+    app.MapControllers();
+
+    app.Run();
+}
+catch (Exception ex) when (ex is not HostAbortedException)
+{
+    Log.Fatal(ex, "Unhandled exception on server startup");
+}
+finally
+{
+    Log.Information("Shut down complete");
+    Log.CloseAndFlush();
+}
