@@ -71,20 +71,11 @@ public class PronunciationAssessmentTest
         // Downsample to 8000 filter.
         var resamplingProvider = new WdlResamplingSampleProvider(mono, 8000);
 
-        var waveProvider = new SampleToWaveProvider16(resamplingProvider);
+        var sampleWriter = new SampleToWaveProvider16(resamplingProvider);
+        var waveProvider16 = sampleWriter.ToSampleProvider().ToWaveProvider16();
 
-        // player (just to test)
-        // var outputDevice = new WaveOutEvent();
-        // outputDevice.Init(waveProvider);
-        // outputDevice.Play();
-        // while (outputDevice.PlaybackState == PlaybackState.Playing)
-        // {
-        //     Thread.Sleep(1000);
-        // }
-        // end of play test
-        var aaa = ConvertWavToByteArray("assets/Pronunciation.wav");
+        var aaa = WaveProviderToBytes(waveProvider16);
 
-        // await waveFileWriter.FlushAsync();
         var service = new PronunciationAssessmentService(_config, _logger);
 
         //Act
@@ -95,14 +86,33 @@ public class PronunciationAssessmentTest
         result.Count.Should().NotBe(0);
     }
 
-    public byte[] ConvertWavToByteArray(string fileName)
+    private byte[] WaveProviderToBytes(IWaveProvider waveProvider)
     {
-        using WaveFileReader reader = new WaveFileReader(fileName);
-        Assert.Equal(16, reader.WaveFormat.BitsPerSample);
-        byte[] buffer = new byte[reader.Length];
-        int read = reader.Read(buffer, 0, buffer.Length);
-        short[] sampleBuffer = new short[read / 2];
-        Buffer.BlockCopy(buffer, 0, sampleBuffer, 0, read);
-        return buffer;
+        // Create a SampleProvider from the WaveProvider
+        ISampleProvider sampleProvider = waveProvider.ToSampleProvider();
+
+        // Specify the number of samples to read (adjust as needed)
+        int bufferSize = 1024;
+
+        // Create a byte array to store the raw PCM data
+        byte[] pcmData = new byte[bufferSize * 2]; // Assuming 16-bit PCM, adjust as needed
+
+        // Create a MemoryStream to store the raw PCM data
+        using (MemoryStream pcmStream = new MemoryStream())
+        {
+            int samplesRead;
+
+            // Read raw PCM data from the SampleProvider into the MemoryStream
+            while ((samplesRead = sampleProvider.Read(pcmData, 0, bufferSize)) > 0)
+            {
+                pcmStream.Write(pcmData, 0, samplesRead * 2); // Assuming 16-bit PCM, adjust as needed
+            }
+
+            // Retrieve the raw PCM data as a byte array
+            byte[] rawPcmBytes = pcmStream.ToArray();
+
+            // Now 'rawPcmBytes' contains the raw PCM data without any headers
+            Console.WriteLine("Conversion completed.");
+        }
     }
 }
