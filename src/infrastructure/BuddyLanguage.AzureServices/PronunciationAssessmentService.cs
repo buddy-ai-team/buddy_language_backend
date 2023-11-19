@@ -57,8 +57,8 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         }
 
         // Подготовка потока данных к обработке сервисом
-        using var ms = new MemoryStream(voiceMessage);
-        using var reader = new BinaryReader(ms);
+        var ms = new MemoryStream(voiceMessage);
+        var reader = new BinaryReader(ms);
         using var audioConfigStream = AudioInputStream.CreatePushStream();
         using var audioConfig = AudioConfig.FromStreamInput(audioConfigStream);
         using var speechRecognizer = new SpeechRecognizer(_speechConfig, audioConfig);

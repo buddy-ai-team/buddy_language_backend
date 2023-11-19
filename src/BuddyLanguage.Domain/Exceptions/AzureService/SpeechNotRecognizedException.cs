@@ -17,9 +17,4 @@ public class SpeechNotRecognizedException : DomainException
         : base(message, innerException)
     {
     }
-
-    protected SpeechNotRecognizedException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-    }
 }

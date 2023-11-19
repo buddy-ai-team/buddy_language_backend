@@ -38,10 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="assets\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="assets\History.aiff">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

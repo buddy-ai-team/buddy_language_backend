@@ -44,75 +44,65 @@ public class PronunciationAssessmentTest
         _logger = new LoggerFactory().CreateLogger<PronunciationAssessmentService>();
     }
 
-    public static byte[] ToArray(Stream stream)
-    {
-        byte[] buffer = new byte[4096];
-        int reader = 0;
-        MemoryStream memoryStream = new MemoryStream();
-        while ((reader = stream.Read(buffer, 0, buffer.Length)) != 0)
-        {
-            memoryStream.Write(buffer, 0, reader);
-        }
-
-        return memoryStream.ToArray();
-    }
-
     [Fact]
     public async Task Result_of_assessment_calculated()
     {
-        var inputReader = new AudioFileReader("assets/Pronunciation.wav");
-        var sampleStream = new WaveToSampleProvider(inputReader);
-        var mono = new StereoToMonoSampleProvider(sampleStream)
-            {
-                LeftVolume = 0.0f,
-                RightVolume = 1.0f
-            };
-
-        // Downsample to 8000 filter.
-        var resamplingProvider = new WdlResamplingSampleProvider(mono, 8000);
-
-        var sampleWriter = new SampleToWaveProvider16(resamplingProvider);
-        var waveProvider16 = sampleWriter.ToSampleProvider().ToWaveProvider16();
-
-        var aaa = WaveProviderToBytes(waveProvider16);
-
+        byte[] data = ConvertToMono16BitPcm("assets/Pronunciation.wav");
         var service = new PronunciationAssessmentService(_config, _logger);
 
         //Act
         IReadOnlyList<WordPronunciationAssessment> result =
-            await service.GetSpeechAssessmentAsync(aaa, default);
+            await service.GetSpeechAssessmentAsync(data, default);
 
         // Assert
         result.Count.Should().NotBe(0);
     }
 
-    private byte[] WaveProviderToBytes(IWaveProvider waveProvider)
+    private byte[] ConvertToMono16BitPcm(string fileName)
     {
-        // Create a SampleProvider from the WaveProvider
-        ISampleProvider sampleProvider = waveProvider.ToSampleProvider();
-
-        // Specify the number of samples to read (adjust as needed)
-        int bufferSize = 1024;
-
-        // Create a byte array to store the raw PCM data
-        byte[] pcmData = new byte[bufferSize * 2]; // Assuming 16-bit PCM, adjust as needed
-
-        // Create a MemoryStream to store the raw PCM data
-        using (MemoryStream pcmStream = new MemoryStream())
+        // Read the WAV file into a byte array
+        byte[] wavData = File.ReadAllBytes(fileName);
+        using (MemoryStream inputStream = new MemoryStream(wavData))
         {
-            int samplesRead;
-
-            // Read raw PCM data from the SampleProvider into the MemoryStream
-            while ((samplesRead = sampleProvider.Read(pcmData, 0, bufferSize)) > 0)
+            using (WaveStream reader = new WaveFileReader(inputStream))
             {
-                pcmStream.Write(pcmData, 0, samplesRead * 2); // Assuming 16-bit PCM, adjust as needed
+                // Convert to 16-bit PCM
+                var pcmFormat = new WaveFormat(16000, 16, 1); // Adjust sample rate as needed
+                var pcmStream = new WaveFormatConversionStream(pcmFormat, reader);
+
+                // Convert to byte array
+                using (MemoryStream outputStream = new MemoryStream())
+                {
+                    pcmStream.CopyTo(outputStream);
+                    return outputStream.ToArray();
+                }
             }
-
-            // Retrieve the raw PCM data as a byte array
-            byte[] rawPcmBytes = pcmStream.ToArray();
-
-            // Now 'rawPcmBytes' contains the raw PCM data without any headers
-            Console.WriteLine("Conversion completed.");
         }
+    }
+
+    private byte[] ConvertToByteArray(ISampleProvider sampleProvider)
+    {
+        int sampleRate = sampleProvider.WaveFormat.SampleRate;
+        int channels = sampleProvider.WaveFormat.Channels;
+
+        // Determine a reasonable buffer size (you may need to adjust this based on your needs)
+        int bufferSize = sampleRate * channels; // 1 second of audio data
+
+        // Create a byte array to hold the converted samples
+        byte[] buffer = new byte[bufferSize * sizeof(float)];
+
+        WaveBuffer waveBuffer = new WaveBuffer(buffer);
+
+        int bytesRead;
+        MemoryStream stream = new MemoryStream();
+
+        do
+        {
+            bytesRead = sampleProvider.Read(waveBuffer, 0, bufferSize);
+            stream.Write(buffer, 0, bytesRead * sizeof(float));
+        }
+        while (bytesRead > 0);
+
+        return stream.ToArray();
     }
 }
