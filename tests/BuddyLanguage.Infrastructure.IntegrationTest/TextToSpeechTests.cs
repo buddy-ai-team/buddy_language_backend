@@ -4,7 +4,6 @@ using FluentAssertions;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest
 {
@@ -73,8 +72,8 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         {
             // Arrange
             //Act
-            string? speechKey = GetKeyFromEnvironment("AZURE_SPEECH_KEY");
-            string? speechRegion = GetKeyFromEnvironment("AZURE_SPEECH_REGION");
+            string speechKey = GetKeyFromEnvironment("AZURE_SPEECH_KEY");
+            string speechRegion = GetKeyFromEnvironment("AZURE_SPEECH_REGION");
 
             // Assert
             var speechConfig = SpeechConfig.FromSubscription(speechKey, speechRegion);
