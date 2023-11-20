@@ -1,4 +1,5 @@
 using BuddyLanguage.Infrastructure;
+using BuddyLanguage.WebApi.Extensions;
 using BuddyLanguage.WebApi.Filters;
 using Serilog;
 using Serilog.Events;
@@ -17,32 +18,21 @@ Log.Logger = new LoggerConfiguration()
     })
     .CreateLogger();
 
-builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration).WriteTo.Console());
-
-builder.WebHost.UseSentry();
-
 try
 {
-    //Swagger Setup
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration).WriteTo.Console());
+
+    builder.WebHost.UseSentry();
+
+    //WebApi services
+    builder.Services.AddWebApiServices(builder.Configuration);
 
     //Domain and Infrastructure services
     builder.Services.AddApplicationServices(builder.Configuration);
 
-    //Filters
-    builder.Services.AddControllers(options =>
-    {
-        options.Filters.Add<CentralizedExceptionHandlingFilter>(order: 1);
-    });
-
     var app = builder.Build();
 
-    //Swagger Build
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
-    app.MapControllers();
+    app.UseWebApi();
 
     app.Run();
 }

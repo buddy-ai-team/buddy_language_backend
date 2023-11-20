@@ -26,6 +26,7 @@
       <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
       <ProjectReference Include="..\..\infrastructure\BuddyLanguage.Infrastructure\BuddyLanguage.Infrastructure.csproj" />
       <ProjectReference Include="..\..\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj" />
+      <ProjectReference Include="..\BuddyLanguage.WebApi\BuddyLanguage.WebApi.csproj" />
     </ItemGroup>
 
     <ItemGroup>
