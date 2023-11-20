@@ -55,7 +55,7 @@ try
 
     var app = builder.Build();
 
-    app.MapGet("/", () => "OK");
+    app.MapGet("/", () => $"Ver: {ReflectionHelper.GetBuildDate():s}");
 
     app.UseWebApi();
 
