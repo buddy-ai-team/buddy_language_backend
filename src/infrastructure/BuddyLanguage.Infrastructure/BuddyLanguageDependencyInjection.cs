@@ -37,21 +37,6 @@ public static class BuddyLanguageDependencyInjection
             .ValidateDataAnnotations()
             ; //.ValidateOnStart()
 
-        // Definition of database file name and connection of it as a service
-        services.AddOptions<SqlConnectionStringOptions>()
-            .BindConfiguration("AzureSqlConnectionStringOptions")
-            .ValidateDataAnnotations()
-            ; //.ValidateOnStart()
-
-        var config = configuration
-            .GetRequiredSection("AzureSqlConnectionStringOptions")
-            .Get<SqlConnectionStringOptions>();
-
-        if (config is null || string.IsNullOrEmpty(config.ConnectionString))
-        {
-            throw new InvalidOperationException("AzureSqlConnectionStringOptions is missing or invalid in configuration.");
-        }
-
         // Подключение репозитория для работы с Ролями
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         services.AddScoped<IRoleRepository, RoleRepositoryEf>();
@@ -59,9 +44,10 @@ public static class BuddyLanguageDependencyInjection
         services.AddScoped<IUserRepository, UserRepositoryEf>();
         services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
 
+        // Can be replaced with Aspire.Microsoft.EntityFrameworkCore.SqlServer
         services.AddDbContext<AppDbContext>(
             options => options.UseSqlServer(
-                config.ConnectionString,
+                configuration.GetRequiredConnectionString("AZURE_SQL_CONNECTIONSTRING"),
                 builder =>
                 {
                     builder.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
@@ -69,7 +55,7 @@ public static class BuddyLanguageDependencyInjection
 
         services.AddChatGptEntityFrameworkIntegration(
             options => options.UseSqlServer(
-                config.ConnectionString,
+                configuration.GetRequiredConnectionString("AZURE_SQL_CONNECTIONSTRING"),
                 builder =>
                 {
                     builder.MigrationsAssembly(typeof(Stub).Assembly.FullName);
@@ -80,8 +66,7 @@ public static class BuddyLanguageDependencyInjection
         services.AddOpenAIService(
         settings =>
         {
-            settings.ApiKey = configuration["OPENAI_API_KEY"] ?? throw new InvalidOperationException(
-                                  "OPENAI_API_KEY environment variable is not set");
+            settings.ApiKey = configuration.GetRequiredValue("OPENAI_API_KEY");
         });
 
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
