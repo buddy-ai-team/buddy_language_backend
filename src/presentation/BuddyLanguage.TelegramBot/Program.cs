@@ -2,7 +2,6 @@ using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
 using BuddyLanguage.TelegramBot.Commands;
 using BuddyLanguage.TelegramBot.Services;
-using BuddyLanguage.WebApi.Extensions;
 using Serilog;
 using Serilog.Events;
 using Telegram.Bot;
@@ -29,8 +28,6 @@ try
 
     builder.Services.AddApplicationServices(builder.Configuration);
 
-    builder.Services.AddWebApiServices(builder.Configuration);
-
     var token = builder.Configuration.GetRequiredValue("BotConfiguration:Token");
 
     builder.Services.AddSingleton(new TelegramBotClientOptions(token));
@@ -56,8 +53,6 @@ try
     var app = builder.Build();
 
     app.MapGet("/", () => $"Ver: {ReflectionHelper.GetBuildDate():s}");
-
-    app.UseWebApi();
 
     app.Run();
 }

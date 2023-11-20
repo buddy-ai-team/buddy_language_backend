@@ -28,18 +28,12 @@
     <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj"/>
     <ProjectReference Include="..\..\infrastructure\BuddyLanguage.Infrastructure\BuddyLanguage.Infrastructure.csproj"/>
     <ProjectReference Include="..\..\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj"/>
-    <ProjectReference Include="..\BuddyLanguage.WebApi\BuddyLanguage.WebApi.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Services\UserBotStates.cs">
       <DependentUpon>TelegramUserRepository.cs</DependentUpon>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Update="appsettings.Development.json" CopyToOutputDirectory="PreserveNewest"/>
   </ItemGroup>
 
 </Project>
