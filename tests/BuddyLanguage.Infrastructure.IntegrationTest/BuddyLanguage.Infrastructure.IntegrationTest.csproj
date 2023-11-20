@@ -33,6 +33,7 @@
     <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj" />
+    <ProjectReference Include="..\..\src\presentation\BuddyLanguage.TelegramBot\BuddyLanguage.TelegramBot.csproj" />
   </ItemGroup>
 
   <ItemGroup>

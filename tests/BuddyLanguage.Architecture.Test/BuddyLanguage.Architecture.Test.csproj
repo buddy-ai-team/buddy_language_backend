@@ -33,6 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\presentation\BuddyLanguage.TelegramBot\BuddyLanguage.TelegramBot.csproj" />
       <ProjectReference Include="..\..\src\presentation\BuddyLanguage.WebApi\BuddyLanguage.WebApi.csproj" />
     </ItemGroup>
 
