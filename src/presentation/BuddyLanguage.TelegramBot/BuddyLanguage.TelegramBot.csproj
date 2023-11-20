@@ -1,38 +1,45 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>fb1d0499-6546-48bc-8368-bfda4d413b9b</UserSecretsId>
-        <LangVersion>12</LangVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>fb1d0499-6546-48bc-8368-bfda4d413b9b</UserSecretsId>
+    <LangVersion>12</LangVersion>
+    <Deterministic>false</Deterministic>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Polly" Version="8.2.0" />
-      <PackageReference Include="Polly.Extensions" Version="8.2.0" />
-      <PackageReference Include="Sentry.AspNetCore" Version="3.41.0" />
-      <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
-      <PackageReference Include="Serilog.Sinks.SentrySDK.AspNetCore" Version="1.0.5" />
-      <PackageReference Include="Telegram.Bot" Version="19.0.0" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Polly" Version="8.2.0"/>
+    <PackageReference Include="Polly.Extensions" Version="8.2.0"/>
+    <PackageReference Include="Sentry.AspNetCore" Version="3.41.0"/>
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0"/>
+    <PackageReference Include="Serilog.Sinks.SentrySDK.AspNetCore" Version="1.0.5"/>
+    <PackageReference Include="Telegram.Bot" Version="19.0.0"/>
 
-    </ItemGroup>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
-      <ProjectReference Include="..\..\infrastructure\BuddyLanguage.Infrastructure\BuddyLanguage.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj" />
-      <ProjectReference Include="..\BuddyLanguage.WebApi\BuddyLanguage.WebApi.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj"/>
+    <ProjectReference Include="..\..\infrastructure\BuddyLanguage.Infrastructure\BuddyLanguage.Infrastructure.csproj"/>
+    <ProjectReference Include="..\..\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj"/>
+    <ProjectReference Include="..\BuddyLanguage.WebApi\BuddyLanguage.WebApi.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <Compile Update="Services\UserBotStates.cs">
-        <DependentUpon>TelegramUserRepository.cs</DependentUpon>
-      </Compile>
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Services\UserBotStates.cs">
+      <DependentUpon>TelegramUserRepository.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Update="appsettings.Development.json" CopyToOutputDirectory="PreserveNewest"/>
+  </ItemGroup>
 
 </Project>
