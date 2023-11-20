@@ -1,4 +1,5 @@
-﻿using BuddyLanguage.Domain.Interfaces;
+﻿using System.Collections.Concurrent;
+using BuddyLanguage.Domain.Interfaces;
 using OpenAI.ChatGpt.Interfaces;
 using Telegram.Bot;
 
@@ -13,6 +14,9 @@ namespace BuddyLanguage.TelegramBot.Services
         private readonly string _prompt = "The user does not appear in the application for a long time, you need to inspire him " +
                                           "to return, continue communication and further study the language. " +
                                           "Do it in a fun comic way.";
+
+        private readonly ConcurrentDictionary<string, DateTime> _lastReminderSentTimes = new ConcurrentDictionary<string, DateTime>();
+        private readonly int _reminderCooldownHours = 24;
 
         public TelegramMessageSendingService(
                                              IChatGPTService chatGPTService,
@@ -42,14 +46,28 @@ namespace BuddyLanguage.TelegramBot.Services
                 var currentTime = DateTime.Now;
                 var afterLastMessageIntervalHours = (currentTime - lastMessageTime).TotalHours;
 
-                if (afterLastMessageIntervalHours >= reminderIntervalHours)
+                if (afterLastMessageIntervalHours >= reminderIntervalHours && !HasRecentReminder(user.Id.ToString()))
                 {
                     var reminder = await _chatGPTSevice.GetAnswer(_prompt, cancellationToken);
                     await _botClient.SendTextMessageAsync(
                         chatId: user.Id.ToString(),
                         text: reminder);
+
+                    _lastReminderSentTimes[user.Id.ToString()] = DateTime.Now;
                 }
             }
+        }
+
+        private bool HasRecentReminder(string userId)
+        {
+            if (_lastReminderSentTimes.TryGetValue(userId, out var lastReminderTime))
+            {
+                var currentTime = DateTime.Now;
+                var elapsedHours = (currentTime - lastReminderTime).TotalHours;
+                return elapsedHours < _reminderCooldownHours;
+            }
+
+            return false;
         }
     }
 }
