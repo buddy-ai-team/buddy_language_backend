@@ -1,4 +1,5 @@
 using BuddyLanguage.Infrastructure;
+using BuddyLanguage.WebApi.Extensions;
 using BuddyLanguage.WebApi.Filters;
 using Serilog;
 using Serilog.Events;
