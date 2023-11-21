@@ -11,5 +11,5 @@ public class MistakesAnswer
 
     public string[] Words { get; set; }
 
-    public override string ToString() => string.Join(",", GrammaMistakes);
+    public override string ToString() => string.Join(",", GrammaMistakes, Words);
 }

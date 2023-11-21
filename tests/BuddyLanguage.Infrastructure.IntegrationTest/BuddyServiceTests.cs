@@ -58,7 +58,7 @@ public class BuddyServiceTests
     }
 
     [Fact]
-    public async Task Checking_learning_word__time__is_found()
+    public async Task Checking_learning_word__favorite__is_found()
     {
         // Arrange
         var openaiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
@@ -87,7 +87,7 @@ public class BuddyServiceTests
 
         // Act
         var mistakes = await buddyService.GetGrammarMistakesAndLearningWords(
-            "What is your любимый фильм?",
+            "What is your любимый film?",
             Language.Russian,
             Language.English,
             CancellationToken.None);
