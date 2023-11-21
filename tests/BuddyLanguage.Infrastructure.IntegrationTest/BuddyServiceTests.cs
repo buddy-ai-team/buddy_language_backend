@@ -87,7 +87,7 @@ public class BuddyServiceTests
 
         // Act
         var mistakes = await buddyService.GetGrammarMistakesAndLearningWords(
-            "I like to spend my время with my parents",
+            "What is your любимый фильм?",
             Language.Russian,
             Language.English,
             CancellationToken.None);
@@ -100,6 +100,6 @@ public class BuddyServiceTests
         mistakes.WordsCount.Should().Be(1);
         mistakes.Words.Should().NotBeNull();
         mistakes.Words.Should().HaveCount(1);
-        mistakes.Words.Should().Contain("time");
+        mistakes.Words.Should().Contain("favorite");
     }
 }

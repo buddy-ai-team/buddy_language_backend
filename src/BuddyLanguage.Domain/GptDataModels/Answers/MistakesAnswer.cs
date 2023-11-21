@@ -10,4 +10,6 @@ public class MistakesAnswer
     public int WordsCount { get; set; }
 
     public string[] Words { get; set; }
+
+    public override string ToString() => string.Join(",", GrammaMistakes);
 }
