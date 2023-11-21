@@ -9,11 +9,7 @@
     <Deterministic>false</Deterministic>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-  </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
