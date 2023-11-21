@@ -15,7 +15,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest;
 public class BuddyServiceTests
 {
     [Fact]
-    public async Task Grammar_checking_missing_modal_verb__am__is_found()
+    public async Task Grammar_checking_irregular_form_of_the_verb__like__is_found()
     {
         // Arrange
         var openaiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
@@ -44,14 +44,14 @@ public class BuddyServiceTests
 
         // Act
         var mistakes = await buddyService.GetGrammarMistakesAndLearningWords(
-            "I ready", Language.Russian, Language.English, CancellationToken.None);
+            "I likes dog", Language.Russian, Language.English, CancellationToken.None);
 
         // Assert
         mistakes.Should().NotBeNull();
         mistakes.GrammaMistakesCount.Should().Be(1);
         mistakes.GrammaMistakes.Should().NotBeNull();
         mistakes.GrammaMistakes.Should().HaveCount(1);
-        mistakes.GrammaMistakes.Should().ContainMatch("*am*");
+        mistakes.GrammaMistakes.Should().ContainMatch("*like*");
         mistakes.WordsCount.Should().Be(0);
         mistakes.Words.Should().BeNullOrEmpty();
         mistakes.Words.Should().HaveCount(0);

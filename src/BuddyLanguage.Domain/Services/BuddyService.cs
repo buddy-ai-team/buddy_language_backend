@@ -75,6 +75,7 @@ namespace BuddyLanguage.Domain.Services
             var mistakes = await mistakesTask;
 
             _logger.LogDebug("Assistant answer: {AssistantAnswer}", assistantAnswer);
+            _logger.LogDebug("Assistant answer: {AssistantAnswer}", mistakes.ToString());
 
             if (mistakes!.WordsCount > 0)
             {
