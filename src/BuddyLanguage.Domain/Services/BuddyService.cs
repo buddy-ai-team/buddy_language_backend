@@ -103,18 +103,19 @@ namespace BuddyLanguage.Domain.Services
             CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
-
             var prompt = $"Here's the text in {learnedLanguage}, it may contain {nativeLanguage} " +
-                $"words. Imagine that you are my {learnedLanguage} teacher. " +
-                $"After analyzing this text in {learnedLanguage}, highlight 2-3 gross grammatical " +
-                $"errors yourself, if any, and write down the rules for these errors in the " +
-                $"corresponding \"Mistakes\" field in {nativeLanguage}, as well as record the number " +
-                $"of these errors in the \"MistakesCount\" field. " +
-                $"Also, this text may include {nativeLanguage} words, just ignore them." +
-                $"Count the number of " +
-                $"{nativeLanguage} words and write them in the \"WordsCount\" field," +
-                $"and the words themselves should be written in the \"Words\" field in {learnedLanguage}.";
-
+                         $"words. Imagine that you are my {learnedLanguage} teacher. Step by step" +
+                         $"1. Please Count the number of " +
+                         $"{nativeLanguage} words and write them in the \"WordsCount\", " +
+                         $"then translated theese words into {learnedLanguage}  and write only" +
+                         $" translated words in the \"Words\"" +
+                         $" Make sure that everything is done correctly" +
+                         $"2. Then you need to translate this sentence into {learnedLanguage}, " +
+                         $"find max 1-2 of the grossest grammatical errors in the translated sentence," +
+                         $" if they are, but not spelling, and write down the rules for these errors " +
+                         $"in the corresponding \"Mistakes\" field in {nativeLanguage}, " +
+                         $"as well as record the number of these errors in the \"MistakesCount\" field. " +
+                         $"Make sure that everything is done correctly";
             return await _chatGPTService.GetStructuredAnswer<MistakesAnswer>(
                 prompt, textMessage, cancellationToken);
         }
