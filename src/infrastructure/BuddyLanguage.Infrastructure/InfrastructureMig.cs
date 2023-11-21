@@ -1,5 +1,5 @@
 ﻿namespace BuddyLanguage.Infrastructure;
 
-public class Stub
+internal class InfrastructureMig
 {
 }

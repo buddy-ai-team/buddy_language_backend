@@ -33,6 +33,8 @@ try
     var app = builder.Build();
 
     app.UseWebApi();
+    app.MapHealthChecks("/buddy_health")
+        .ShortCircuit();
 
     app.Run();
 }
