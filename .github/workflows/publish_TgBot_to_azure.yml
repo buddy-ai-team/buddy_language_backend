@@ -26,10 +26,10 @@ jobs:
         run: dotnet restore ./src/presentation/BuddyLanguage.TelegramBot/BuddyLanguage.TelegramBot.csproj
 
       - name: Build
-        run: dotnet build ./src/presentation/BuddyLanguage.TelegramBot/BuddyLanguage.TelegramBot.csproj --configuration Release --no-restore
+        run: dotnet build ./src/presentation/BuddyLanguage.TelegramBot/BuddyLanguage.TelegramBot.csproj --configuration Release --no-restore --os linux-x64
 
       - name: Publish
-        run: dotnet publish ./src/presentation/BuddyLanguage.TelegramBot/BuddyLanguage.TelegramBot.csproj --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+        run: dotnet publish ./src/presentation/BuddyLanguage.TelegramBot/BuddyLanguage.TelegramBot.csproj --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}' --os linux-x64
 
       - name: Deployment
         uses: azure/webapps-deploy@v2
