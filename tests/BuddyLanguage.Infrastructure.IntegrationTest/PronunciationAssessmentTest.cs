@@ -10,6 +10,7 @@ using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NAudio.Utils;
+using NAudio.Vorbis;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NVorbis;
@@ -47,7 +48,9 @@ public class PronunciationAssessmentTest
     [Fact]
     public async Task Result_of_assessment_calculated()
     {
-        byte[] data = ConvertToMono16BitPcm("assets/Pronunciation.wav");
+        byte[] data = ConvertOggToWav("assets/Pronunciation.ogg");
+
+        // byte[] data = await File.ReadAllBytesAsync("assets/Pronunciation.wav");
         var service = new PronunciationAssessmentService(_config, _logger);
 
         //Act
@@ -60,22 +63,17 @@ public class PronunciationAssessmentTest
 
     private byte[] ConvertToMono16BitPcm(string fileName)
     {
-        // Read the WAV file into a byte array
-        byte[] wavData = File.ReadAllBytes(fileName);
-        using (MemoryStream inputStream = new MemoryStream(wavData))
+        using (var reader = new VorbisWaveReader(fileName))
         {
-            using (WaveStream reader = new WaveFileReader(inputStream))
-            {
-                // Convert to 16-bit PCM
-                var pcmFormat = new WaveFormat(16000, 16, 1); // Adjust sample rate as needed
-                var pcmStream = new WaveFormatConversionStream(pcmFormat, reader);
+            // Convert to 16-bit PCM
+            var pcmFormat = new WaveFormat(16000, 16, 1); // Adjust sample rate as needed
+            var pcmStream = new WaveFormatConversionStream(pcmFormat, reader);
 
-                // Convert to byte array
-                using (MemoryStream outputStream = new MemoryStream())
-                {
-                    pcmStream.CopyTo(outputStream);
-                    return outputStream.ToArray();
-                }
+            // Convert to byte array
+            using (MemoryStream outputStream = new MemoryStream())
+            {
+                pcmStream.CopyTo(outputStream);
+                return outputStream.ToArray();
             }
         }
     }
@@ -104,5 +102,30 @@ public class PronunciationAssessmentTest
         while (bytesRead > 0);
 
         return stream.ToArray();
+    }
+
+    private byte[] ConvertOggToWav(string inputFilePath)
+    {
+        using (var vorbisReader = new VorbisWaveReader(inputFilePath))
+        {
+            var waveFormat = new WaveFormat(16000, 16, 1); // Adjust sample rate as needed
+
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var waveWriter = new WaveFileWriter(memoryStream, waveFormat))
+                {
+                    var buffer = new float[vorbisReader.WaveFormat.SampleRate * vorbisReader.WaveFormat.Channels];
+
+                    int samplesRead;
+                    while ((samplesRead = vorbisReader.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        waveWriter.WriteSamples(buffer, 0, samplesRead);
+                    }
+                }
+
+                // Convert the memory stream to an array of bytes
+                return memoryStream.ToArray();
+            }
+        }
     }
 }
