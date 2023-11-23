@@ -1,4 +1,3 @@
-using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
 using BuddyLanguage.TelegramBot.Commands;
@@ -21,18 +20,15 @@ Log.Logger = new LoggerConfiguration()
     })
     .CreateLogger();
 
-builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration).WriteTo.Console());
-
-builder.WebHost.UseSentry();
 try
 {
+    builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration).WriteTo.Console());
+
+    builder.WebHost.UseSentry();
+
     builder.Services.AddApplicationServices(builder.Configuration);
 
-    var token = builder.Configuration["BotConfiguration:Token"];
-    if (string.IsNullOrWhiteSpace(token))
-    {
-        throw new InvalidOperationException("Telegram bot token is not set");
-    }
+    var token = builder.Configuration.GetRequiredValue("BotConfiguration:Token");
 
     builder.Services.AddSingleton(new TelegramBotClientOptions(token));
 
@@ -56,13 +52,13 @@ try
 
     var app = builder.Build();
 
-    app.MapGet("/", () => "Hello World!");
+    app.MapGet("/", () => $"Ver: {ReflectionHelper.GetBuildDate():s}");
 
     app.Run();
 }
-catch (Exception ex)
+catch (Exception ex) when (ex is not HostAbortedException)
 {
-    Log.Error(ex, "An unhandled exception occurred.");
+    Log.Fatal(ex, "Unhandled exception on server startup");
 }
 finally
 {

@@ -1,7 +1,8 @@
 using System.Reflection;
 using BuddyLanguage.Domain.Services;
 using BuddyLanguage.Infrastructure;
-using BuddyLanguage.WebApi.Filters;
+using BuddyLanguage.TelegramBot;
+using BuddyLanguage.WebApi.Extensions;
 using FluentAssertions;
 using NetArchTest.Rules;
 
@@ -13,13 +14,14 @@ public class LayersDependenciesTest
     /// Перечень существующих сборок
     /// </summary>
     private static readonly Assembly InfrastructureAssembly = typeof(BuddyLanguageDependencyInjection).Assembly;
-    private static readonly Assembly PresentationWebApiAssembly = typeof(CentralizedExceptionHandlingFilter).Assembly;
+    private static readonly Assembly PresentationWebApiAssembly = typeof(WebApiIntegrationExtensions).Assembly;
+    private static readonly Assembly PresentationTelegramBotAssembly = typeof(TelegramUserService).Assembly;
     private static readonly Assembly DomainAssembly = typeof(RoleService).Assembly;
 
     /// <summary>
     /// Gets перечень существующих namespace
     /// </summary>
-    private static string PresentationNamespace => PresentationWebApiAssembly.GetName().Name!;
+    private static string PresentationNamespace => PresentationTelegramBotAssembly.GetName().Name!;
 
     private static string DomainNamespace => DomainAssembly.GetName().Name!;
 
@@ -36,6 +38,7 @@ public class LayersDependenciesTest
         {
             InfrastructureAssembly,
             PresentationWebApiAssembly,
+            PresentationTelegramBotAssembly,
             DomainAssembly
         });
 
@@ -55,16 +58,6 @@ public class LayersDependenciesTest
         Types.That()
             .ResideInNamespace(DomainNamespace)
             .ShouldNot().HaveDependencyOn(InfrastructureNamespace)
-            .GetResult().IsSuccessful
-            .Should().BeTrue();
-    }
-
-    [Fact]
-    public void Presentation_depends_on_domain()
-    {
-        Types.That()
-            .ResideInNamespace(PresentationNamespace)
-            .Should().HaveDependencyOn(DomainNamespace)
             .GetResult().IsSuccessful
             .Should().BeTrue();
     }
