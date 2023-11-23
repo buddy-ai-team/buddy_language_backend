@@ -24,6 +24,8 @@ try
 
     builder.WebHost.UseSentry();
 
+    builder.Services.AddCors();
+
     //WebApi services
     builder.Services.AddWebApiServices(builder.Configuration);
 
@@ -31,6 +33,14 @@ try
     builder.Services.AddApplicationServices(builder.Configuration);
 
     var app = builder.Build();
+
+    app.UseCors(policy =>
+    {
+        policy
+            .WithOrigins("https://buddy-language-bot.netlify.app/", "http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 
     app.UseWebApi();
     app.MapHealthChecks("/buddy_health")
