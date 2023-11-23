@@ -12,5 +12,5 @@ public class RoleRepositoryEf : EfRepository<Role>, IRoleRepository
     }
 
     public async Task<IReadOnlyList<Role>> GetAll(CancellationToken cancellationToken)
-    => await Entities.ToListAsync(cancellationToken);
+        => await Entities.ToListAsync(cancellationToken);
 }
