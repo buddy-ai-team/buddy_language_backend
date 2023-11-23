@@ -48,7 +48,8 @@ public class PronunciationAssessmentTest
     [Fact]
     public async Task Result_of_assessment_calculated()
     {
-        byte[] data = ConvertOggToWav("assets/Pronunciation.ogg");
+        byte[] inputData = System.IO.File.ReadAllBytes("assets/Pronunciation.ogg");
+        byte[] data = ConvertOggToPcm(inputData);
 
         // byte[] data = await File.ReadAllBytesAsync("assets/Pronunciation.wav");
         var service = new PronunciationAssessmentService(_config, _logger);
@@ -61,70 +62,19 @@ public class PronunciationAssessmentTest
         result.Count.Should().NotBe(0);
     }
 
-    private byte[] ConvertToMono16BitPcm(string fileName)
+    private byte[] ConvertOggToPcm(byte[] oggData)
     {
-        using (var reader = new VorbisWaveReader(fileName))
+        using (var oggStream = new MemoryStream(oggData))
+        using (var pcmStream = new MemoryStream())
         {
-            // Convert to 16-bit PCM
-            var pcmFormat = new WaveFormat(16000, 16, 1); // Adjust sample rate as needed
-            var pcmStream = new WaveFormatConversionStream(pcmFormat, reader);
-
-            // Convert to byte array
-            using (MemoryStream outputStream = new MemoryStream())
+            using (var readerStream = new VorbisWaveReader(oggStream))
             {
-                pcmStream.CopyTo(outputStream);
-                return outputStream.ToArray();
-            }
-        }
-    }
-
-    private byte[] ConvertToByteArray(ISampleProvider sampleProvider)
-    {
-        int sampleRate = sampleProvider.WaveFormat.SampleRate;
-        int channels = sampleProvider.WaveFormat.Channels;
-
-        // Determine a reasonable buffer size (you may need to adjust this based on your needs)
-        int bufferSize = sampleRate * channels; // 1 second of audio data
-
-        // Create a byte array to hold the converted samples
-        byte[] buffer = new byte[bufferSize * sizeof(float)];
-
-        WaveBuffer waveBuffer = new WaveBuffer(buffer);
-
-        int bytesRead;
-        MemoryStream stream = new MemoryStream();
-
-        do
-        {
-            bytesRead = sampleProvider.Read(waveBuffer, 0, bufferSize);
-            stream.Write(buffer, 0, bytesRead * sizeof(float));
-        }
-        while (bytesRead > 0);
-
-        return stream.ToArray();
-    }
-
-    private byte[] ConvertOggToWav(string inputFilePath)
-    {
-        using (var vorbisReader = new VorbisWaveReader(inputFilePath))
-        {
-            var waveFormat = new WaveFormat(16000, 16, 1); // Adjust sample rate as needed
-
-            using (var memoryStream = new MemoryStream())
-            {
-                using (var waveWriter = new WaveFileWriter(memoryStream, waveFormat))
+                var waveFormat = new WaveFormat(16000, 16, 1); // 16kHz, 16bit, mono
+                using (var resampler = new MediaFoundationResampler(readerStream, waveFormat))
                 {
-                    var buffer = new float[vorbisReader.WaveFormat.SampleRate * vorbisReader.WaveFormat.Channels];
-
-                    int samplesRead;
-                    while ((samplesRead = vorbisReader.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        waveWriter.WriteSamples(buffer, 0, samplesRead);
-                    }
+                    WaveFileWriter.WriteWavFileToStream(pcmStream, resampler);
+                    return pcmStream.ToArray();
                 }
-
-                // Convert the memory stream to an array of bytes
-                return memoryStream.ToArray();
             }
         }
     }
