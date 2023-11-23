@@ -4,4 +4,5 @@ namespace BuddyLanguage.Domain.Interfaces;
 
 public interface IRoleRepository : IRepository<Role>
 {
+    Task<IReadOnlyList<Role>> GetAll(CancellationToken cancellationToken);
 }
