@@ -8,7 +8,6 @@ using BuddyLanguage.TextToSpeech;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using OpenAI.ChatGpt.EntityFrameworkCore;
 using OpenAI.ChatGpt.EntityFrameworkCore.Extensions;
 using OpenAI.Extensions;
 
@@ -46,32 +45,44 @@ public static class BuddyLanguageDependencyInjection
 
         // Can be replaced with Aspire.Microsoft.EntityFrameworkCore.SqlServer
         services.AddDbContext<AppDbContext>(
-            options => options.UseSqlServer(
-                configuration.GetRequiredConnectionString("AZURE_SQL_CONNECTIONSTRING"),
-                builder =>
-                {
-                    builder.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
-                }));
+            options =>
+            {
+                options.UseSqlServer(
+                        configuration.GetRequiredConnectionString("AZURE_SQL_CONNECTIONSTRING"),
+                        builder =>
+                        {
+                            builder.UseAzureSqlDefaults();
+                            builder.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                        })
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging();
+            });
 
         services.AddChatGptEntityFrameworkIntegration(
-            options => options.UseSqlServer(
-                configuration.GetRequiredConnectionString("AZURE_SQL_CONNECTIONSTRING"),
-                builder =>
-                {
-                    builder.MigrationsAssembly(typeof(Stub).Assembly.FullName);
-                }));
+            options =>
+            {
+                options.UseSqlServer(
+                        configuration.GetRequiredConnectionString("AZURE_SQL_CONNECTIONSTRING"),
+                        builder =>
+                        {
+                            builder.UseAzureSqlDefaults();
+                            builder.MigrationsAssembly(typeof(InfrastructureMig).Assembly.FullName);
+                        })
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging();
+            });
 
-        services.AddScoped<IChatGPTService, ChatGPTService>();
+        services.AddHealthChecks()
+            .AddDbContextCheck<AppDbContext>();
 
         services.AddOpenAIService(
-        settings =>
-        {
-            settings.ApiKey = configuration.GetRequiredValue("OPENAI_API_KEY");
-        });
+            settings =>
+            {
+                settings.ApiKey = configuration.GetRequiredValue("OPENAI_API_KEY");
+            });
 
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
         services.AddScoped<ITextToSpeech, AzureTextToSpeech>();
-
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
         return services;
