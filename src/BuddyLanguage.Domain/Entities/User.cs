@@ -20,7 +20,7 @@ namespace BuddyLanguage.Domain.Entities
                 NativeLanguage = Language.Russian,
                 TargetLanguage = Language.English,
                 SelectedVoice = Voice.Male,
-                SelectedSpeed = TtsSpeed.Medium
+                SelectedSpeed = TtsSpeed.Slow
             };
         }
 
