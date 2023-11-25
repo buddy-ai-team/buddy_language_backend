@@ -3,6 +3,7 @@ using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Exceptions;
 using BuddyLanguage.Domain.GptDataModels.Answers;
 using BuddyLanguage.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BuddyLanguage.Domain.Services
 {
@@ -35,8 +36,8 @@ namespace BuddyLanguage.Domain.Services
                 string RecognizedMessage,
                 string BotAnswerMessage,
                 byte[] BotAnswerWavMessage,
-                string[]? Mistakes,
-                string[]? Words)>
+                string[] Mistakes,
+                string[] Words)>
             ProcessUserMessage(
                 User user,
                 byte[] oggVoiceMessage,
