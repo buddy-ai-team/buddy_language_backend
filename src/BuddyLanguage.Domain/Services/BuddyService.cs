@@ -3,7 +3,6 @@ using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Exceptions;
 using BuddyLanguage.Domain.GptDataModels.Answers;
 using BuddyLanguage.Domain.Interfaces;
-using Microsoft.Extensions.Logging;
 
 namespace BuddyLanguage.Domain.Services
 {
@@ -105,18 +104,19 @@ namespace BuddyLanguage.Domain.Services
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
             var prompt = $"Here's the text in {learnedLanguage}, it may contain {nativeLanguage} " +
-                         $"words. Imagine that you are my {learnedLanguage} teacher. Step by step" +
-                         $"1. Please Count the number of " +
-                         $"{nativeLanguage} words and write them in the \"WordsCount\", " +
-                         $"then translated theese words into {learnedLanguage}  and write only" +
-                         $" translated words in the \"Words\"" +
-                         $" Make sure that everything is done correctly" +
-                         $"2. Then you need to translate this sentence into {learnedLanguage}, " +
-                         $"find max 1-2 of the grossest grammatical errors in the translated sentence," +
-                         $" if they are, but not spelling, and write down the rules for these errors " +
-                         $"in the corresponding \"Mistakes\" field in {nativeLanguage}, " +
-                         $"as well as record the number of these errors in the \"MistakesCount\" field. " +
-                         $"Make sure that everything is done correctly";
+                  $"words. Imagine that you are my {learnedLanguage} teacher. Step by step" +
+                  $"1. Please Count the number of " +
+                  $"{nativeLanguage} words and write them in the \"WordsCount\", " +
+                  $"then translated theese words into {learnedLanguage}  and write only" +
+                  $" translated words in the \"Words\"" +
+                  $" Make sure that everything is done correctly" +
+                  $"2. Then you need to translate this sentence into {learnedLanguage}, find max 1-2 of" +
+                  $"the grossest only grammatical errors in the translated sentence, if they are," +
+                  $"and formulate rules for these errors and how to correctly. " +
+                  $"Translate these rules into {nativeLanguage} and write them in the " +
+                  $" \"Mistakes\" field only {nativeLanguage} translated " +
+                  $"Count the number of errors and write them in the field in the \"MistakesCount\" field. " +
+                  $"Make sure that everything is done correctly";
             return await _chatGPTService.GetStructuredAnswer<MistakesAnswer>(
                 prompt, textMessage, cancellationToken);
         }
