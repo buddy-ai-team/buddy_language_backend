@@ -103,6 +103,7 @@ namespace BuddyLanguage.Domain.Services
             Language learnedLanguage,
             CancellationToken cancellationToken)
         {
+            ArgumentException.ThrowIfNullOrEmpty(textMessage);
             var prompt = $"Here's the text in {learnedLanguage}, it may contain {nativeLanguage} " +
                 $"words. Imagine that you are my {learnedLanguage} teacher. Step by step" +
                 $"1.Please count the number each" +
