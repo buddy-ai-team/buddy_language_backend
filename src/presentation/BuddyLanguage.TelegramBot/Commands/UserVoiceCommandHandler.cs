@@ -78,16 +78,16 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                     voice: InputFile.FromStream(memoryStream, "answer.ogg"),
                     cancellationToken: cancellationToken);
 
-                if (mistakes != null && words != null)
+                if (mistakes.Length > 0 && words.Length > 0)
                 {
                     var grammaMistakes = string.Join(", ", mistakes);
                     var studiedWords = string.Join(", ", words);
                     await _botClient.SendTextMessageAsync(
                         chatId: update.Message.Chat.Id,
-                        text: $"Ваши ошибки: {grammaMistakes}/nСлова на изучение: {studiedWords}",
+                        text: $"Ваши ошибки: {grammaMistakes}\nСлова на изучение: {studiedWords}",
                         cancellationToken: cancellationToken);
                 }
-                else if (mistakes != null && words == null)
+                else if (mistakes.Length > 0 && words.Length == 0)
                 {
                     var grammaMistakes = string.Join(", ", mistakes);
                     await _botClient.SendTextMessageAsync(
@@ -95,7 +95,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                         text: $"Ваши ошибки: {grammaMistakes}",
                         cancellationToken: cancellationToken);
                 }
-                else if (mistakes == null && words != null)
+                else if (mistakes.Length == 0 && words.Length > 0)
                 {
                     var studiedWords = string.Join(", ", words);
                     await _botClient.SendTextMessageAsync(
