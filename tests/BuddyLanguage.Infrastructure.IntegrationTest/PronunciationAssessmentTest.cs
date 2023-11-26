@@ -80,7 +80,7 @@ public class PronunciationAssessmentTest
             // var resampler = new WdlResamplingSampleProvider(reader, outRate);
             var pcmData = new WaveFloatTo16Provider(reader.ToWaveProvider());
 
-            // WaveFileWriter.CreateWaveFile16("assets/Sample.wav", pcmData.ToSampleProvider());
+            WaveFileWriter.CreateWaveFile16("assets/Sample.wav", pcmData.ToSampleProvider());
             using (var memoryStream = new MemoryStream())
             {
                 WaveFileWriter.WriteWavFileToStream(memoryStream, pcmData);
