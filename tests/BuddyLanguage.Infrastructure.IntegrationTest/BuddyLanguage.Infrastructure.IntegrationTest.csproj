@@ -19,8 +19,8 @@
     <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
     <PackageReference Include="NVorbis" Version="0.10.5" />
     <PackageReference Include="Telegram.Bot" Version="19.0.0" />
-    <PackageReference Include="xunit" Version="2.6.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3">
+    <PackageReference Include="xunit" Version="2.6.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -36,6 +36,11 @@
     <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.AzureServices\BuddyLanguage.AzureServices.csproj" />
+    <ProjectReference Include="..\..\src\presentation\BuddyLanguage.TelegramBot\BuddyLanguage.TelegramBot.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="assets\" />
   </ItemGroup>
 
   <ItemGroup>

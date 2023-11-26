@@ -8,7 +8,6 @@ using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using OpenAI.ChatGpt.EntityFrameworkCore;
 using OpenAI.ChatGpt.EntityFrameworkCore.Extensions;
 using OpenAI.Extensions;
 
@@ -37,21 +36,6 @@ public static class BuddyLanguageDependencyInjection
             .ValidateDataAnnotations()
             ; //.ValidateOnStart()
 
-        // Definition of database file name and connection of it as a service
-        services.AddOptions<SqlConnectionStringOptions>()
-            .BindConfiguration("AzureSqlConnectionStringOptions")
-            .ValidateDataAnnotations()
-            ; //.ValidateOnStart()
-
-        var config = configuration
-            .GetRequiredSection("AzureSqlConnectionStringOptions")
-            .Get<SqlConnectionStringOptions>();
-
-        if (config is null || string.IsNullOrEmpty(config.ConnectionString))
-        {
-            throw new InvalidOperationException("AzureSqlConnectionStringOptions is missing or invalid in configuration.");
-        }
-
         // Подключение репозитория для работы с Ролями
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         services.AddScoped<IRoleRepository, RoleRepositoryEf>();
@@ -59,34 +43,46 @@ public static class BuddyLanguageDependencyInjection
         services.AddScoped<IUserRepository, UserRepositoryEf>();
         services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
 
+        // Can be replaced with Aspire.Microsoft.EntityFrameworkCore.SqlServer
         services.AddDbContext<AppDbContext>(
-            options => options.UseSqlServer(
-                config.ConnectionString,
-                builder =>
-                {
-                    builder.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
-                }));
+            options =>
+            {
+                options.UseSqlServer(
+                        configuration.GetRequiredConnectionString("AZURE_SQL_CONNECTIONSTRING"),
+                        builder =>
+                        {
+                            builder.UseAzureSqlDefaults();
+                            builder.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                        })
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging();
+            });
 
         services.AddChatGptEntityFrameworkIntegration(
-            options => options.UseSqlServer(
-                config.ConnectionString,
-                builder =>
-                {
-                    builder.MigrationsAssembly(typeof(Stub).Assembly.FullName);
-                }));
+            options =>
+            {
+                options.UseSqlServer(
+                        configuration.GetRequiredConnectionString("AZURE_SQL_CONNECTIONSTRING"),
+                        builder =>
+                        {
+                            builder.UseAzureSqlDefaults();
+                            builder.MigrationsAssembly(typeof(InfrastructureMig).Assembly.FullName);
+                        })
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging();
+            });
 
-        services.AddScoped<IChatGPTService, ChatGPTService>();
+        services.AddHealthChecks()
+            .AddDbContextCheck<AppDbContext>();
 
         services.AddOpenAIService(
-        settings =>
-        {
-            settings.ApiKey = configuration["OPENAI_API_KEY"] ?? throw new InvalidOperationException(
-                                  "OPENAI_API_KEY environment variable is not set");
-        });
+            settings =>
+            {
+                settings.ApiKey = configuration.GetRequiredValue("OPENAI_API_KEY");
+            });
 
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
         services.AddScoped<ITextToSpeech, AzureTextToSpeech>();
-
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
         return services;
