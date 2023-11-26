@@ -48,8 +48,6 @@ public class PronunciationAssessmentTest
     [Fact]
     public async Task Result_of_assessment_calculated()
     {
-        var inpuData1 = new AudioFileReader("assets/Pronunciation.wav");
-
         // byte[] inputData = System.IO.File.ReadAllBytes("assets/Pronunciation.wav");
         byte[] inputData = Convert("assets/Pronunciation.wav");
 
@@ -58,7 +56,7 @@ public class PronunciationAssessmentTest
 
         //Act
         IReadOnlyList<WordPronunciationAssessment> result =
-            await service.PronunciationAssessmentWithStreamInternalAsync(GetData(), default);
+            await service.PronunciationAssessmentWithStreamInternalAsync(HeaderCutter(inputData), default);
 
         // Assert
         result.Count.Should().NotBe(0);
