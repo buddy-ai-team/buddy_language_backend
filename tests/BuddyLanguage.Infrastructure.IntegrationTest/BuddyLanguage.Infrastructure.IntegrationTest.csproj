@@ -46,7 +46,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="assets\Pronunciation.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="assets\Pronunciation.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

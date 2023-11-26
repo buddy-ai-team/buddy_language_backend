@@ -48,34 +48,51 @@ public class PronunciationAssessmentTest
     [Fact]
     public async Task Result_of_assessment_calculated()
     {
-        byte[] inputData = System.IO.File.ReadAllBytes("assets/Pronunciation.ogg");
-        byte[] data = ConvertOggToPcm(inputData);
+        var inpuData1 = new AudioFileReader("assets/Pronunciation.wav");
+
+        // byte[] inputData = System.IO.File.ReadAllBytes("assets/Pronunciation.wav");
+        byte[] inputData = Convert("assets/Pronunciation.wav");
 
         // byte[] data = await File.ReadAllBytesAsync("assets/Pronunciation.wav");
         var service = new PronunciationAssessmentService(_config, _logger);
 
         //Act
         IReadOnlyList<WordPronunciationAssessment> result =
-            await service.GetSpeechAssessmentAsync(data, default);
+            await service.PronunciationAssessmentWithStreamInternalAsync(GetData(), default);
 
         // Assert
         result.Count.Should().NotBe(0);
     }
 
-    private byte[] ConvertOggToPcm(byte[] oggData)
+    private byte[] GetData()
     {
-        using (var oggStream = new MemoryStream(oggData))
-        using (var pcmStream = new MemoryStream())
+        var audioDataWithHeader = File.ReadAllBytes("assets/Sample.wav");
+        var audioData = new byte[audioDataWithHeader.Length - 46];
+        Array.Copy(audioDataWithHeader, 46, audioData, 0, audioData.Length);
+        return audioData;
+    }
+
+    private byte[] Convert(string inputFile)
+    {
+        // int outRate = 16000;
+        using (var reader = new AudioFileReader(inputFile))
         {
-            using (var readerStream = new VorbisWaveReader(oggStream))
+            // var resampler = new WdlResamplingSampleProvider(reader, outRate);
+            var pcmData = new WaveFloatTo16Provider(reader.ToWaveProvider());
+
+            // WaveFileWriter.CreateWaveFile16("assets/Sample.wav", pcmData.ToSampleProvider());
+            using (var memoryStream = new MemoryStream())
             {
-                var waveFormat = new WaveFormat(16000, 16, 1); // 16kHz, 16bit, mono
-                using (var resampler = new MediaFoundationResampler(readerStream, waveFormat))
-                {
-                    WaveFileWriter.WriteWavFileToStream(pcmStream, resampler);
-                    return pcmStream.ToArray();
-                }
+                WaveFileWriter.WriteWavFileToStream(memoryStream, pcmData);
+                return memoryStream.ToArray();
             }
         }
+    }
+
+    private byte[] HeaderCutter(byte[] audioDataWithHeader)
+    {
+        var audioData = new byte[audioDataWithHeader.Length - 46];
+        Array.Copy(audioDataWithHeader, 46, audioData, 0, audioData.Length);
+        return audioData;
     }
 }

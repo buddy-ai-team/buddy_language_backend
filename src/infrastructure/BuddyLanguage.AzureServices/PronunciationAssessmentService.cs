@@ -92,4 +92,48 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
 
         return totalResult;
     }
+
+    public async Task<IReadOnlyList<WordPronunciationAssessment>> PronunciationAssessmentWithStreamInternalAsync(
+        byte[] audioData,
+        CancellationToken cancellationToken)
+    {
+        using (var audioInputStream = AudioInputStream.CreatePushStream(AudioStreamFormat.GetWaveFormatPCM(16000, 16, 1))) // This need be set based on the format of the given audio data
+        using (var audioConfig = AudioConfig.FromStreamInput(audioInputStream))
+
+        // Specify the language used for Pronunciation Assessment.
+        using (var speechRecognizer = new SpeechRecognizer(_speechConfig, "en-US", audioConfig))
+        {
+            _pronunciationAssessmentConfig.ApplyTo(speechRecognizer);
+
+            audioInputStream.Write(audioData);
+            audioInputStream.Write(new byte[0]); // send a zero-size chunk to signal the end of stream
+
+            var result = await speechRecognizer.RecognizeOnceAsync().ConfigureAwait(false);
+
+            if (result.Reason == ResultReason.Canceled)
+            {
+                var cancellationDetail = CancellationDetails.FromResult(result);
+                throw cancellationDetail.Reason switch
+                {
+                    CancellationReason.Error => new Exception(
+                        $"CANCELED: ErrorCode={cancellationDetail.ErrorCode} ErrorDetails={cancellationDetail.ErrorDetails}"),
+                    CancellationReason.EndOfStream => new Exception(
+                        $"CANCELED: ReachedEndOfStream={cancellationDetail.ErrorDetails}"),
+                    _ => throw new Exception($"CANCELED: Reason={cancellationDetail.Reason} ErrorDetails={cancellationDetail.ErrorDetails}"),
+                };
+            }
+
+            // Получение результата оценки произношения
+            var pronunciationAssessmentResult =
+                PronunciationAssessmentResult.FromResult(result);
+
+            var totalResult =
+                pronunciationAssessmentResult
+                    .Words
+                    .Select(word => new WordPronunciationAssessment(word.Word, word.AccuracyScore))
+                    .ToList();
+
+            return totalResult;
+        }
+    }
 }
