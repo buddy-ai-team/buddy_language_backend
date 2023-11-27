@@ -1,4 +1,5 @@
-﻿using BuddyLanguage.Domain.Enumerations;
+﻿using System.Transactions;
+using BuddyLanguage.Domain.Enumerations;
 
 namespace BuddyLanguage.Domain.Entities;
 
@@ -8,13 +9,14 @@ public class WordEntity : IEntity
 {
     private string _word;
 
-    public WordEntity(Guid id, Guid accountId, string word, Language language, WordEntityStatus wordStatus)
+    public WordEntity(Guid id, Guid accountId, string word, Language language, WordEntityStatus wordStatus, string? translation = "")
     {
         Id = id;
         UserId = accountId;
         _word = word;
         Language = language;
         WordStatus = wordStatus;
+        Translation = translation;
     }
 
     protected WordEntity()

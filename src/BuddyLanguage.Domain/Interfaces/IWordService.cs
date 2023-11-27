@@ -12,6 +12,7 @@ public interface IWordService
     Task<WordEntity> UpdateWordEntityById(
         Guid id,
         string word,
+        string? translation,
         Language language,
         WordEntityStatus status,
         CancellationToken cancellationToken);
@@ -19,6 +20,7 @@ public interface IWordService
     Task<WordEntity> AddWord(
         Guid accountId,
         string word,
+        string? translation,
         Language language,
         WordEntityStatus status,
         CancellationToken cancellationToken);

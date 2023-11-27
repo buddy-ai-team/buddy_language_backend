@@ -144,7 +144,7 @@ namespace BuddyLanguage.Domain.Services
             {
                 //TODO: метод AddWords(words)
                 await _wordService.AddWord(
-                    userId, word, Language.English, WordEntityStatus.Learning, cancellationToken);
+                    userId, word, string.Empty, Language.English, WordEntityStatus.Learning, cancellationToken);
             }
         }
     }
