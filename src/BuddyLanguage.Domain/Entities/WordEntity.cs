@@ -41,4 +41,6 @@ public class WordEntity : IEntity
             _word = value;
         }
     }
+
+    public string? Translation { get; set; }
 }
