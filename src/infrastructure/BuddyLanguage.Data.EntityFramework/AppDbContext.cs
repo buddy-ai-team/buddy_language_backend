@@ -27,6 +27,13 @@ public class AppDbContext : DbContext
             .WithOne(wordEntity => wordEntity.User)
             .HasForeignKey(wordEntity => wordEntity.UserId);
 
+        // Define the one-to-one relationship between User and Role
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.UserPreferences.AssistantRole)
+            .WithOne()
+            .HasForeignKey<User>(u => u.UserPreferences.AssistantRoleId)
+            .IsRequired(false);
+
         // Configure UserPreferences as an owned type
         modelBuilder.Entity<User>()
             .OwnsOne(user => user.UserPreferences, preferences =>
