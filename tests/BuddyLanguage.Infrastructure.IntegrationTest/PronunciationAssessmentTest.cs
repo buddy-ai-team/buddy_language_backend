@@ -46,7 +46,7 @@ public class PronunciationAssessmentTest
 
         // Act
         IReadOnlyList<WordPronunciationAssessment> result =
-            await service.GetSpeechAssessmentAsync(ConvertOggToPcm(inputData), default);
+            await service.GetSpeechAssessmentAsync(ConvertOggToPcm(inputData), "en-US", default);
 
         // Assert
         result.Count.Should().BeGreaterThan(3);

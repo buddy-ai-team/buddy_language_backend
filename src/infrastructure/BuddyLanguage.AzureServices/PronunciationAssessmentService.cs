@@ -31,7 +31,6 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         _speechConfig = SpeechConfig.FromSubscription(
             azureConfig.SpeechKey,
             azureConfig.SpeechRegion);
-        _speechConfig.SpeechRecognitionLanguage = "en-US";
     }
 
     /// <summary>
@@ -40,17 +39,28 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
     /// <param name="audioData">Голосовое сообщение в виде набора бойт.
     /// Поддерживаемые форматы: PCM, 16 bit, sample rate 16000, mono
     /// </param>
+    /// <param name="language">язык пользователя
+    /// Для английского языка задать "en-US"</param>
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Оценка произношения для каждого слова</returns>
     public async Task<IReadOnlyList<WordPronunciationAssessment>> GetSpeechAssessmentAsync(
         byte[] audioData,
+        string language,
         CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(language))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(language));
+        }
+
+        // Specify exact language to recognizer
+        _speechConfig.SpeechRecognitionLanguage = language;
+
         using (var audioInputStream = AudioInputStream.CreatePushStream(AudioStreamFormat.GetWaveFormatPCM(16000, 16, 1))) // This need be set based on the format of the given audio data
         using (var audioConfig = AudioConfig.FromStreamInput(audioInputStream))
 
         // Specify the language used for Pronunciation Assessment.
-        using (var speechRecognizer = new SpeechRecognizer(_speechConfig, "en-US", audioConfig))
+        using (var speechRecognizer = new SpeechRecognizer(_speechConfig, language, audioConfig))
         {
             _pronunciationAssessmentConfig.ApplyTo(speechRecognizer);
 

@@ -10,8 +10,11 @@ public interface IPronunciationAssessmentService
     /// <param name="audioData">Голосовое сообщение в виде набора бойт.
     /// Поддерживаемые форматы: PCM, 16 bit, sample rate 16000, mono
     /// </param>
+    /// <param name="language">язык пользователя</param>
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Оценка произношения для каждого слова</returns>
     Task<IReadOnlyList<WordPronunciationAssessment>> GetSpeechAssessmentAsync(
-        byte[] audioData, CancellationToken cancellationToken);
+        byte[] audioData,
+        string language,
+        CancellationToken cancellationToken);
 }
