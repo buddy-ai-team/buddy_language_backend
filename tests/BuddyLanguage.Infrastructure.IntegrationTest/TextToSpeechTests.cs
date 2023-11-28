@@ -1,5 +1,5 @@
-﻿using BuddyLanguage.Domain.Enumerations;
-using BuddyLanguage.TextToSpeech;
+﻿using BuddyLanguage.AzureServices;
+using BuddyLanguage.Domain.Enumerations;
 using FluentAssertions;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Logging;
@@ -46,7 +46,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
 
                 // Arrange
                 var logger = new LoggerFactory().CreateLogger<AzureTextToSpeech>();
-                var options = Options.Create(new AzureTTSConfig()
+                var options = Options.Create(new AzureConfig()
                     {
                         SpeechKey = GetKeyFromEnvironment("AZURE_SPEECH_KEY"),
                         SpeechRegion = GetKeyFromEnvironment("AZURE_SPEECH_REGION")
