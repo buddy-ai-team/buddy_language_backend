@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BuddyLanguage.Domain.Services
 {
-    public class WordService : IWordService
+    public class WordService
     {
         private readonly ILogger<WordService> _logger;
         private readonly IUnitOfWork _uow;

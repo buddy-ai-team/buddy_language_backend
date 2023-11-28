@@ -12,14 +12,14 @@ namespace BuddyLanguage.Domain.Services
         private readonly IChatGPTService _chatGPTService;
         private readonly ISpeechRecognitionService _speechRecognitionService;
         private readonly ITextToSpeech _textToSpeechService;
-        private readonly IWordService _wordService;
+        private readonly WordService _wordService;
         private readonly ILogger<BuddyService> _logger;
 
         public BuddyService(
             IChatGPTService chatGPTService,
             ISpeechRecognitionService speechRecognitionService,
             ITextToSpeech textToSpeechService,
-            IWordService wordService,
+            WordService wordService,
             ILogger<BuddyService> logger)
         {
             _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
