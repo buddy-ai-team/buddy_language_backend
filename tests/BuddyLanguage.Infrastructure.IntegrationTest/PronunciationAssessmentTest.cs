@@ -48,15 +48,15 @@ public class PronunciationAssessmentTest
     [Fact]
     public async Task Result_of_assessment_calculated()
     {
-        // byte[] inputData = System.IO.File.ReadAllBytes("assets/Pronunciation.wav");
-        byte[] inputData = Convert("assets/Pronunciation.wav");
+        // byte[] inputData = Convert("assets/Pronunciation.wav");
+        byte[] inputData = System.IO.File.ReadAllBytes("assets/Pronunciation.ogg");
 
         // byte[] data = await File.ReadAllBytesAsync("assets/Pronunciation.wav");
         var service = new PronunciationAssessmentService(_config, _logger);
 
         //Act
         IReadOnlyList<WordPronunciationAssessment> result =
-            await service.PronunciationAssessmentWithStreamInternalAsync(HeaderCutter(inputData), default);
+            await service.PronunciationAssessmentWithStreamInternalAsync(ConvertOggToPcm(inputData), default);
 
         // Assert
         result.Count.Should().NotBe(0);
@@ -92,5 +92,34 @@ public class PronunciationAssessmentTest
         var audioData = new byte[audioDataWithHeader.Length - 46];
         Array.Copy(audioDataWithHeader, 46, audioData, 0, audioData.Length);
         return audioData;
+    }
+
+    private byte[] ConvertOggToPcm(byte[] oggData)
+    {
+        using var oggStream = new MemoryStream(oggData);
+        using var vorbis = new VorbisWaveReader(oggStream);
+        var resampler = new WdlResamplingSampleProvider(vorbis, 16000);
+
+        // Converts from float to 16-bit PCM
+        var to16Bit = new WaveFloatTo16Provider(resampler.ToWaveProvider());
+
+        // Converts to mono
+        var mono = new StereoToMonoProvider16(to16Bit) { LeftVolume = 0.5f, RightVolume = 0.5f };
+
+        // Create a new MemoryStream to store the converted PCM data
+        using var pcmStream = new MemoryStream();
+
+        // Write the converted PCM data to the MemoryStream
+        using (var pcmWriter = new WaveFileWriter(pcmStream, mono.WaveFormat))
+        {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = mono.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                pcmWriter.Write(buffer, 0, bytesRead);
+            }
+        }
+
+        return pcmStream.ToArray();
     }
 }
