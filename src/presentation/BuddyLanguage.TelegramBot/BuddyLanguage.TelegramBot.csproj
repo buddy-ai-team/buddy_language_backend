@@ -29,7 +29,7 @@
     <ProjectReference Include="..\..\infrastructure\BuddyLanguage.Infrastructure\BuddyLanguage.Infrastructure.csproj"/>
     <ProjectReference Include="..\..\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj"/>
   </ItemGroup>
-
+  
   <ItemGroup>
     <Compile Update="Services\UserBotStates.cs">
       <DependentUpon>TelegramUserRepository.cs</DependentUpon>

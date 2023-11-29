@@ -1,10 +1,10 @@
-﻿using BuddyLanguage.ChatGPTServiceLib;
+﻿using BuddyLanguage.AzureServices;
+using BuddyLanguage.ChatGPTServiceLib;
 using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Data.EntityFramework.Repositories;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
-using BuddyLanguage.TextToSpeech;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +31,7 @@ public static class BuddyLanguageDependencyInjection
     {
         //Services
         //Azure TTS
-        services.AddOptions<AzureTTSConfig>()
+        services.AddOptions<AzureConfig>()
             .BindConfiguration("AzureTTSConfig")
             .ValidateDataAnnotations()
             ; //.ValidateOnStart()

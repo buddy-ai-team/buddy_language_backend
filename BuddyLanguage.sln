@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.ChatGPTServic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.OpenAIWhisperSpeechRecognitionService", "src\infrastructure\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj", "{64D89577-D3E9-40AF-A9FB-03EA41F7356C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.TextToSpeech", "src\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj", "{158B5246-FBDC-4D78-86A6-A5AA9202E445}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.AzureServices", "src\infrastructure\BuddyLanguage.AzureServices\BuddyLanguage.AzureServices.csproj", "{158B5246-FBDC-4D78-86A6-A5AA9202E445}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Architecture.Test", "tests\BuddyLanguage.Architecture.Test\BuddyLanguage.Architecture.Test.csproj", "{781AD5FE-86F4-47FD-B7F7-F6161541C82E}"
 EndProject
@@ -40,6 +40,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.TelegramBot", "src\presentation\BuddyLanguage.TelegramBot\BuddyLanguage.TelegramBot.csproj", "{ED529C28-1A3A-41FF-9485-0218F55D47C3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.HttpModels", "src\presentation\BuddyLanguage.HttpModels\BuddyLanguage.HttpModels.csproj", "{10F75D72-895C-4856-9485-EA1BC5B4A7E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.WebAPI.Test", "tests\BuddyLanguage.WebAPI.Test\BuddyLanguage.WebAPI.Test.csproj", "{98C162E5-F82A-44F0-A54E-717873F57B39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +97,10 @@ Global
 		{10F75D72-895C-4856-9485-EA1BC5B4A7E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10F75D72-895C-4856-9485-EA1BC5B4A7E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10F75D72-895C-4856-9485-EA1BC5B4A7E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98C162E5-F82A-44F0-A54E-717873F57B39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98C162E5-F82A-44F0-A54E-717873F57B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98C162E5-F82A-44F0-A54E-717873F57B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98C162E5-F82A-44F0-A54E-717873F57B39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,6 +120,7 @@ Global
 		{41B8D7D8-A562-4E59-92BE-800B880247E4} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 		{ED529C28-1A3A-41FF-9485-0218F55D47C3} = {1824C987-16E5-4AA7-86EB-680D58B6A5C6}
 		{10F75D72-895C-4856-9485-EA1BC5B4A7E8} = {1824C987-16E5-4AA7-86EB-680D58B6A5C6}
+		{98C162E5-F82A-44F0-A54E-717873F57B39} = {29BBBC3B-7154-4E97-8CE0-82567911AFC0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EA996F8-4CC9-4CE0-98C9-1833EAF2E957}

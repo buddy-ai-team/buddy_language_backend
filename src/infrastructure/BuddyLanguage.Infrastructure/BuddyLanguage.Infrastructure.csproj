@@ -14,12 +14,12 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
     </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
-    <ProjectReference Include="..\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj" />
-    <ProjectReference Include="..\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj" />
-    <ProjectReference Include="..\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj" />
-    <ProjectReference Include="..\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
+      <ProjectReference Include="..\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj" />
+      <ProjectReference Include="..\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj" />
+      <ProjectReference Include="..\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj" />
+      <ProjectReference Include="..\BuddyLanguage.AzureServices\BuddyLanguage.AzureServices.csproj" />
+    </ItemGroup>
 
 </Project>
