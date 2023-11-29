@@ -85,7 +85,8 @@ public class BuddyServiceTests
         // Act
         var mistakes = await buddyService.GetLearningWords(
             "What is your любимый film?",
-            Language.Russian, Language.English,
+            Language.Russian,
+            Language.English,
             CancellationToken.None);
 
         // Assert
