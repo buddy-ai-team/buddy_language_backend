@@ -94,6 +94,6 @@ public class BuddyServiceTests
         words.WordsCount.Should().Be(1);
         words.Words.Should().NotBeNull();
         words.Words.Should().HaveCount(1);
-        words.Words.Should().Contain("любимый");
+        words.Words.Should().Contain("favorite");
     }
 }
