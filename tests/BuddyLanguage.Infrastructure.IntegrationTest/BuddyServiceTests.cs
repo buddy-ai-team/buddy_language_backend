@@ -83,17 +83,17 @@ public class BuddyServiceTests
             Mock.Of<ILogger<BuddyService>>());
 
         // Act
-        var mistakes = await buddyService.GetLearningWords(
+        var words = await buddyService.GetLearningWords(
             "What is your любимый film?",
             Language.Russian,
             Language.English,
             CancellationToken.None);
 
         // Assert
-        mistakes.Should().NotBeNull();
-        mistakes.WordsCount.Should().Be(1);
-        mistakes.Words.Should().NotBeNull();
-        mistakes.Words.Should().HaveCount(1);
-        mistakes.Words.Should().Contain("favorite");
+        words.Should().NotBeNull();
+        words.WordsCount.Should().Be(1);
+        words.Words.Should().NotBeNull();
+        words.Words.Should().HaveCount(1);
+        words.Words.Should().Contain("любимый");
     }
 }
