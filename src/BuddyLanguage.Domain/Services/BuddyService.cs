@@ -126,11 +126,11 @@ namespace BuddyLanguage.Domain.Services
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
             var prompt = $"Я предоставлю тебе тексты, которые ты должен будешь проверить дважды " +
-                         $"на наличие {nativeLanguage} слов. По завершении проверки текста, " +
-                         $"посчитай количество {nativeLanguage} слов, а также предоставь мне " +
+                         $"на наличие {nativeLanguage} слов." +
+                         $"Посчитай количество {nativeLanguage} слов, а также найди " +
                          $"абсолютно все {nativeLanguage} слова из текста, если они есть." +
                          $"Затем переведи эти слова на {targetLanguage} язык и " +
-                         $"запиши только перевед этих слов в поле \"Words\". " +
+                         $"запиши в поле \"Words\". только перевод этих слов " +
                          $"Пожалуйста, убедись, что ты нашел абсолютно все слова.";
             return await _chatGPTService.GetStructuredAnswer<WordAnswer>(
                 prompt, textMessage, cancellationToken);
