@@ -28,10 +28,4 @@
       <ProjectReference Include="..\..\src\presentation\BuddyLanguage.WebApi\BuddyLanguage.WebApi.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="System.Private.CoreLib">
-        <HintPath>..\..\..\..\.dotnet\shared\Microsoft.NETCore.App\8.0.0\System.Private.CoreLib.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
 </Project>
