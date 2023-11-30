@@ -130,7 +130,7 @@ namespace BuddyLanguage.Domain.Services
                          $"Посчитай количество {nativeLanguage} слов, а также найди " +
                          $"абсолютно все {nativeLanguage} слова из текста, если они есть." +
                          $"Затем переведи эти слова на {targetLanguage} язык и " +
-                         $"запиши в поле \"Words\". только перевод этих слов " +
+                         $"запиши в поле \"Words\" только перевод этих слов. " +
                          $"Пожалуйста, убедись, что ты нашел абсолютно все слова.";
             return await _chatGPTService.GetStructuredAnswer<WordAnswer>(
                 prompt, textMessage, cancellationToken);
