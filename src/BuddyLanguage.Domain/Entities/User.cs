@@ -24,6 +24,12 @@ namespace BuddyLanguage.Domain.Entities
         //Reverse Navigation Property
         public List<WordEntity>? WordEntities { get; set; }
 
+        //External Key To The Role
+        public Guid AssistantRoleId { get; set; }
+
+        //For Include
+        public Role? AssistantRole { get; set; }
+
         public string? FirstName
         {
             get => _firstName;
@@ -77,12 +83,6 @@ namespace BuddyLanguage.Domain.Entities
             public Voice SelectedVoice { get; set; }
 
             public TtsSpeed SelectedSpeed { get; set; }
-
-            //External Key To The Role
-            public Guid AssistantRoleId { get; set; }
-
-            //For Include
-            public Role? AssistantRole { get; set; } 
         }
     }
 }

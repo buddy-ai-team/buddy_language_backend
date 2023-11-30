@@ -13,7 +13,7 @@ namespace BuddyLanguage.Data.EntityFramework.Repositories
 
         public override async Task<User> GetById(Guid id, CancellationToken cancellationToken)
         {
-            return await Entities.Include(x => x.UserPreferences.AssistantRole)
+            return await Entities.Include(x => x.AssistantRole)
                                  .FirstAsync(it => it.Id == id, cancellationToken);              
         }
 
