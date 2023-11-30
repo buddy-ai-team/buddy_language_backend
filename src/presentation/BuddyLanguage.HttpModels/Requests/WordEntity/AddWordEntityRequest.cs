@@ -13,6 +13,8 @@ namespace BuddyLanguage.HttpModels.Requests.WordEntity
         [Required]
         public string Word { get; set; }
 
+        public string? Translation { get; set; }
+
         [Required]
         public Language Language { get; set; }
 

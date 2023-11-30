@@ -35,11 +35,14 @@ public class BuddyServiceTests
             mockOptions.Object,
             Mock.Of<ILogger<ChatGPTService>>());
 
+        var wordService = new WordService(
+            Mock.Of<IUnitOfWork>(), Mock.Of<ILogger<WordService>>());
+
         var buddyService = new BuddyService(
             chatGptService,
             Mock.Of<ISpeechRecognitionService>(),
             Mock.Of<ITextToSpeech>(),
-            Mock.Of<IWordService>(),
+            wordService,
             Mock.Of<ILogger<BuddyService>>());
 
         // Act
@@ -75,11 +78,14 @@ public class BuddyServiceTests
             mockOptions.Object,
             Mock.Of<ILogger<ChatGPTService>>());
 
+        var wordService = new WordService(
+            Mock.Of<IUnitOfWork>(), Mock.Of<ILogger<WordService>>());
+
         var buddyService = new BuddyService(
             chatGptService,
             Mock.Of<ISpeechRecognitionService>(),
             Mock.Of<ITextToSpeech>(),
-            Mock.Of<IWordService>(),
+            wordService,
             Mock.Of<ILogger<BuddyService>>());
 
         // Act
