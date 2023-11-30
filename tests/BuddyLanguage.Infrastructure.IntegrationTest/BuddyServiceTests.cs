@@ -46,8 +46,8 @@ public class BuddyServiceTests
             Mock.Of<ILogger<BuddyService>>());
 
         // Act
-        var mistakes = await buddyService.GetGrammarMistakesAndLearningWords(
-            "I likes dog", Language.Russian, Language.English, CancellationToken.None);
+        var mistakes = await buddyService.GetGrammarMistakes(
+            "I likes dog", Language.Russian, CancellationToken.None);
 
         // Assert
         mistakes.Should().NotBeNull();
@@ -89,17 +89,17 @@ public class BuddyServiceTests
             Mock.Of<ILogger<BuddyService>>());
 
         // Act
-        var mistakes = await buddyService.GetGrammarMistakesAndLearningWords(
+        var words = await buddyService.GetLearningWords(
             "What is your любимый film?",
             Language.Russian,
             Language.English,
             CancellationToken.None);
 
         // Assert
-        mistakes.Should().NotBeNull();
-        mistakes.WordsCount.Should().Be(1);
-        mistakes.Words.Should().NotBeNull();
-        mistakes.Words.Should().HaveCount(1);
-        mistakes.Words.Should().ContainMatch("favorite");
+        words.Should().NotBeNull();
+        words.WordsCount.Should().Be(1);
+        words.Words.Should().NotBeNull();
+        words.Words.Should().HaveCount(1);
+        words.Words.Should().Contain("favorite");
     }
 }
