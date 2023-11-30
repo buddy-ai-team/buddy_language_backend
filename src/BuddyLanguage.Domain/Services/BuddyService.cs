@@ -90,7 +90,11 @@ namespace BuddyLanguage.Domain.Services
                 assistantAnswer, targetLanguage, voice, speed, cancellationToken);
 
             return (
-                userMessage, assistantAnswer, botAnswerWavMessage, mistakes.GrammaMistakes, studiedWords.Words);
+                userMessage,
+                assistantAnswer,
+                botAnswerWavMessage,
+                mistakes.GrammaMistakes,
+                studiedWords.Words);
         }
 
         public async Task<string> ContinueDialogAndGetAnswer(
