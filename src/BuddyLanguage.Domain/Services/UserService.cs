@@ -40,7 +40,7 @@ namespace BuddyLanguage.Domain.Services
                 user.UserPreferences.TargetLanguage = Language.English;
                 user.UserPreferences.SelectedVoice = Voice.Male;
                 user.UserPreferences.SelectedSpeed = TtsSpeed.Slow;
-                user.AssistantRoleId = Guid.Empty; /*user.UserPreferences.AssistantRoleId = DefaultRoleId;*/
+                user.UserPreferences.AssistantRoleId = Guid.Empty; /*user.UserPreferences.AssistantRoleId = DefaultRoleId;*/
 
                 await _uow.UserRepository.Add(user, cancellationToken);
                 await _uow.SaveChangesAsync(cancellationToken);

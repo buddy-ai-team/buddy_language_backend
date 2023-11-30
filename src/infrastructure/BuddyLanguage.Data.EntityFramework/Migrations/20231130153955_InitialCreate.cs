@@ -29,21 +29,21 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AssistantRoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TelegramId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserPreferences_NativeLanguage = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserPreferences_TargetLanguage = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserPreferences_SelectedVoice = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserPreferences_SelectedSpeed = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    UserPreferences_SelectedSpeed = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserPreferences_AssistantRoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Roles_AssistantRoleId",
-                        column: x => x.AssistantRoleId,
+                        name: "FK_Users_Roles_UserPreferences_AssistantRoleId",
+                        column: x => x.UserPreferences_AssistantRoleId,
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -72,9 +72,9 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_AssistantRoleId",
+                name: "IX_Users_UserPreferences_AssistantRoleId",
                 table: "Users",
-                column: "AssistantRoleId");
+                column: "UserPreferences_AssistantRoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WordEntities_UserId",

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuddyLanguage.Data.EntityFramework.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231130152740_InitialCreate")]
+    [Migration("20231130153955_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -48,9 +48,6 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AssistantRoleId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
@@ -61,8 +58,6 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AssistantRoleId");
 
                     b.ToTable("Users");
                 });
@@ -98,15 +93,12 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
 
             modelBuilder.Entity("BuddyLanguage.Domain.Entities.User", b =>
                 {
-                    b.HasOne("BuddyLanguage.Domain.Entities.Role", "AssistantRole")
-                        .WithMany()
-                        .HasForeignKey("AssistantRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.OwnsOne("BuddyLanguage.Domain.Entities.User+Preferences", "UserPreferences", b1 =>
                         {
                             b1.Property<Guid>("UserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<Guid>("AssistantRoleId")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("NativeLanguage")
@@ -127,13 +119,21 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
 
                             b1.HasKey("UserId");
 
+                            b1.HasIndex("AssistantRoleId");
+
                             b1.ToTable("Users");
+
+                            b1.HasOne("BuddyLanguage.Domain.Entities.Role", "AssistantRole")
+                                .WithMany()
+                                .HasForeignKey("AssistantRoleId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
-                        });
 
-                    b.Navigation("AssistantRole");
+                            b1.Navigation("AssistantRole");
+                        });
 
                     b.Navigation("UserPreferences")
                         .IsRequired();
