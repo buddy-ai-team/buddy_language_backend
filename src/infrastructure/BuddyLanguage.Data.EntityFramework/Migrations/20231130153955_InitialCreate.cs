@@ -35,11 +35,18 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                     UserPreferences_NativeLanguage = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserPreferences_TargetLanguage = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserPreferences_SelectedVoice = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserPreferences_SelectedSpeed = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    UserPreferences_SelectedSpeed = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserPreferences_AssistantRoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Roles_UserPreferences_AssistantRoleId",
+                        column: x => x.UserPreferences_AssistantRoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -50,7 +57,8 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                     Language = table.Column<int>(type: "int", nullable: false),
                     WordStatus = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Word = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Word = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Translation = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -64,6 +72,11 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_UserPreferences_AssistantRoleId",
+                table: "Users",
+                column: "UserPreferences_AssistantRoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WordEntities_UserId",
                 table: "WordEntities",
                 column: "UserId");
@@ -73,13 +86,13 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Roles");
-
-            migrationBuilder.DropTable(
                 name: "WordEntities");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
         }
     }
 }

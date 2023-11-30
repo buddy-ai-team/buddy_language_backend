@@ -1,4 +1,5 @@
-﻿using BuddyLanguage.Domain.Services;
+﻿using BuddyLanguage.Domain.Entities;
+using BuddyLanguage.Domain.Services;
 using BuddyLanguage.HttpModels.Requests.User;
 using BuddyLanguage.HttpModels.Responses.User;
 using Microsoft.AspNetCore.Mvc;
@@ -22,10 +23,9 @@ namespace BuddyLanguage.WebApi.Controllers
          * /user/get?userId=...
          */
         [HttpGet("get")]
-        public async Task<ActionResult<UserResponse>> GetUserById(Guid userId, CancellationToken cancellationToken)
+        public async Task<ActionResult<User>> GetUserById(Guid userId, CancellationToken cancellationToken)
         {
-            var userVar = await _userService.GetUserById(userId, cancellationToken);
-            return new UserResponse(userVar.Id, userVar.FirstName, userVar.LastName, userVar.TelegramId);
+            return await _userService.GetUserById(userId, cancellationToken);
         }
 
         /*
