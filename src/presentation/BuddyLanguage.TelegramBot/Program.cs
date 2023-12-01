@@ -2,38 +2,55 @@ using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
 using BuddyLanguage.TelegramBot.Commands;
 using BuddyLanguage.TelegramBot.Services;
-using OpenAI.ChatGpt;
-using Polly;
+using Serilog;
+using Serilog.Events;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddApplicationServices(builder.Configuration);
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.Sentry(o =>
+    {
+        o.Dsn = builder.Configuration["Sentry:Dsn"];
+        o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+        o.MinimumEventLevel = LogEventLevel.Error;
+    })
+    .CreateLogger();
 
-var token = builder.Configuration["BotConfiguration:Token"];
-if (string.IsNullOrWhiteSpace(token))
+try
 {
-    throw new InvalidOperationException("Telegram bot token is not set");
-}
+    builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration).WriteTo.Console());
 
-builder.Services.AddSingleton(new TelegramBotClientOptions(token));
+    builder.WebHost.UseSentry();
 
-// TODO Implement Polly after update to .NET 8: https://github.com/dotnet/docs/blob/main/docs/core/resilience/http-resilience.md
-builder.Services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(token));
+    builder.Services.AddApplicationServices(builder.Configuration);
 
-builder.Services.AddSingleton<BotUserStateService>();
+    var token = builder.Configuration.GetRequiredValue("BotConfiguration:Token");
 
-builder.Services.AddHostedService<TelegramBotUpdatesListener>();
+    builder.Services.AddSingleton(new TelegramBotClientOptions(token));
 
-builder.Services.AddScoped<IBotCommandHandler, StartCommandHandler>();
-builder.Services.AddScoped<IBotCommandHandler, ResetTopicCommand>();
-builder.Services.AddScoped<IBotCommandHandler, UnknownCommandHandler>();
-builder.Services.AddScoped<IBotCommandHandler, UserVoiceCommandHandler>();
-builder.Services.AddScoped<IBotCommandHandler, UserVoiceCommandHandler>();
+    // TODO Implement Polly after update to .NET 8: https://github.com/dotnet/docs/blob/main/docs/core/resilience/http-resilience.md
+    builder.Services.AddHttpClient("TelegramBotClient");
+    builder.Services.AddSingleton<ITelegramBotClient>(provider =>
+    {
+        IHttpClientFactory factory = provider.GetRequiredService<IHttpClientFactory>();
+        HttpClient client = factory.CreateClient("TelegramBotClient");
+        return new TelegramBotClient(token, client);
+    });
 
-var app = builder.Build();
+    builder.Services.AddSingleton<TelegramUserRepository>();
 
-app.MapGet("/", () => "Hello World!");
+    builder.Services.AddHostedService<TelegramBotUpdatesListener>();
+
+    builder.Services.AddScoped<IBotCommandHandler, StartCommandHandler>();
+    builder.Services.AddScoped<IBotCommandHandler, ResetTopicCommand>();
+    builder.Services.AddScoped<IBotCommandHandler, UnknownCommandHandler>();
+    builder.Services.AddScoped<IBotCommandHandler, UserVoiceCommandHandler>();
+
+    var app = builder.Build();
 
 app.Run();
 
@@ -43,4 +60,16 @@ app.Run();
 // ReSharper disable once ClassNeverInstantiated.Global
 public partial class Program
 {
+    app.MapGet("/", () => $"Ver: {ReflectionHelper.GetBuildDate():s}");
+
+    app.Run();
+}
+catch (Exception ex) when (ex is not HostAbortedException)
+{
+    Log.Fatal(ex, "Unhandled exception on server startup");
+}
+finally
+{
+    Log.Information("Shut down complete");
+    Log.CloseAndFlush();
 }

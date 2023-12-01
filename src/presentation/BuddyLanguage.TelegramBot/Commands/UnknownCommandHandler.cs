@@ -20,7 +20,7 @@ namespace BuddyLanguage.TelegramBot.Commands
             {
                 await _botClient.SendTextMessageAsync(
                     chatId: update.Message.Chat.Id,
-                    text: "Извините, данная команда не распознана.",
+                    text: "Пока что умею отвечать только на голосовые собощения на английском языке.",
                     cancellationToken: cancellationToken);
             }
         }

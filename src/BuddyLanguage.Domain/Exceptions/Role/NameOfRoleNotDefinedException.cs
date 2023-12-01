@@ -17,9 +17,4 @@ public class NameOfRoleNotDefinedException : DomainException
         : base(message, innerException)
     {
     }
-
-    protected NameOfRoleNotDefinedException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-    }
 }

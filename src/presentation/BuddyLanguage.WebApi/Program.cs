@@ -1,27 +1,59 @@
 using BuddyLanguage.Infrastructure;
+using BuddyLanguage.WebApi.Extensions;
 using BuddyLanguage.WebApi.Filters;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Swagger Setup
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.Sentry(o =>
+    {
+        o.Dsn = builder.Configuration["Sentry:Dsn"];
+        o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+        o.MinimumEventLevel = LogEventLevel.Error;
+    })
+    .CreateLogger();
 
-//Domain and Infrastructure services
-builder.Services.AddApplicationServices(builder.Configuration);
-
-//Filters
-builder.Services.AddControllers(options =>
+try
 {
-    options.Filters.Add<CentralizedExceptionHandlingFilter>(order: 1);
-});
+    builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration).WriteTo.Console());
 
-var app = builder.Build();
+    builder.WebHost.UseSentry();
 
-//Swagger Build
-app.UseSwagger();
-app.UseSwaggerUI();
+    builder.Services.AddCors();
 
-app.MapControllers();
+    //WebApi services
+    builder.Services.AddWebApiServices(builder.Configuration);
 
-app.Run();
+    //Domain and Infrastructure services
+    builder.Services.AddApplicationServices(builder.Configuration);
+
+    var app = builder.Build();
+
+    app.UseCors(policy =>
+    {
+        policy
+            .WithOrigins("https://buddy-language-bot.netlify.app")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+
+    app.UseWebApi();
+    app.MapHealthChecks("/buddy_health")
+        .ShortCircuit();
+
+    app.Run();
+}
+catch (Exception ex) when (ex is not HostAbortedException)
+{
+    Log.Fatal(ex, "Unhandled exception on server startup");
+}
+finally
+{
+    Log.Information("Shut down complete");
+    Log.CloseAndFlush();
+}

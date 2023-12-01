@@ -37,15 +37,16 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         }
 
         await _botClient.SendTextMessageAsync(
-            update.Message!.Chat.Id, "Thinking...", cancellationToken: cancellationToken);
+            update.Message!.Chat.Id, "Обработка...", cancellationToken: cancellationToken);
 
         var user = await _userService.GetUserByTelegramId(telegramUserId, cancellationToken);
+        _logger.LogInformation("Processing UserVoiceCommand...");
 
         if (voice != null && update.Message != null)
         {
             var duration = TimeSpan.FromSeconds(voice.Duration);
 
-            if (duration <= TimeSpan.FromMinutes(30))
+            if (duration <= TimeSpan.FromMinutes(3))
             {
                 File voiceFile = await _botClient.GetFileAsync(voice.FileId, cancellationToken);
                 using var voiceStream = new MemoryStream(); //voiceFile.FileSize
@@ -61,28 +62,52 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
                 var voiceMessage = voiceStream.ToArray();
 
-                var (answerBytes, mistakes, words) =
+                var (recognizedMessage,  answerText, answerBytes, mistakes, words) =
                     await _buddyService.ProcessUserMessage(user, voiceMessage, cancellationToken);
 
-                using var memoryStream = new MemoryStream(answerBytes); // доделать
+                await _botClient.SendTextMessageAsync(
+                    update.Message.Chat.Id,
+                    $"Вы сказали: \n```\n{recognizedMessage}\n```",
+                    cancellationToken: cancellationToken);
+                await _botClient.SendTextMessageAsync(
+                    update.Message.Chat.Id, answerText, cancellationToken: cancellationToken);
+
+                using var memoryStream = new MemoryStream(answerBytes);
                 await _botClient.SendVoiceAsync(
                     chatId: update.Message.Chat.Id,
                     voice: InputFile.FromStream(memoryStream, "answer.ogg"),
                     cancellationToken: cancellationToken);
-                await _botClient.SendTextMessageAsync(
-                    chatId: update.Message.Chat.Id,
-                    text: $"Ваши ошибки: {mistakes}",
-                    cancellationToken: cancellationToken);
-                await _botClient.SendTextMessageAsync(
-                    chatId: update.Message.Chat.Id,
-                    text: $"Слова на изучение: {words}",
-                    cancellationToken: cancellationToken);
+
+                if (mistakes.Length > 0 && words.Length > 0)
+                {
+                    var grammaMistakes = string.Join(", ", mistakes);
+                    var studiedWords = string.Join(", ", words);
+                    await _botClient.SendTextMessageAsync(
+                        chatId: update.Message.Chat.Id,
+                        text: $"Ваши ошибки: {grammaMistakes}\nСлова на изучение: {studiedWords}",
+                        cancellationToken: cancellationToken);
+                }
+                else if (mistakes.Length > 0 && words.Length == 0)
+                {
+                    var grammaMistakes = string.Join(", ", mistakes);
+                    await _botClient.SendTextMessageAsync(
+                        chatId: update.Message.Chat.Id,
+                        text: $"Ваши ошибки: {grammaMistakes}",
+                        cancellationToken: cancellationToken);
+                }
+                else if (mistakes.Length == 0 && words.Length > 0)
+                {
+                    var studiedWords = string.Join(", ", words);
+                    await _botClient.SendTextMessageAsync(
+                        chatId: update.Message.Chat.Id,
+                        text: $"Слова на изучение: {studiedWords}",
+                        cancellationToken: cancellationToken);
+                }
             }
             else
             {
-                // Голосовое сообщение длится более 30 минут
                 string text = "Превышена допустимая длительность голосового сообщения. " +
-                                "Максимальная длительность: 30 минут.";
+                                    "Максимальная длительность: 3 минуты.";
                 await _botClient.SendTextMessageAsync(
                     chatId: update.Message.Chat.Id,
                     text: text,

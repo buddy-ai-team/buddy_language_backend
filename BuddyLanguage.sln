@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8BAB869C-013
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infrastructure", "infrastructure", "{B7E89B02-7310-4605-9FB5-C6816DD5EE51}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{9BBF7E54-7319-4B7E-8D7E-0F371F7EF0DD}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{29BBBC3B-7154-4E97-8CE0-82567911AFC0}"
 	ProjectSection(SolutionItems) = preProject
 		tests\Directory.Build.props = tests\Directory.Build.props
@@ -30,13 +28,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.ChatGPTServic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.OpenAIWhisperSpeechRecognitionService", "src\infrastructure\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj", "{64D89577-D3E9-40AF-A9FB-03EA41F7356C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.TextToSpeech", "src\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj", "{158B5246-FBDC-4D78-86A6-A5AA9202E445}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.AzureServices", "src\infrastructure\BuddyLanguage.AzureServices\BuddyLanguage.AzureServices.csproj", "{158B5246-FBDC-4D78-86A6-A5AA9202E445}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.Architecture.Test", "tests\BuddyLanguage.Architecture.Test\BuddyLanguage.Architecture.Test.csproj", "{781AD5FE-86F4-47FD-B7F7-F6161541C82E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Architecture.Test", "tests\BuddyLanguage.Architecture.Test\BuddyLanguage.Architecture.Test.csproj", "{781AD5FE-86F4-47FD-B7F7-F6161541C82E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.HttpModels", "shared\BuddyLanguage.HttpModels\BuddyLanguage.HttpModels.csproj", "{4D262B1C-28C3-42B2-B449-9C683A87A44D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.Infrastructure", "src\infrastructure\BuddyLanguage.Infrastructure\BuddyLanguage.Infrastructure.csproj", "{41B8D7D8-A562-4E59-92BE-800B880247E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.Infrastructure", "src\infrastructure\BuddyLanguage.Infrastructure\BuddyLanguage.Infrastructure.csproj", "{41B8D7D8-A562-4E59-92BE-800B880247E4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configs", "configs", "{1202EB6B-7F30-4689-B767-FA1D77B77061}"
 	ProjectSection(SolutionItems) = preProject
@@ -44,7 +40,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configs", "configs", "{1202
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.TelegramBot", "src\presentation\BuddyLanguage.TelegramBot\BuddyLanguage.TelegramBot.csproj", "{ED529C28-1A3A-41FF-9485-0218F55D47C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.TelegramBot", "src\presentation\BuddyLanguage.TelegramBot\BuddyLanguage.TelegramBot.csproj", "{ED529C28-1A3A-41FF-9485-0218F55D47C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.HttpModels", "src\presentation\BuddyLanguage.HttpModels\BuddyLanguage.HttpModels.csproj", "{10F75D72-895C-4856-9485-EA1BC5B4A7E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.WebAPI.Test", "tests\BuddyLanguage.WebAPI.Test\BuddyLanguage.WebAPI.Test.csproj", "{98C162E5-F82A-44F0-A54E-717873F57B39}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.TelegramBot.IntegrationTest", "tests\BuddyLanguage.TelegramBot.IntegrationTest\BuddyLanguage.TelegramBot.IntegrationTest.csproj", "{6CC5E47B-C9C1-4278-9075-E411464E773C}"
 EndProject
@@ -74,10 +74,6 @@ Global
 		{BF991769-EAC3-49CA-A315-8A2AB27EDF6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF991769-EAC3-49CA-A315-8A2AB27EDF6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF991769-EAC3-49CA-A315-8A2AB27EDF6B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F13ACF1E-21D9-4598-9E54-965B11225D1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F13ACF1E-21D9-4598-9E54-965B11225D1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F13ACF1E-21D9-4598-9E54-965B11225D1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -90,10 +86,14 @@ Global
 		{158B5246-FBDC-4D78-86A6-A5AA9202E445}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{158B5246-FBDC-4D78-86A6-A5AA9202E445}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{158B5246-FBDC-4D78-86A6-A5AA9202E445}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4D262B1C-28C3-42B2-B449-9C683A87A44D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D262B1C-28C3-42B2-B449-9C683A87A44D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D262B1C-28C3-42B2-B449-9C683A87A44D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D262B1C-28C3-42B2-B449-9C683A87A44D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{781AD5FE-86F4-47FD-B7F7-F6161541C82E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41B8D7D8-A562-4E59-92BE-800B880247E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41B8D7D8-A562-4E59-92BE-800B880247E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41B8D7D8-A562-4E59-92BE-800B880247E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41B8D7D8-A562-4E59-92BE-800B880247E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ED529C28-1A3A-41FF-9485-0218F55D47C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ED529C28-1A3A-41FF-9485-0218F55D47C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED529C28-1A3A-41FF-9485-0218F55D47C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -104,6 +104,14 @@ Global
 		{6CC5E47B-C9C1-4278-9075-E411464E773C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CC5E47B-C9C1-4278-9075-E411464E773C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CC5E47B-C9C1-4278-9075-E411464E773C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10F75D72-895C-4856-9485-EA1BC5B4A7E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10F75D72-895C-4856-9485-EA1BC5B4A7E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10F75D72-895C-4856-9485-EA1BC5B4A7E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10F75D72-895C-4856-9485-EA1BC5B4A7E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98C162E5-F82A-44F0-A54E-717873F57B39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98C162E5-F82A-44F0-A54E-717873F57B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98C162E5-F82A-44F0-A54E-717873F57B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98C162E5-F82A-44F0-A54E-717873F57B39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -116,14 +124,15 @@ Global
 		{1824C987-16E5-4AA7-86EB-680D58B6A5C6} = {8BAB869C-0136-46CC-B9A0-46636FC4C9C8}
 		{EB441BAB-DAE3-4724-B63A-A182D005DA54} = {1824C987-16E5-4AA7-86EB-680D58B6A5C6}
 		{BF991769-EAC3-49CA-A315-8A2AB27EDF6B} = {29BBBC3B-7154-4E97-8CE0-82567911AFC0}
-		{781AD5FE-86F4-47FD-B7F7-F6161541C82E} = {29BBBC3B-7154-4E97-8CE0-82567911AFC0}
 		{F13ACF1E-21D9-4598-9E54-965B11225D1D} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 		{64D89577-D3E9-40AF-A9FB-03EA41F7356C} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 		{158B5246-FBDC-4D78-86A6-A5AA9202E445} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
-		{4D262B1C-28C3-42B2-B449-9C683A87A44D} = {9BBF7E54-7319-4B7E-8D7E-0F371F7EF0DD}
-		{ED529C28-1A3A-41FF-9485-0218F55D47C3} = {1824C987-16E5-4AA7-86EB-680D58B6A5C6}
+		{781AD5FE-86F4-47FD-B7F7-F6161541C82E} = {29BBBC3B-7154-4E97-8CE0-82567911AFC0}
 		{41B8D7D8-A562-4E59-92BE-800B880247E4} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 		{6CC5E47B-C9C1-4278-9075-E411464E773C} = {29BBBC3B-7154-4E97-8CE0-82567911AFC0}
+		{ED529C28-1A3A-41FF-9485-0218F55D47C3} = {1824C987-16E5-4AA7-86EB-680D58B6A5C6}
+		{10F75D72-895C-4856-9485-EA1BC5B4A7E8} = {1824C987-16E5-4AA7-86EB-680D58B6A5C6}
+		{98C162E5-F82A-44F0-A54E-717873F57B39} = {29BBBC3B-7154-4E97-8CE0-82567911AFC0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EA996F8-4CC9-4CE0-98C9-1833EAF2E957}

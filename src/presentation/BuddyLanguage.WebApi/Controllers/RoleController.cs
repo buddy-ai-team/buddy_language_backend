@@ -19,10 +19,10 @@ public class RoleController : ControllerBase
         _roleService = roleService ?? throw new ArgumentNullException(nameof(roleService));
     }
 
-    [HttpGet("id")]
-    public async Task<ActionResult<RoleResponse>> GetRoleById(RoleByIdRequest roleByIdRequest, CancellationToken cancellationToken)
+    [HttpGet("get")]
+    public async Task<ActionResult<RoleResponse>> GetRoleById(Guid roleId, CancellationToken cancellationToken)
     {
-        var role = await _roleService.GetRoleById(roleByIdRequest.Id, cancellationToken);
+        var role = await _roleService.GetRoleById(roleId, cancellationToken);
         var resp = new RoleResponse(role.Id, role.Name, role.Prompt);
         return resp;
     }
@@ -31,7 +31,6 @@ public class RoleController : ControllerBase
     public async Task<ActionResult<UpdateRoleResponse>> UpdateRole(UpdateRoleRequest request, CancellationToken cancellationToken)
     {
         var role = await _roleService.ChangePromptByRoleId(request.Id, request.Name, request.Prompt, cancellationToken);
-
         return new UpdateRoleResponse(role.Id, role.Name, role.Prompt);
     }
 
@@ -46,7 +45,6 @@ public class RoleController : ControllerBase
     public async Task<ActionResult<UpdateRoleResponse>> AddRole(AddRoleRequest request, CancellationToken cancellationToken)
     {
         var role = await _roleService.AddRole(request.Name, request.Prompt, cancellationToken);
-
         return new UpdateRoleResponse(role.Id, role.Name, role.Prompt);
     }
 }

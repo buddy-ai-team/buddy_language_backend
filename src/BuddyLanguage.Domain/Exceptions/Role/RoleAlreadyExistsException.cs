@@ -17,9 +17,4 @@ public class RoleAlreadyExistsException : DomainException
         : base(message, innerException)
     {
     }
-
-    protected RoleAlreadyExistsException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-    }
 }

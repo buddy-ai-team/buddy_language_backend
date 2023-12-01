@@ -1,4 +1,4 @@
-﻿using BuddyLanguage.Domain.Exceptions;
+﻿using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
 using FluentAssertions;
@@ -15,82 +15,55 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         {
             FluentActions.Invoking(() =>
             {
-                WhisperSpeechRecognitionService whisperService = new(null!);
+                _ = new WhisperSpeechRecognitionService(null!);
             })
                .Should()
                .Throw<ArgumentNullException>();
         }
 
         [Fact]
-        public async Task Voice_message_converts_to_text_successfully()
+        public async Task Recognition_of_multilingual_voice_message_is_correct()
         {
-            string fileName = @"assets/History.mp3";
+            string fileName = "assets/Cats.mp3";
             byte[] bytes = await File.ReadAllBytesAsync(fileName);
 
-            var service = new OpenAIService(new OpenAiOptions()
+            IOpenAIService openAIService = new OpenAIService(new OpenAiOptions()
             {
                 ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
             });
-
-            IOpenAIService openAIService = service;
             WhisperSpeechRecognitionService whisperService = new(openAIService);
 
-            await FluentActions.Invoking(async () =>
-            await whisperService.RecognizeSpeechToTextAsync(bytes, fileName, default))
-                .Should().NotThrowAsync();
+            var text = await whisperService.RecognizeSpeechToTextAsync(
+                bytes, AudioFormat.Mp3, Language.English, Language.Russian, default);
+
+            text.Should().NotBeNull();
+            text.Should().Contain("I нравится cats");
         }
 
         [Fact]
-        public async Task Whisper_service_rejects_invalid_file_formats()
+        public async Task Voice_message_converts_to_text_successfully()
         {
-            string fileName = @"assets/History.aiff";
-            byte[] bytes = File.ReadAllBytes(fileName);
+            string fileName = "assets/History.mp3";
+            byte[] bytes = await File.ReadAllBytesAsync(fileName);
 
-            var service = new OpenAIService(new OpenAiOptions()
+            IOpenAIService openAIService = new OpenAIService(new OpenAiOptions()
             {
                 ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
             });
-
-            IOpenAIService openAIService = service;
             WhisperSpeechRecognitionService whisperService = new(openAIService);
 
             await FluentActions.Invoking(async () =>
-            {
-                await whisperService.RecognizeSpeechToTextAsync(bytes, fileName, default);
-            }).Should().ThrowAsync<InvalidSpeechRecognitionException>();
-        }
-
-        [Theory]
-        [InlineData(null, "VoiceMessage.mp3")]
-        [InlineData(new byte[] { 1, 2, 3 }, null)]
-        [InlineData(new byte[0], "VoiceMessage.mp3")]
-        [InlineData(null, null)]
-        public async Task Whisper_service_rejects_files_with_incorrect_data(
-            byte[] bytes,
-            string fileName)
-        {
-            var service = new OpenAIService(new OpenAiOptions()
-            {
-                ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
-            });
-
-            IOpenAIService openAIService = service;
-            WhisperSpeechRecognitionService whisperService = new(openAIService);
-
-            await FluentActions.Invoking(async () =>
-            {
-                await whisperService.RecognizeSpeechToTextAsync(bytes, fileName, default);
-            }).Should().ThrowAsync<ArgumentException>();
+                await whisperService.RecognizeSpeechToTextAsync(bytes, AudioFormat.Mp3, Language.Russian, Language.English, default))
+                .Should().NotThrowAsync();
         }
 
         [Fact]
         public void Whisper_service_implements_interface()
         {
-            var service = new OpenAIService(new OpenAiOptions()
+            IOpenAIService openAIService = new OpenAIService(new OpenAiOptions()
             {
                 ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new InvalidOperationException()
             });
-            IOpenAIService openAIService = service;
             WhisperSpeechRecognitionService whisperService = new(openAIService);
 
             whisperService.Should().BeAssignableTo<ISpeechRecognitionService>();

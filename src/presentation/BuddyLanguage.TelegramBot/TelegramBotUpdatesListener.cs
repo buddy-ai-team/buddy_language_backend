@@ -14,18 +14,18 @@ public class TelegramBotUpdatesListener : BackgroundService
     private readonly ITelegramBotClient _botClient;
     private readonly ILogger<TelegramBotUpdatesListener> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly BotUserStateService _userStateService;
+    private readonly TelegramUserRepository _telegramUserRepository;
 
     public TelegramBotUpdatesListener(
         ITelegramBotClient telegramBotClient,
         ILogger<TelegramBotUpdatesListener> logger,
         IServiceProvider serviceProvider,
-        BotUserStateService userStateService)
+        TelegramUserRepository telegramUserRepository)
     {
         _botClient = telegramBotClient ?? throw new ArgumentNullException(nameof(telegramBotClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        _userStateService = userStateService ?? throw new ArgumentNullException(nameof(userStateService));
+        _telegramUserRepository = telegramUserRepository ?? throw new ArgumentNullException(nameof(telegramUserRepository));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -43,8 +43,16 @@ public class TelegramBotUpdatesListener : BackgroundService
             cancellationToken: stoppingToken);
     }
 
-    private Task SendTypingActionAsync(ChatId chatId)
-        => _botClient.SendChatActionAsync(chatId, ChatAction.Typing);
+    private async Task SendDelayedTypingActionAsync(ChatId chatId, CancellationToken ctsTypingToken)
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(200), ctsTypingToken);
+        while (!ctsTypingToken.IsCancellationRequested)
+        {
+            await _botClient.SendChatActionAsync(
+                chatId, ChatAction.Typing, cancellationToken: ctsTypingToken);
+            await Task.Delay(TimeSpan.FromSeconds(3), ctsTypingToken);
+        }
+    }
 
     private async Task UpdateHander(
         ITelegramBotClient telegramBotClient, Update update, CancellationToken cancellationToken)
@@ -74,8 +82,22 @@ public class TelegramBotUpdatesListener : BackgroundService
 
         if (commandHandler != null && update.Message != null)
         {
-            await SendTypingActionAsync(update.Message.Chat.Id); // Показываем, что робот печатает сообщение
-            await commandHandler.HandleAsync(update, cancellationToken);
+            var ctsTyping = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _ = SendDelayedTypingActionAsync(update.Message.Chat.Id, ctsTyping.Token); // Показываем, что робот печатает сообщение
+            try
+            {
+                await commandHandler.HandleAsync(update, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error in command handler {CommandHandler}", commandHandler.GetType().Name);
+                await telegramBotClient.SendTextMessageAsync(
+                    update.Message.Chat.Id,
+                    $"Произошла ошибка: \n{e.Message}\n{e.StackTrace}",
+                    cancellationToken: cancellationToken);
+            }
+
+            await ctsTyping.CancelAsync();
         }
         else
         {
@@ -88,15 +110,15 @@ public class TelegramBotUpdatesListener : BackgroundService
     {
         // TODO: to commands
         var telegramId = message.From!.Id;
-        if (_userStateService.IsAuthenticated(telegramId))
+        if (_telegramUserRepository.IsAuthenticated(telegramId))
         {
             return true;
         }
 
-        if (_userStateService.GetUserState(telegramId) == UserBotStates.AccessPassword
+        if (_telegramUserRepository.GetUserState(telegramId) == UserBotStates.AccessPassword
             && message.Text is { } password)
         {
-            if (!_userStateService.VerifyPasswordAndUpdateState(telegramId, password))
+            if (!_telegramUserRepository.VerifyPasswordAndUpdateState(telegramId, password))
             {
                 await _botClient.SendTextMessageAsync(
                     message.Chat.Id,
@@ -119,7 +141,7 @@ public class TelegramBotUpdatesListener : BackgroundService
             message.Chat.Id,
             "Вы не авторизованы. Пожалуйста, авторизуйтесь.\nВведите пароль:",
             cancellationToken: cancellationToken);
-        _userStateService.SetUserState(message.From.Id, UserBotStates.AccessPassword);
+        _telegramUserRepository.SetUserState(message.From.Id, UserBotStates.AccessPassword);
 
         return false;
     }

@@ -1,14 +1,13 @@
-﻿using BuddyLanguage.ChatGPTServiceLib;
+﻿using BuddyLanguage.AzureServices;
+using BuddyLanguage.ChatGPTServiceLib;
 using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Data.EntityFramework.Repositories;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
-using BuddyLanguage.TextToSpeech;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using OpenAI.ChatGpt.EntityFrameworkCore;
 using OpenAI.ChatGpt.EntityFrameworkCore.Extensions;
 using OpenAI.Extensions;
 
@@ -32,22 +31,10 @@ public static class BuddyLanguageDependencyInjection
     {
         //Services
         //Azure TTS
-        services.AddOptions<AzureTTSConfig>()
+        services.AddOptions<AzureConfig>()
             .BindConfiguration("AzureTTSConfig")
             .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        // Definition of database file name and connection of it as a service
-        services.AddOptions<MySqlConnectionStringOptions>()
-            .BindConfiguration("MySqlConnectionStringOptions")
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        var config = configuration
-            .GetRequiredSection("MySqlConnectionStringOptions")
-            .Get<MySqlConnectionStringOptions>();
-
-        var mySqlServerVersion = new MySqlServerVersion(new Version(8, 0));
+            ; //.ValidateOnStart()
 
         // Подключение репозитория для работы с Ролями
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
@@ -56,38 +43,46 @@ public static class BuddyLanguageDependencyInjection
         services.AddScoped<IUserRepository, UserRepositoryEf>();
         services.AddScoped<IUnitOfWork, UnitOfWorkEf>();
 
-        if (config is null || string.IsNullOrEmpty(config.ConnectionString))
-        {
-            throw new InvalidOperationException("MySqlConnectionStringOptions is missing or invalid in configuration.");
-        }
-
+        // Can be replaced with Aspire.Microsoft.EntityFrameworkCore.SqlServer
         services.AddDbContext<AppDbContext>(
-            optionsAction: options => options.UseMySql(config.ConnectionString, mySqlServerVersion));
-
-        services.AddDbContext<ChatGptDbContextTmp>(
-            options => options.UseMySql(config.ConnectionString, mySqlServerVersion));
+            options =>
+            {
+                options.UseSqlServer(
+                        configuration.GetRequiredConnectionString("AZURE_SQL_CONNECTIONSTRING"),
+                        builder =>
+                        {
+                            builder.UseAzureSqlDefaults();
+                            builder.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                        })
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging();
+            });
 
         services.AddChatGptEntityFrameworkIntegration(
-            op => op.UseMySql(
-                config.ConnectionString,
-                mySqlServerVersion,
-                builder =>
-                {
-                    builder.MigrationsAssembly(typeof(ChatGptDbContext).Assembly.FullName);
-                }));
+            options =>
+            {
+                options.UseSqlServer(
+                        configuration.GetRequiredConnectionString("AZURE_SQL_CONNECTIONSTRING"),
+                        builder =>
+                        {
+                            builder.UseAzureSqlDefaults();
+                            builder.MigrationsAssembly(typeof(InfrastructureMig).Assembly.FullName);
+                        })
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging();
+            });
 
-        services.AddScoped<IChatGPTService, ChatGPTService>();
+        services.AddHealthChecks()
+            .AddDbContextCheck<AppDbContext>();
 
         services.AddOpenAIService(
-        settings =>
-        {
-            settings.ApiKey = configuration["OPENAI_API_KEY"] ?? throw new InvalidOperationException(
-                                  "OPENAI_API_KEY environment variable is not set");
-        });
+            settings =>
+            {
+                settings.ApiKey = configuration.GetRequiredValue("OPENAI_API_KEY");
+            });
 
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
         services.AddScoped<ITextToSpeech, AzureTextToSpeech>();
-
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
         return services;
@@ -97,7 +92,7 @@ public static class BuddyLanguageDependencyInjection
         this IServiceCollection services)
     {
         services.AddScoped<RoleService>();
-        services.AddScoped<WordEntityService>();
+        services.AddScoped<WordService>();
         services.AddScoped<UserService>();
         services.AddScoped<BuddyService>();
 

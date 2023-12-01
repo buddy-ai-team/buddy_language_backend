@@ -17,10 +17,5 @@ namespace BuddyLanguage.Domain.Exceptions
             : base(message, innerException)
         {
         }
-
-        protected InvalidSpeechRecognitionException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 }

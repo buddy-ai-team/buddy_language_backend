@@ -35,6 +35,13 @@ namespace BuddyLanguage.Domain.Services
             {
                 var user = new User(Guid.NewGuid(), firstName ?? string.Empty, lastName ?? string.Empty, telegramId);
 
+                //Temporary Default Values
+                user.UserPreferences.NativeLanguage = Language.Russian;
+                user.UserPreferences.TargetLanguage = Language.English;
+                user.UserPreferences.SelectedVoice = Voice.Male;
+                user.UserPreferences.SelectedSpeed = TtsSpeed.Slow;
+                user.UserPreferences.AssistantRoleId = Guid.Empty; /*user.UserPreferences.AssistantRoleId = DefaultRoleId;*/
+
                 await _uow.UserRepository.Add(user, cancellationToken);
                 await _uow.SaveChangesAsync(cancellationToken);
                 return user;

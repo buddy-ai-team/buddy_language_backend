@@ -1,10 +1,9 @@
-﻿using BuddyLanguage.Domain.Enumerations;
-using BuddyLanguage.TextToSpeech;
+﻿using BuddyLanguage.AzureServices;
+using BuddyLanguage.Domain.Enumerations;
 using FluentAssertions;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest
 {
@@ -47,7 +46,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
 
                 // Arrange
                 var logger = new LoggerFactory().CreateLogger<AzureTextToSpeech>();
-                var options = Options.Create(new AzureTTSConfig()
+                var options = Options.Create(new AzureConfig()
                     {
                         SpeechKey = GetKeyFromEnvironment("AZURE_SPEECH_KEY"),
                         SpeechRegion = GetKeyFromEnvironment("AZURE_SPEECH_REGION")
@@ -58,7 +57,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
                 var cancellationToken = CancellationToken.None;
 
                 // Act
-                var audioData = await textToSpeechClient.TextToWavByteArrayAsync(text, language, voice, cancellationToken);
+                var audioData = await textToSpeechClient.TextToWavByteArrayAsync(text, language, voice, TtsSpeed.Medium, cancellationToken);
 
                 // Assert
                 audioData.Should().NotBeNullOrEmpty($"Audio Data For Language: {language} and Voice: {voice} combination was null/empty!");
@@ -73,8 +72,8 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         {
             // Arrange
             //Act
-            string? speechKey = GetKeyFromEnvironment("AZURE_SPEECH_KEY");
-            string? speechRegion = GetKeyFromEnvironment("AZURE_SPEECH_REGION");
+            string speechKey = GetKeyFromEnvironment("AZURE_SPEECH_KEY");
+            string speechRegion = GetKeyFromEnvironment("AZURE_SPEECH_REGION");
 
             // Assert
             var speechConfig = SpeechConfig.FromSubscription(speechKey, speechRegion);
