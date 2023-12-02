@@ -62,7 +62,9 @@ public class AuthenticationFilterTest
     // Получить пример строки заголовка Authorization
     private string GetTestInitData()
     {
-        return
-            "query_id=AAHdF6IQAAAAAN0XohDhrOrc&user=%7B%22id%22%3A279058397%2C%22first_name%22%3A%22Vladislav%22%2C%22last_name%22%3A%22Kibenko%22%2C%22username%22%3A%22vdkfrost%22%2C%22language_code%22%3A%22ru%22%2C%22is_premium%22%3Atrue%7D&auth_date=1662771648&hash=c501b71e775f74ce10e377dea85a7ea24ecd640b223ea86dfe453e0eaed2e2b2";
+        const string start = "query_id=AAG4059_AAAAALjTn3-y9ZAg&user=%7B%22id%22%3A2141180856%2C%22first_name%22%3A%22%D0%9E%D0%BD%D0%B8%D1%89%D0%B5%D0%BD%D0%BA%D0%BE%20%D0%90%D0%BD%D0%BD%D0%B0%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22Anna_Onis%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%7D&";
+        string date = "auth_date=" + "1701279684";
+        const string end = "&hash=c85cdb29adad89e0f4635317bc1ae064f810d3e8227dd119c01bad0b9b406f69";
+        return start + date + end;
     }
 }
