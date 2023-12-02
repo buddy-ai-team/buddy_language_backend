@@ -93,7 +93,7 @@ public class TelegramBotUpdatesListener : BackgroundService
                 _logger.LogError(e, "Error in command handler {CommandHandler}", commandHandler.GetType().Name);
                 await telegramBotClient.SendTextMessageAsync(
                     update.Message.Chat.Id,
-                    $"Произошла ошибка: \n{e.Message}\n{e.StackTrace}",
+                    $"Произошла ошибка:\n{e}",
                     cancellationToken: cancellationToken);
             }
 
