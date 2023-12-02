@@ -98,8 +98,9 @@ public class BuddyServiceTests
         // Assert
         words.Should().NotBeNull();
         words.WordsCount.Should().Be(1);
-        words.Words.Should().NotBeNull();
-        words.Words.Should().HaveCount(1);
-        words.Words.Should().Contain("favorite");
+        words.StudiedWords.Should().NotBeNull();
+        words.StudiedWords.Should().HaveCount(1);
+        words.StudiedWords.ContainsKey("любимый");
+        words.StudiedWords.ContainsValue("favorite");
     }
 }
