@@ -69,7 +69,7 @@ namespace BuddyLanguage.Domain.Services
         {
             ArgumentException.ThrowIfNullOrEmpty(word, nameof(word));
 
-            var wordVar = new WordEntity(Guid.NewGuid(), accountId, word, language, status, translation);
+            var wordVar = new WordEntity(Guid.NewGuid(), accountId, word, language, status, translation!);
 
             await _uow.WordEntityRepository.Add(wordVar, cancellationToken);
             await _uow.SaveChangesAsync(cancellationToken);
