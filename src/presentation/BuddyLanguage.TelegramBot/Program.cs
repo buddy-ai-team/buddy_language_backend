@@ -2,7 +2,6 @@ using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
 using BuddyLanguage.TelegramBot.Commands;
 using BuddyLanguage.TelegramBot.Services;
-using Scrutor;
 using Serilog;
 using Serilog.Events;
 using Telegram.Bot;
@@ -23,7 +22,10 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration).WriteTo.Console());
+    builder.Logging.ClearProviders();
+
+    // https://github.com/dmitry-slabko/article-azure-logging-pub/blob/main/AzureLogging/Logging/Registration/HostBuilderExtensions.cs
+    builder.Host.UseSerilog(ConfigureLogger, writeToProviders: false);
 
     builder.WebHost.UseSentry();
 
@@ -66,4 +68,32 @@ finally
 {
     Log.Information("Shut down complete");
     Log.CloseAndFlush();
+}
+
+return;
+
+static void ConfigureLogger(HostBuilderContext context, LoggerConfiguration config)
+{
+    // TODO: move to infrastructure
+    config.Enrich.FromLogContext()
+        .MinimumLevel.Debug()
+        .WriteTo.Console();
+
+    if (!context.HostingEnvironment.IsDevelopment())
+    {
+        config.WriteTo.Sentry(o =>
+            {
+                o.Dsn = context.Configuration["Sentry:Dsn"];
+                o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+                o.MinimumEventLevel = LogEventLevel.Error;
+            })
+            .WriteTo.Async(x =>
+            {
+                string azureLogFile = $@"D:\home\LogFiles\Application\{context.HostingEnvironment.ApplicationName}.txt";
+                x.File(
+                    azureLogFile,
+                    shared: true,
+                    flushToDiskInterval: TimeSpan.FromSeconds(1));
+            });
+    }
 }
