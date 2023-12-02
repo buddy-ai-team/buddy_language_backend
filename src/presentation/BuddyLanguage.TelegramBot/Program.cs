@@ -2,6 +2,7 @@ using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
 using BuddyLanguage.TelegramBot.Commands;
 using BuddyLanguage.TelegramBot.Services;
+using Scrutor;
 using Serilog;
 using Serilog.Events;
 using Telegram.Bot;
