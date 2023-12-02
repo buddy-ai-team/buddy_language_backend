@@ -1,5 +1,4 @@
-﻿using System.Transactions;
-using BuddyLanguage.Domain.Enumerations;
+﻿using BuddyLanguage.Domain.Enumerations;
 
 namespace BuddyLanguage.Domain.Entities;
 
@@ -8,15 +7,16 @@ namespace BuddyLanguage.Domain.Entities;
 public class WordEntity : IEntity
 {
     private string _word;
+    private string _translation;
 
-    public WordEntity(Guid id, Guid accountId, string word, Language language, WordEntityStatus wordStatus, string? translation = "")
+    public WordEntity(Guid id, Guid accountId, string word, string translation, Language language, WordEntityStatus wordStatus)
     {
         Id = id;
         UserId = accountId;
         _word = word;
+        _translation = translation;
         Language = language;
-        WordStatus = wordStatus;
-        Translation = translation;
+        WordStatus = wordStatus;    
     }
 
     protected WordEntity()
@@ -44,5 +44,13 @@ public class WordEntity : IEntity
         }
     }
 
-    public string? Translation { get; set; }
+    public string Translation
+    {
+        get => _translation;
+        set
+        {
+            ArgumentException.ThrowIfNullOrEmpty(value);
+            _translation = value;
+        }
+    }
 }

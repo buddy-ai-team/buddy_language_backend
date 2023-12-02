@@ -37,7 +37,7 @@ namespace BuddyLanguage.Domain.Services
                 string BotAnswerMessage,
                 byte[] BotAnswerWavMessage,
                 string[] Mistakes,
-                string[] Words)>
+                Dictionary<string, string> Words)>
             ProcessUserMessage(
                 User user,
                 byte[] oggVoiceMessage,
@@ -49,6 +49,7 @@ namespace BuddyLanguage.Domain.Services
             var targetLanguage = user.UserPreferences.TargetLanguage;
             var voice = user.UserPreferences.SelectedVoice;
             var speed = user.UserPreferences.SelectedSpeed;
+            var role = user.UserPreferences.AssistantRole;
 
             if (oggVoiceMessage.Length == 0)
             {
@@ -65,12 +66,11 @@ namespace BuddyLanguage.Domain.Services
             }
 
             var assistantTask = ContinueDialogAndGetAnswer(
-                userMessage, user.Id, cancellationToken);
+                userMessage, user.Id, role!, cancellationToken);
             var mistakesTask = GetGrammarMistakes(
                 userMessage, nativeLanguage, cancellationToken);
             var wordsTask = GetLearningWords(
                 userMessage, nativeLanguage, targetLanguage, cancellationToken);
-
             await Task.WhenAll(assistantTask, mistakesTask, wordsTask);
 
             var assistantAnswer = await assistantTask;
@@ -79,11 +79,10 @@ namespace BuddyLanguage.Domain.Services
 
             _logger.LogDebug("Assistant answer: {AssistantAnswer}", assistantAnswer);
             _logger.LogDebug("Assistant answer: {AssistantAnswer}", mistakes);
-            _logger.LogDebug("Assistant answer: {AssistantAnswer}", studiedWords);
 
             if (studiedWords.WordsCount > 0)
             {
-                await AddWordsToUser(studiedWords.Words, user.Id, cancellationToken);
+                await AddWordsToUser(studiedWords.StudiedWords, user.Id, cancellationToken);
             }
 
             var botAnswerWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
@@ -94,15 +93,16 @@ namespace BuddyLanguage.Domain.Services
                 assistantAnswer,
                 botAnswerWavMessage,
                 mistakes.GrammaMistakes,
-                studiedWords.Words);
+                studiedWords.StudiedWords);
         }
 
         public async Task<string> ContinueDialogAndGetAnswer(
-            string textMessage, Guid userId, CancellationToken cancellationToken)
+            string textMessage, Guid userId, Role role, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
+            ArgumentNullException.ThrowIfNull(role);
             return await _chatGPTService.GetAnswerOnTopic(
-                textMessage, userId, cancellationToken);
+                textMessage, userId, role, cancellationToken);
         }
 
         public async Task<MistakesAnswer> GetGrammarMistakes(
@@ -125,17 +125,17 @@ namespace BuddyLanguage.Domain.Services
         public async Task<WordAnswer> GetLearningWords(
             string textMessage,
             Language nativeLanguage,
-            Language targetLanguage, 
+            Language targetLanguage,
             CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
             var prompt = $"Я предоставлю тебе тексты, которые ты должен будешь проверить дважды " +
-                         $"на наличие {nativeLanguage} слов." +
-                         $"Посчитай количество {nativeLanguage} слов, а также найди " +
-                         $"абсолютно все {nativeLanguage} слова из текста, если они есть." +
-                         $"Затем переведи эти слова на {targetLanguage} язык и " +
-                         $"запиши в поле \"Words\" только перевод этих слов. " +
-                         $"Пожалуйста, убедись, что ты нашел абсолютно все слова.";
+                          $"на наличие {nativeLanguage} слов." +
+                          $"Посчитай количество {nativeLanguage} слов, а также найди " +
+                          $"абсолютно все {nativeLanguage} слова из текста, если они есть." +
+                          $"Затем запиши эти слова, а также " +
+                          $"перевод этих слов на {targetLanguage} в поле \"StudiedWords\"." +
+                          $"Пожалуйста, убедись, что ты нашел абсолютно все слова.";
             return await _chatGPTService.GetStructuredAnswer<WordAnswer>(
                 prompt, textMessage, cancellationToken);
         }
@@ -147,12 +147,12 @@ namespace BuddyLanguage.Domain.Services
         }
 
         private async Task AddWordsToUser(
-            string[] words,
+            Dictionary<string, string> words,
             Guid userId,
             CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(words);
-            if (words.Length == 0)
+            if (words.Count == 0)
             {
                 throw new ArgumentException(nameof(words));
             }
@@ -161,7 +161,7 @@ namespace BuddyLanguage.Domain.Services
             {
                 //TODO: метод AddWords(words)
                 await _wordService.AddWord(
-                    userId, word, string.Empty, Language.English, WordEntityStatus.Learning, cancellationToken);
+                    userId, word.Key, word.Value, Language.English, WordEntityStatus.Learning, cancellationToken);
             }
         }
     }

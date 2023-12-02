@@ -5,8 +5,6 @@ namespace BuddyLanguage.Domain.GptDataModels.Answers
     {
         public int WordsCount { get; set; }
 
-        public string[] Words { get; set; }
-
-        public override string ToString() => string.Join(",", Words);
+        public Dictionary<string, string> StudiedWords { get; set; }
     }
 }
