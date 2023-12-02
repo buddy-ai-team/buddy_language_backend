@@ -37,7 +37,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         }
 
         await _botClient.SendTextMessageAsync(
-            update.Message!.Chat.Id, "Thinking...", cancellationToken: cancellationToken);
+            update.Message!.Chat.Id, "Обработка...", cancellationToken: cancellationToken);
 
         var user = await _userService.GetUserByTelegramId(telegramUserId, cancellationToken);
         _logger.LogInformation("Processing UserVoiceCommand...");
@@ -46,7 +46,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         {
             var duration = TimeSpan.FromSeconds(voice.Duration);
 
-            if (duration <= TimeSpan.FromMinutes(30))
+            if (duration <= TimeSpan.FromMinutes(3))
             {
                 File voiceFile = await _botClient.GetFileAsync(voice.FileId, cancellationToken);
                 using var voiceStream = new MemoryStream(); //voiceFile.FileSize
@@ -67,7 +67,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
                 await _botClient.SendTextMessageAsync(
                     update.Message.Chat.Id,
-                    $"Recognized: \n```\n{recognizedMessage}\n```",
+                    $"Вы сказали: \n```\n{recognizedMessage}\n```",
                     cancellationToken: cancellationToken);
                 await _botClient.SendTextMessageAsync(
                     update.Message.Chat.Id, answerText, cancellationToken: cancellationToken);
@@ -107,7 +107,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
             else
             {
                 string text = "Превышена допустимая длительность голосового сообщения. " +
-                                    "Максимальная длительность: 30 минут.";
+                                    "Максимальная длительность: 3 минуты.";
                 await _botClient.SendTextMessageAsync(
                     chatId: update.Message.Chat.Id,
                     text: text,

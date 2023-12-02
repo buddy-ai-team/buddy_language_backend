@@ -37,7 +37,7 @@ try
     app.UseCors(policy =>
     {
         policy
-            .WithOrigins("https://buddy-language-bot.netlify.app/", "http://localhost:5173")
+            .WithOrigins("https://buddy-language-bot.netlify.app")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
