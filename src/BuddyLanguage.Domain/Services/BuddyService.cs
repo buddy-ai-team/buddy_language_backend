@@ -70,7 +70,6 @@ namespace BuddyLanguage.Domain.Services
                 userMessage, nativeLanguage, cancellationToken);
             var wordsTask = GetLearningWords(
                 userMessage, nativeLanguage, targetLanguage, cancellationToken);
-
             await Task.WhenAll(assistantTask, mistakesTask, wordsTask);
 
             var assistantAnswer = await assistantTask;
