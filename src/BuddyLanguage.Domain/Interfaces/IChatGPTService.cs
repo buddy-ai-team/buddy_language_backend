@@ -1,4 +1,6 @@
-﻿namespace BuddyLanguage.Domain.Interfaces
+﻿using BuddyLanguage.Domain.Entities;
+
+namespace BuddyLanguage.Domain.Interfaces
 {
     // Rating: https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard
     public interface IChatGPTService
@@ -8,9 +10,11 @@
         /// </summary>
         /// <param name="userMessage">Сообщение пользователя.</param>
         /// <param name="userId">Идентификатор пользователя.</param>
+        /// <param name="role">Роль пользователя</param>
         /// <param name="cancellation">Токен отмены для отмены операции.</param>
         /// <returns>Ответ на сообщение пользователя.</returns>
-        Task<string> GetAnswerOnTopic(string userMessage, Guid userId, CancellationToken cancellation);
+        Task<string> GetAnswerOnTopic(
+            string userMessage, Guid userId, Role role, CancellationToken cancellation);
 
         /// <summary>
         /// Получает ответ на сообщение пользователя.

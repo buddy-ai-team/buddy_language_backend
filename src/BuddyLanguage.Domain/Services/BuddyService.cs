@@ -49,6 +49,7 @@ namespace BuddyLanguage.Domain.Services
             var targetLanguage = user.UserPreferences.TargetLanguage;
             var voice = user.UserPreferences.SelectedVoice;
             var speed = user.UserPreferences.SelectedSpeed;
+            var role = user.UserPreferences.AssistantRole;
 
             if (oggVoiceMessage.Length == 0)
             {
@@ -65,7 +66,7 @@ namespace BuddyLanguage.Domain.Services
             }
 
             var assistantTask = ContinueDialogAndGetAnswer(
-                userMessage, user.Id, cancellationToken);
+                userMessage, user.Id, role!, cancellationToken);
             var mistakesTask = GetGrammarMistakes(
                 userMessage, nativeLanguage, cancellationToken);
             var wordsTask = GetLearningWords(
@@ -98,11 +99,12 @@ namespace BuddyLanguage.Domain.Services
         }
 
         public async Task<string> ContinueDialogAndGetAnswer(
-            string textMessage, Guid userId, CancellationToken cancellationToken)
+            string textMessage, Guid userId, Role role, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
+            ArgumentNullException.ThrowIfNull(role);
             return await _chatGPTService.GetAnswerOnTopic(
-                textMessage, userId, cancellationToken);
+                textMessage, userId, role, cancellationToken);
         }
 
         public async Task<MistakesAnswer> GetGrammarMistakes(
@@ -125,7 +127,7 @@ namespace BuddyLanguage.Domain.Services
         public async Task<WordAnswer> GetLearningWords(
             string textMessage,
             Language nativeLanguage,
-            Language targetLanguage, 
+            Language targetLanguage,
             CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);

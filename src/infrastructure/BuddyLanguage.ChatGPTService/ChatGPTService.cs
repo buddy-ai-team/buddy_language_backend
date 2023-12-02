@@ -1,4 +1,5 @@
-﻿using BuddyLanguage.Domain.Interfaces;
+﻿using BuddyLanguage.Domain.Entities;
+using BuddyLanguage.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenAI.ChatGpt;
@@ -36,10 +37,11 @@ namespace BuddyLanguage.ChatGPTServiceLib
         }
 
         public async Task<string> GetAnswerOnTopic(
-            string userMessage, Guid userId, CancellationToken cancellationToken)
+            string userMessage, Guid userId, Role role, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(userMessage);
-            ChatService chatService = await GetChatServiceDialog(userId, cancellationToken);
+            ArgumentNullException.ThrowIfNull(role);
+            ChatService chatService = await GetChatServiceDialog(userId, role, cancellationToken);
             string answer = await chatService.GetNextMessageResponse(userMessage, cancellationToken);
             return answer;
         }
@@ -95,8 +97,12 @@ namespace BuddyLanguage.ChatGPTServiceLib
             await chatGpt.StartNewTopic(cancellationToken: cancellationToken);
         }
 
-        private async Task<ChatService> GetChatServiceDialog(Guid userId, CancellationToken cancellationToken)
+        private async Task<ChatService> GetChatServiceDialog(
+            Guid userId,
+            Role role,
+            CancellationToken cancellationToken)
         {
+            ArgumentNullException.ThrowIfNull(role); 
             _config.Model = _model; // TODO fix
             ChatGPT chatGpt = await _chatGptFactory.Create(
                 userId.ToString(),
@@ -120,7 +126,12 @@ namespace BuddyLanguage.ChatGPTServiceLib
                         messages,
                         model: _model,
                         cancellationToken: cancellationToken);
-                    string initialMessage = _config.InitialSystemMessage! + "\n\nContext: " + summary;
+
+                    string initialMessage =
+                        $"{_config.InitialSystemMessage!}" +
+                        $"\n\nRole: {role.Name}" +
+                        $"\n\nPrompt: {role.Prompt}" +
+                        $"\n\nContext: {summary}"; 
                     var dialog = Dialog.StartAsSystem(initialMessage);
                     chatService = await chatGpt.StartNewTopic(
                         "Summarized",
