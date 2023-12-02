@@ -101,6 +101,7 @@ public class TelegramBotUpdatesListener : BackgroundService
                 _logger.LogError(e, "Error in command handler {CommandHandler}", commandHandler.GetType().Name);
                 await SendErrorToUser(telegramBotClient, update.Message.Chat.Id, e, cancellationToken);
             }
+
             await ctsTyping.CancelAsync();
         }
         else
@@ -122,8 +123,7 @@ public class TelegramBotUpdatesListener : BackgroundService
             chatId: chatId,
             document: InputFile.FromStream(errorMessageStream, "error.txt"),
             caption: "Произошла ошибка",
-            cancellationToken: cancellationToken
-        );
+            cancellationToken: cancellationToken);
     }
 
     private async Task RegisterUser(Update update, IServiceScope scope, CancellationToken cancellationToken)
