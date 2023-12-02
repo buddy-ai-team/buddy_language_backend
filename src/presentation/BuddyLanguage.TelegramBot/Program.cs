@@ -2,6 +2,7 @@ using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
 using BuddyLanguage.TelegramBot.Commands;
 using BuddyLanguage.TelegramBot.Services;
+using Scrutor;
 using Serilog;
 using Serilog.Events;
 using Telegram.Bot;
@@ -45,10 +46,11 @@ try
 
     builder.Services.AddHostedService<TelegramBotUpdatesListener>();
 
-    builder.Services.AddScoped<IBotCommandHandler, StartCommandHandler>();
-    builder.Services.AddScoped<IBotCommandHandler, ResetTopicCommand>();
-    builder.Services.AddScoped<IBotCommandHandler, UnknownCommandHandler>();
-    builder.Services.AddScoped<IBotCommandHandler, UserVoiceCommandHandler>();
+    builder.Services.Scan(scan => scan
+        .FromAssemblyOf<StartCommandHandler>()
+        .AddClasses(classes => classes.AssignableTo<IBotCommandHandler>())
+        .AsImplementedInterfaces()
+        .WithScopedLifetime());
 
     var app = builder.Build();
 

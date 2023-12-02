@@ -27,27 +27,37 @@ namespace BuddyLanguage.Domain.Services
 
             try
             {
-                await _uow.UserRepository.GetUserByTelegramId(telegramId, cancellationToken);
+                return await _uow.UserRepository.GetUserByTelegramId(telegramId, cancellationToken);
             }
-
-            //TODO: FIX
-            catch (InvalidOperationException)
+            catch (UserNotFoundException)
             {
-                var user = new User(Guid.NewGuid(), firstName ?? string.Empty, lastName ?? string.Empty, telegramId);
-
-                //Temporary Default Values
-                user.UserPreferences.NativeLanguage = Language.Russian;
-                user.UserPreferences.TargetLanguage = Language.English;
-                user.UserPreferences.SelectedVoice = Voice.Male;
-                user.UserPreferences.SelectedSpeed = TtsSpeed.Slow;
-                user.UserPreferences.AssistantRoleId = Guid.Empty; /*user.UserPreferences.AssistantRoleId = DefaultRoleId;*/
-
-                await _uow.UserRepository.Add(user, cancellationToken);
-                await _uow.SaveChangesAsync(cancellationToken);
+                User user = await Register(firstName, lastName, telegramId, cancellationToken);
                 return user;
             }
+        }
 
-            return await _uow.UserRepository.GetUserByTelegramId(telegramId, cancellationToken);
+        public async Task<User> Register(
+            string? firstName,
+            string? lastName,
+            string telegramId,
+            CancellationToken cancellationToken)
+        {
+            var user = new User(Guid.NewGuid(), firstName ?? string.Empty, lastName ?? string.Empty, telegramId)
+            {
+                UserPreferences =
+                {
+                    //Temporary Default Values
+                    NativeLanguage = Language.Russian,
+                    TargetLanguage = Language.English,
+                    SelectedVoice = Voice.Male,
+                    SelectedSpeed = TtsSpeed.Slow,
+                    AssistantRoleId = Guid.Empty // TODO DefaultRoleId;
+                }
+            };
+
+            await _uow.UserRepository.Add(user, cancellationToken);
+            await _uow.SaveChangesAsync(cancellationToken);
+            return user;
         }
 
         public virtual async Task<User> GetUserById(Guid id, CancellationToken cancellationToken)

@@ -9,7 +9,7 @@
     <Deterministic>false</Deterministic>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -17,6 +17,7 @@
     </PackageReference>
     <PackageReference Include="Polly" Version="8.2.0"/>
     <PackageReference Include="Polly.Extensions" Version="8.2.0"/>
+    <PackageReference Include="Scrutor" Version="4.2.2" />
     <PackageReference Include="Sentry.AspNetCore" Version="3.41.0"/>
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.0"/>
     <PackageReference Include="Serilog.Sinks.SentrySDK.AspNetCore" Version="1.0.5"/>
@@ -27,9 +28,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj"/>
     <ProjectReference Include="..\..\infrastructure\BuddyLanguage.Infrastructure\BuddyLanguage.Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj"/>
   </ItemGroup>
-  
+
   <ItemGroup>
     <Compile Update="Services\UserBotStates.cs">
       <DependentUpon>TelegramUserRepository.cs</DependentUpon>
