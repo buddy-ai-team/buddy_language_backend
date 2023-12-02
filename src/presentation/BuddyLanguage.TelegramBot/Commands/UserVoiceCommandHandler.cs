@@ -78,16 +78,21 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                     voice: InputFile.FromStream(memoryStream, "answer.ogg"),
                     cancellationToken: cancellationToken);
 
-                if (mistakes.Length > 0 && words.Length > 0)
+                if (mistakes.Length > 0 && words.Count > 0)
                 {
                     var grammaMistakes = string.Join(", ", mistakes);
-                    var studiedWords = string.Join(", ", words);
+                    string studiedWords = string.Empty; 
+                    foreach (var word in words)
+                    {
+                        studiedWords += $"{word.Key} - {word.Value}\n";
+                    }
+
                     await _botClient.SendTextMessageAsync(
                         chatId: update.Message.Chat.Id,
                         text: $"Ваши ошибки: {grammaMistakes}\nСлова на изучение: {studiedWords}",
                         cancellationToken: cancellationToken);
                 }
-                else if (mistakes.Length > 0 && words.Length == 0)
+                else if (mistakes.Length > 0 && words.Count == 0)
                 {
                     var grammaMistakes = string.Join(", ", mistakes);
                     await _botClient.SendTextMessageAsync(
@@ -95,9 +100,14 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                         text: $"Ваши ошибки: {grammaMistakes}",
                         cancellationToken: cancellationToken);
                 }
-                else if (mistakes.Length == 0 && words.Length > 0)
+                else if (mistakes.Length == 0 && words.Count > 0)
                 {
-                    var studiedWords = string.Join(", ", words);
+                    string studiedWords = string.Empty;
+                    foreach (var word in words)
+                    {
+                        studiedWords += $"{word.Key} - {word.Value}\n";
+                    }
+
                     await _botClient.SendTextMessageAsync(
                         chatId: update.Message.Chat.Id,
                         text: $"Слова на изучение: {studiedWords}",
