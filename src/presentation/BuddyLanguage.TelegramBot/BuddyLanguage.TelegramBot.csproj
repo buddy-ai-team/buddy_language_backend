@@ -9,7 +9,7 @@
     <Deterministic>false</Deterministic>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -28,9 +28,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj"/>
     <ProjectReference Include="..\..\infrastructure\BuddyLanguage.Infrastructure\BuddyLanguage.Infrastructure.csproj"/>
-    <ProjectReference Include="..\..\infrastructure\BuddyLanguage.TextToSpeech\BuddyLanguage.TextToSpeech.csproj"/>
   </ItemGroup>
-  
+
   <ItemGroup>
     <Compile Update="Services\UserBotStates.cs">
       <DependentUpon>TelegramUserRepository.cs</DependentUpon>

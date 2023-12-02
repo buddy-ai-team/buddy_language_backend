@@ -35,26 +35,13 @@ public class StartCommandHandler : IBotCommandHandler
             info.LastName);
 
         await _userService.TryRegister(
-            info.FirstName,
-            info.LastName,
-            info.UserId,
-            cancellationToken);
+            info.FirstName, info.LastName, info.UserId, cancellationToken);
 
         const string welcomeMessage =
             "Привет! Поздравляю вас с регистрацией! Расскажу немного о себе, я ваш бот-собеседник. Вы можете отправлять голосовые сообщения на английском или русском языке не более 3х минут и я вам отвечу. Может поговорить на интересующие вас темы. Также я могу проводить грамматический анализ сообщений и исправлять ошибки.";
         await _botClient.SendTextMessageAsync(
-            info.ChatId,
-            welcomeMessage,
-            cancellationToken: cancellationToken);
+            info.ChatId, welcomeMessage, cancellationToken: cancellationToken);
 
-        // TODO: Отправка первого аудиосообщения от бота
-        /*var welcomeBytes = await AzureTextToSpeech.TextToWavByteArrayAsync(welcomeMessage, Domain.Enumerations.Language.Russian, Domain.Enumerations.Voice.Female, cancellationToken: cancellationToken);*/
-
-        // using var memoryStream = new MemoryStream();
-        // await _botClient.SendVoiceAsync(
-        // chatId: telegramId,
-        // voice: InputFile.FromStream(memoryStream, "answer.ogg"),
-        // cancellationToken: cancellationToken);
         await _botClient.SendTextMessageAsync(
             info.ChatId,
             "Hello! I am Buddy! What are we going to talk about today?",
