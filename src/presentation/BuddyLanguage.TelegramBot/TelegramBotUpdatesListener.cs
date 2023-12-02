@@ -1,8 +1,8 @@
-﻿using BuddyLanguage.Domain.Exceptions.User;
+﻿using System.Text;
+using BuddyLanguage.Domain.Exceptions.User;
 using BuddyLanguage.Domain.Services;
 using BuddyLanguage.TelegramBot.Commands;
 using BuddyLanguage.TelegramBot.Services;
-using OpenAI.ChatGpt.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -99,12 +99,8 @@ public class TelegramBotUpdatesListener : BackgroundService
             catch (Exception e)
             {
                 _logger.LogError(e, "Error in command handler {CommandHandler}", commandHandler.GetType().Name);
-                await telegramBotClient.SendTextMessageAsync(
-                    update.Message.Chat.Id,
-                    $"Произошла ошибка:\n{e}",
-                    cancellationToken: cancellationToken);
+                await SendErrorToUser(telegramBotClient, update.Message.Chat.Id, e, cancellationToken);
             }
-
             await ctsTyping.CancelAsync();
         }
         else
@@ -112,6 +108,22 @@ public class TelegramBotUpdatesListener : BackgroundService
             var unknownCommandHandler = botCommandHandlers.First(handler => handler is UnknownCommandHandler);
             await unknownCommandHandler.HandleAsync(update, cancellationToken);
         }
+    }
+
+    private async Task SendErrorToUser(
+        ITelegramBotClient telegramBotClient, long chatId, Exception e, CancellationToken cancellationToken)
+    {
+        // Convert the error message to bytes and write it to a MemoryStream
+        byte[] errorMessageBytes = Encoding.UTF8.GetBytes($"Произошла ошибка:\n{e}");
+        using var errorMessageStream = new MemoryStream(errorMessageBytes);
+
+        // Send the error file
+        await telegramBotClient.SendDocumentAsync(
+            chatId: chatId,
+            document: InputFile.FromStream(errorMessageStream, "error.txt"),
+            caption: "Произошла ошибка",
+            cancellationToken: cancellationToken
+        );
     }
 
     private async Task RegisterUser(Update update, IServiceScope scope, CancellationToken cancellationToken)
