@@ -8,12 +8,14 @@ namespace BuddyLanguage.Domain.Services
 {
     public class UserService
     {
-        private readonly ILogger<UserService> _logger;
         private readonly IUnitOfWork _uow;
+        private readonly RoleService _roleService;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(IUnitOfWork uow, ILogger<UserService> logger)
+        public UserService(IUnitOfWork uow, RoleService roleService, ILogger<UserService> logger)
         {
             _uow = uow ?? throw new ArgumentNullException(nameof(uow));
+            _roleService = roleService ?? throw new ArgumentNullException(nameof(roleService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -51,7 +53,7 @@ namespace BuddyLanguage.Domain.Services
                     TargetLanguage = Language.English,
                     SelectedVoice = Voice.Male,
                     SelectedSpeed = TtsSpeed.Slow,
-                    AssistantRoleId = Guid.Empty // TODO DefaultRoleId;
+                    AssistantRoleId = _roleService.GetDefaultRole().Id
                 }
             };
 
