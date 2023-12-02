@@ -71,4 +71,12 @@ public class RoleService
         await _uow.SaveChangesAsync(cancellationToken);
         return await _uow.RoleRepository.GetById(role.Id, cancellationToken);
     }
+
+    public virtual Role GetDefaultRole()
+    {
+        string name = "Foreign language teacher";
+        string prompt = "Conduct a dialogue with me as if you were a foreign language teacher.";
+
+        return new Role(Guid.NewGuid(), name, prompt);
+    }
 }
