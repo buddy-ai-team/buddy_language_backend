@@ -91,7 +91,8 @@ public class TelegramBotUpdatesListener : BackgroundService
             }
             catch (UserNotFoundException) when (update.Message.From is not null)
             {
-                _logger.LogInformation("User {TelegramId} not found - registering",
+                _logger.LogInformation(
+                    "User {TelegramId} not found - registering",
                     update.Message.From.Id);
                 await RegisterUser(update, scope, cancellationToken);
             }
@@ -113,7 +114,7 @@ public class TelegramBotUpdatesListener : BackgroundService
         }
     }
 
-    private static async Task RegisterUser(Update update, IServiceScope scope, CancellationToken cancellationToken)
+    private async Task RegisterUser(Update update, IServiceScope scope, CancellationToken cancellationToken)
     {
         var userService = scope.ServiceProvider.GetRequiredService<UserService>();
         await userService.TryRegister(

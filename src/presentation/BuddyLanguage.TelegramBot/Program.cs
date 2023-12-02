@@ -5,7 +5,6 @@ using BuddyLanguage.TelegramBot.Services;
 using Serilog;
 using Serilog.Events;
 using Telegram.Bot;
-using Scrutor;
 
 var builder = WebApplication.CreateBuilder(args);
 
