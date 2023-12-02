@@ -62,14 +62,14 @@ namespace BuddyLanguage.Domain.Services
         public virtual async Task<WordEntity> AddWord(
             Guid accountId,
             string word,
-            string? translation,
+            string translation,
             Language language,
             WordEntityStatus status,
             CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(word, nameof(word));
 
-            var wordVar = new WordEntity(Guid.NewGuid(), accountId, word, language, status, translation!);
+            var wordVar = new WordEntity(Guid.NewGuid(), accountId, word, language, status, translation);
 
             await _uow.WordEntityRepository.Add(wordVar, cancellationToken);
             await _uow.SaveChangesAsync(cancellationToken);
