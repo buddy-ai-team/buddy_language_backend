@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace BuddyLanguage.WebApi.Filters;
+namespace BuddyLanguage.WebApi.Filters.AuthenticationData;
 
 public class InitData
 {

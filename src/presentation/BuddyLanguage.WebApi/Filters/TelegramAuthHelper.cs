@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using BuddyLanguage.WebApi.Filters.AuthenticationData;
 
 namespace BuddyLanguage.WebApi.Filters;
 

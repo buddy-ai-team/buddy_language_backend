@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using Moq;
 
 namespace BuddyLanguage.WebAPI.Test;
 
@@ -21,28 +20,33 @@ public class AuthenticationFilterTest
     }
 
     [Fact]
-    public Task I_do_not_know_how_to_name_it()
+    public Task User_telegram_Id_recieved_from_Authorization_header()
     {
         // Arrange
+        // Инициализация HttpContext c тестовой информацией в заголовке Authorization
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Headers["Authorization"] =
             $"tma {GetTestInitData()}";
 
-        var userid = GetTgUserIdFromTma($"tma {GetTestInitData()}");
+        // Получение Id пользователя телеграм из строки заголовка
+        int resultUserId = GetTgUserIdFromTma($"tma {GetTestInitData()}");
 
+        // Инициализация ActionContext
         var actionContext = new ActionContext(httpContext, new RouteData { }, new ControllerActionDescriptor { });
 
+        // Инициалиазация тестиру
         var filter = new AuthenticationFilter(_logger);
 
         // Act
         filter.OnAuthorization(new AuthorizationFilterContext(actionContext, new List<IFilterMetadata>()));
 
         // Assert
-        httpContext.Items["TelegramUserId"].Should().Be("279058397");
+        httpContext.Items["TelegramUserId"].Should().Be(resultUserId);
         return Task.CompletedTask;
     }
 
-    private string GetTgUserIdFromTma(string tma)
+    // Получить телеграм Id пользователя из строки по расположению данных
+    private int GetTgUserIdFromTma(string tma)
     {
         var initDate = tma[4..];
         var queryParams = HttpUtility.ParseQueryString(initDate);
@@ -52,9 +56,10 @@ public class AuthenticationFilterTest
         var (idStartsAtIndex, idEndsAtIndex) = (6, userJson.IndexOf(','));
         var telegramUserId = userJson[idStartsAtIndex..idEndsAtIndex];
 
-        return telegramUserId;
+        return int.Parse(telegramUserId);
     }
 
+    // Получить пример строки заголовка Authorization
     private string GetTestInitData()
     {
         return
