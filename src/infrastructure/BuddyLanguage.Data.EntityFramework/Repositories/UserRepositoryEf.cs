@@ -40,7 +40,9 @@ namespace BuddyLanguage.Data.EntityFramework.Repositories
             CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(telegramId);
-            return Entities.SingleOrDefaultAsync(
+            return Entities
+                .Include(x => x.UserPreferences.AssistantRole)
+                .SingleOrDefaultAsync(
                 x => x.TelegramId == telegramId, cancellationToken);
         }
     }

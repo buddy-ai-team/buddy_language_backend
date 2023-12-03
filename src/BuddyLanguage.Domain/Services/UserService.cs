@@ -53,7 +53,7 @@ namespace BuddyLanguage.Domain.Services
                     TargetLanguage = Language.English,
                     SelectedVoice = Voice.Male,
                     SelectedSpeed = TtsSpeed.Slow,
-                    AssistantRole = await _roleService.GetDefaultRole(cancellationToken)
+                    AssistantRole = await _roleService.GetOrCreateDefaultRole(cancellationToken)
                 }
             };
 
