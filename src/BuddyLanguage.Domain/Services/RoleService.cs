@@ -74,7 +74,7 @@ public class RoleService
         return await _uow.RoleRepository.GetById(role.Id, cancellationToken);
     }
 
-    public virtual async Task<Role> GetDefaultRole(CancellationToken cancellationToken)
+    public virtual async Task<Role> GetOrCreateDefaultRole(CancellationToken cancellationToken)
     {
         var existedDefaultRole = await _uow.RoleRepository.FindRoleByRoleType(
             RoleType.Default, cancellationToken);
