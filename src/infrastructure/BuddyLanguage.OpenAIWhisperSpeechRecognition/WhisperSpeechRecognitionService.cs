@@ -44,7 +44,14 @@ namespace BuddyLanguage.OpenAIWhisperSpeechRecognitionService
                     File = voiceMessage,
                     Model = Models.WhisperV1,
                     ResponseFormat = StaticValues.AudioStatics.ResponseFormat.VerboseJson,
-                    Prompt = $"In this audio, you will hear both {studiedLanguage} and {nativeLanguage} languages. Please transcribe exactly as spoken, including any filler words, without altering or omitting any part of the speech. It is crucial for the language learning application that each word, including those in Russian, is transcribed precisely as it is pronounced, maintaining all original features of the spoken content."
+                    Prompt = $"In this audio, you will hear both {studiedLanguage} and " +
+                    $"{nativeLanguage} languages. Please transcribe exactly as spoken, " +
+                    $"including any filler words, without altering or omitting any part " +
+                    $"of the speech, without using phonetic transliteration. " +
+                    $"It is crucial for the language learning application " +
+                    $"that each word, including those in {nativeLanguage}, " +
+                    $"is transcribed precisely as it is pronounced, maintaining all " +
+                    $"original features of the spoken content."
                 },
                     cancellationToken);
 

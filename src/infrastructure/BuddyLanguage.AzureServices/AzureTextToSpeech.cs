@@ -2,13 +2,12 @@
 using BuddyLanguage.Domain.Exceptions.TTS;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.CognitiveServices.Speech;
-using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static BuddyLanguage.Domain.Enumerations.Language;
 using static BuddyLanguage.Domain.Enumerations.Voice;
 
-namespace BuddyLanguage.TextToSpeech
+namespace BuddyLanguage.AzureServices
 {
     /// <summary>
     /// Implementation of the ITextToSpeech interface using Microsoft Azure Cognitive Services Text-to-Speech.
@@ -16,14 +15,14 @@ namespace BuddyLanguage.TextToSpeech
     public class AzureTextToSpeech : ITextToSpeech
     {
         private readonly ILogger<AzureTextToSpeech> _logger;
-        private readonly AzureTTSConfig _config;
+        private readonly AzureConfig _config;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureTextToSpeech"/> class.
         /// </summary>
         /// <param name="config">Configuration of AzureTTS</param>
         /// <param name="logger">The logger for logging messages.</param>
-        public AzureTextToSpeech(IOptions<AzureTTSConfig> config, ILogger<AzureTextToSpeech> logger)
+        public AzureTextToSpeech(IOptions<AzureConfig> config, ILogger<AzureTextToSpeech> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config.Value ?? throw new ArgumentNullException(nameof(config));

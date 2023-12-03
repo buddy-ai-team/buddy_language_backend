@@ -3,9 +3,9 @@ namespace BuddyLanguage.Domain.GptDataModels.Answers;
 
 public class MistakesAnswer
 {
-    public int MistakesCount { get; set; }
+    public int GrammaMistakesCount { get; set; }
 
-    public string[] Mistakes { get; set; }
+    public string[] GrammaMistakes { get; set; }
 
-    public override string ToString() => string.Join(", ", Mistakes);
+    public override string ToString() => string.Join(",", GrammaMistakes);
 }

@@ -22,7 +22,10 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration).WriteTo.Console());
+    builder.Logging.ClearProviders();
+
+    // https://github.com/dmitry-slabko/article-azure-logging-pub/blob/main/AzureLogging/Logging/Registration/HostBuilderExtensions.cs
+    builder.Host.UseSerilog(ConfigureLogger, writeToProviders: false);
 
     builder.WebHost.UseSentry();
 
@@ -45,10 +48,11 @@ try
 
     builder.Services.AddHostedService<TelegramBotUpdatesListener>();
 
-    builder.Services.AddScoped<IBotCommandHandler, StartCommandHandler>();
-    builder.Services.AddScoped<IBotCommandHandler, ResetTopicCommand>();
-    builder.Services.AddScoped<IBotCommandHandler, UnknownCommandHandler>();
-    builder.Services.AddScoped<IBotCommandHandler, UserVoiceCommandHandler>();
+    builder.Services.Scan(scan => scan
+        .FromAssemblyOf<StartCommandHandler>()
+        .AddClasses(classes => classes.AssignableTo<IBotCommandHandler>())
+        .AsImplementedInterfaces()
+        .WithScopedLifetime());
 
     var app = builder.Build();
 
@@ -64,4 +68,32 @@ finally
 {
     Log.Information("Shut down complete");
     Log.CloseAndFlush();
+}
+
+return;
+
+static void ConfigureLogger(HostBuilderContext context, LoggerConfiguration config)
+{
+    // TODO: move to infrastructure
+    config.Enrich.FromLogContext()
+        .MinimumLevel.Debug()
+        .WriteTo.Console();
+
+    if (!context.HostingEnvironment.IsDevelopment())
+    {
+        config.WriteTo.Sentry(o =>
+            {
+                o.Dsn = context.Configuration["Sentry:Dsn"];
+                o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+                o.MinimumEventLevel = LogEventLevel.Error;
+            })
+            .WriteTo.Async(x =>
+            {
+                string azureLogFile = $@"D:\home\LogFiles\Application\{context.HostingEnvironment.ApplicationName}.txt";
+                x.File(
+                    azureLogFile,
+                    shared: true,
+                    flushToDiskInterval: TimeSpan.FromSeconds(1));
+            });
+    }
 }

@@ -14,6 +14,9 @@ namespace BuddyLanguage.HttpModels.Requests.WordEntity
         public string Word { get; set; }
 
         [Required]
+        public string Translation { get; set; }
+
+        [Required]
         public Language Language { get; set; }
 
         [Required]

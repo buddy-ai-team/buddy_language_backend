@@ -7,14 +7,16 @@ namespace BuddyLanguage.Domain.Entities;
 public class WordEntity : IEntity
 {
     private string _word;
+    private string _translation;
 
-    public WordEntity(Guid id, Guid accountId, string word, Language language, WordEntityStatus wordStatus)
+    public WordEntity(Guid id, Guid accountId, string word, string translation, Language language, WordEntityStatus wordStatus)
     {
         Id = id;
         UserId = accountId;
         _word = word;
+        _translation = translation;
         Language = language;
-        WordStatus = wordStatus;
+        WordStatus = wordStatus;    
     }
 
     protected WordEntity()
@@ -39,6 +41,16 @@ public class WordEntity : IEntity
         {
             ArgumentException.ThrowIfNullOrEmpty(value);
             _word = value;
+        }
+    }
+
+    public string Translation
+    {
+        get => _translation;
+        set
+        {
+            ArgumentException.ThrowIfNullOrEmpty(value);
+            _translation = value;
         }
     }
 }

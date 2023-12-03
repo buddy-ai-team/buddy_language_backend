@@ -68,6 +68,9 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                     b.Property<int>("Language")
                         .HasColumnType("int");
 
+                    b.Property<string>("Translation")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -92,6 +95,9 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
                             b1.Property<Guid>("UserId")
                                 .HasColumnType("uniqueidentifier");
 
+                            b1.Property<Guid>("AssistantRoleId")
+                                .HasColumnType("uniqueidentifier");
+
                             b1.Property<string>("NativeLanguage")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
@@ -110,10 +116,20 @@ namespace BuddyLanguage.Data.EntityFramework.Migrations
 
                             b1.HasKey("UserId");
 
+                            b1.HasIndex("AssistantRoleId");
+
                             b1.ToTable("Users");
+
+                            b1.HasOne("BuddyLanguage.Domain.Entities.Role", "AssistantRole")
+                                .WithMany()
+                                .HasForeignKey("AssistantRoleId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
+
+                            b1.Navigation("AssistantRole");
                         });
 
                     b.Navigation("UserPreferences")

@@ -30,7 +30,7 @@ public class WordEntityController : ControllerBase
     [HttpPost("update")]
     public async Task<ActionResult<WordEntityResponse>> UpdateWordEntityStatus(UpdateWordEntityRequest request, CancellationToken cancellationToken)
     {
-        WordEntity wordVar = await _wordService.UpdateWordEntityById(request.Id, request.Word, request.Language, request.Status, cancellationToken);
+        WordEntity wordVar = await _wordService.UpdateWordEntityById(request.Id, request.Word, request.Translation, request.Language, request.Status, cancellationToken);
         return new WordEntityResponse(wordVar.Id, wordVar.UserId, wordVar.Word, wordVar.Language, wordVar.WordStatus);
     }
 
@@ -46,7 +46,7 @@ public class WordEntityController : ControllerBase
     public async Task<ActionResult<WordEntityResponse>> AddWordEntity(
         AddWordEntityRequest request, CancellationToken cancellationToken)
     {
-        WordEntity wordVar = await _wordService.AddWord(request.AccountId, request.Word, request.Language, request.Status, cancellationToken);
+        WordEntity wordVar = await _wordService.AddWord(request.AccountId, request.Word, request.Translation, request.Language, request.Status, cancellationToken);
         return new WordEntityResponse(wordVar.Id, wordVar.UserId, wordVar.Word, wordVar.Language, wordVar.WordStatus);
     }
 }
