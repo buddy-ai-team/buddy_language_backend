@@ -22,7 +22,9 @@ namespace BuddyLanguage.Data.EntityFramework.Repositories
         {
             ArgumentNullException.ThrowIfNull(telegramId);
             var user =
-                await Entities.SingleOrDefaultAsync(
+                await Entities
+                .Include(x => x.UserPreferences.AssistantRole)
+                .SingleOrDefaultAsync(
                     x => x.TelegramId == telegramId,
                     cancellationToken);
             if (user is null)
