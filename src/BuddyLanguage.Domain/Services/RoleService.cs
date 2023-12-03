@@ -76,15 +76,15 @@ public class RoleService
 
     public virtual async Task<Role> GetDefaultRole(CancellationToken cancellationToken)
     {
-        var findRole = await _uow.RoleRepository.FindRoleByRoleType(
+        var existedDefaultRole = await _uow.RoleRepository.FindRoleByRoleType(
             RoleType.Default, cancellationToken);
-        if (findRole == null)
+        if (existedDefaultRole == null)
         {
             string name = "Foreign language teacher";
             string prompt = "Conduct a dialogue with me as if you were a foreign language teacher.";
             return await AddRole(name, prompt, RoleType.Default, cancellationToken);
         }
 
-        return findRole; 
+        return existedDefaultRole; 
     }
 }
