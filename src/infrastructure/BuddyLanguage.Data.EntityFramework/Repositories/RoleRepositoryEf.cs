@@ -12,9 +12,6 @@ public class RoleRepositoryEf : EfRepository<Role>, IRoleRepository
     {
     }
 
-    public async Task<IReadOnlyList<Role>> GetAll(CancellationToken cancellationToken)
-        => await Entities.ToListAsync(cancellationToken);
-
     public async Task<Role?> FindRoleByRoleType(
         RoleType roleType, CancellationToken cancellationToken)
     {
