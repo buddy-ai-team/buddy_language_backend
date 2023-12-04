@@ -1,7 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Net.Sockets;
 using BuddyLanguage.Domain.Interfaces;
 using OpenAI.ChatGpt.Interfaces;
-using OpenAI.ChatGpt.Models;
 using Telegram.Bot;
 
 namespace BuddyLanguage.TelegramBot.Services
@@ -43,10 +42,11 @@ namespace BuddyLanguage.TelegramBot.Services
                 var lastMessageTime = messages.Last().CreatedAt;
                 var currentTime = DateTime.Now;
                 var afterLastMessageIntervalHours = (currentTime - lastMessageTime).TotalHours;
+                var currentAssistantRole = user.UserPreferences.AssistantRole;
 
                 if (afterLastMessageIntervalHours >= reminderIntervalHours)
                 {
-                    var reminder = await _chatGPTSevice.GetAnswerOnTopic(_prompt, user.Id, cancellationToken);
+                    var reminder = await _chatGPTSevice.GetAnswerOnTopic(_prompt, user.Id, currentAssistantRole, cancellationToken);
                     await _botClient.SendTextMessageAsync(
                         chatId: user.Id.ToString(),
                         text: reminder);
