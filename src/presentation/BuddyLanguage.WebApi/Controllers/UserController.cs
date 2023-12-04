@@ -32,10 +32,10 @@ namespace BuddyLanguage.WebApi.Controllers
          * /user/get_by_telegram_id?id=...
          */
         [HttpGet("get_by_telegram_id")]
-        public async Task<ActionResult<UserResponse>> GetUserByTelegramId(string id, CancellationToken cancellationToken)
+        public async Task<ActionResult<User>> GetUserByTelegramId(string id, CancellationToken cancellationToken)
         {
             var userVar = await _userService.GetUserByTelegramId(id, cancellationToken);
-            return new UserResponse(userVar.Id, userVar.FirstName, userVar.LastName, userVar.TelegramId);
+            return Ok(userVar);
         }
 
         [HttpPost("update")]
