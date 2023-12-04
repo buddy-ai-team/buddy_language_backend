@@ -1,4 +1,5 @@
 ﻿using BuddyLanguage.Domain.Entities;
+using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Exceptions.Role;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -53,7 +54,8 @@ public class RoleService
         return await _uow.RoleRepository.GetById(role.Id, cancellationToken);
     }
 
-    public virtual async Task<Role> AddRole(string name, string prompt, CancellationToken cancellationToken)
+    public virtual async Task<Role> AddRole(
+        string name, string prompt, RoleType roleType, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -65,7 +67,7 @@ public class RoleService
             throw new PromptOfRoleNotDefinedException("Prompt of role was not defined");
         }
 
-        var role = new Role(Guid.NewGuid(), name, prompt);
+        var role = new Role(Guid.NewGuid(), name, prompt, roleType);
 
         await _uow.RoleRepository.Add(role, cancellationToken);
         await _uow.SaveChangesAsync(cancellationToken);
@@ -74,9 +76,9 @@ public class RoleService
 
     public virtual Role GetDefaultRole()
     {
-        string name = "Friend";
-        string prompt = "Keep up a conversation with me as if you were my friend.";
+        string name = "Foreign language teacher";
+        string prompt = "Conduct a dialogue with me as if you were a foreign language teacher.";
 
-        return new Role(Guid.NewGuid(), name, prompt);
+        return existedDefaultRole; 
     }
 }

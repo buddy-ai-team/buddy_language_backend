@@ -44,7 +44,8 @@ public class RoleController : ControllerBase
     [HttpPost("add")]
     public async Task<ActionResult<UpdateRoleResponse>> AddRole(AddRoleRequest request, CancellationToken cancellationToken)
     {
-        var role = await _roleService.AddRole(request.Name, request.Prompt, cancellationToken);
+        var role = await _roleService.AddRole(
+            request.Name, request.Prompt, request.RoleType, cancellationToken);
         return new UpdateRoleResponse(role.Id, role.Name, role.Prompt);
     }
 }

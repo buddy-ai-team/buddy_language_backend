@@ -1,11 +1,13 @@
-﻿namespace BuddyLanguage.Domain.Entities;
+﻿using BuddyLanguage.Domain.Enumerations;
+
+namespace BuddyLanguage.Domain.Entities;
 
 public class Role : IEntity
 {
     private string? _name;
     private string? _prompt;
 
-    public Role(Guid id, string name, string prompt)
+    public Role(Guid id, string name, string prompt, RoleType roleType)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -20,7 +22,10 @@ public class Role : IEntity
         Id = id;
         _name = name;
         _prompt = prompt;
+        RoleType = roleType;
     }
+
+    public RoleType RoleType { get; set; }
 
     public Guid Id { get; init; }
 
