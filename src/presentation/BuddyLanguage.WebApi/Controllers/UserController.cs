@@ -50,6 +50,20 @@ namespace BuddyLanguage.WebApi.Controllers
             return new UserResponse(userVar.Id, userVar.FirstName, userVar.LastName, userVar.TelegramId);
         }
 
+        [HttpPost("update_user_preferences")]
+        public async Task<ActionResult<UserResponse>> UpdateUserPreferences(UpdateUserPreferencesRequest request, CancellationToken cancellationToken)
+        {
+            var userVar = await _userService.UpdateUserPreferencesByUserId(
+                request.Id,
+                request.NativeLanguage,
+                request.TargetLanguage,
+                request.SelectedSpeed,
+                request.SelectedVoice,
+                request.AssistantRoleId,
+                cancellationToken);
+            return new UserResponse(userVar.Id, userVar.FirstName, userVar.LastName, userVar.TelegramId);
+        }
+
         [HttpPost("add")]
         public async Task<ActionResult<UserResponse>> AddUser(
             AddUserRequest request, CancellationToken cancellationToken)
