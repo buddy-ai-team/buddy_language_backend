@@ -74,8 +74,8 @@ public class RoleService
 
     public virtual Role GetDefaultRole()
     {
-        string name = "Foreign language teacher";
-        string prompt = "Conduct a dialogue with me as if you were a foreign language teacher.";
+        string name = "Friend";
+        string prompt = "Keep up a conversation with me as if you were my friend.";
 
         return new Role(Guid.NewGuid(), name, prompt);
     }
