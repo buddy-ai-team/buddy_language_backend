@@ -80,11 +80,11 @@ public class RoleService
             RoleType.Default, cancellationToken);
         if (existedDefaultRole == null)
         {
-            string name = "Foreign language teacher";
-            string prompt = "Conduct a dialogue with me as if you were a foreign language teacher.";
+            string name = "Friend";
+            string prompt = "Keep up a conversation with me as if you were my friend..";
             return await AddRole(name, prompt, RoleType.Default, cancellationToken);
         }
 
-        return existedDefaultRole; 
+        return existedDefaultRole;
     }
 }

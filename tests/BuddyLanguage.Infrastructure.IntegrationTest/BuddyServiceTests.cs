@@ -42,6 +42,7 @@ public class BuddyServiceTests
             chatGptService,
             Mock.Of<ISpeechRecognitionService>(),
             Mock.Of<ITextToSpeech>(),
+            Mock.Of<IPronunciationAssessmentService>(),
             wordService,
             Mock.Of<ILogger<BuddyService>>());
 
@@ -85,6 +86,7 @@ public class BuddyServiceTests
             chatGptService,
             Mock.Of<ISpeechRecognitionService>(),
             Mock.Of<ITextToSpeech>(),
+            Mock.Of<IPronunciationAssessmentService>(),
             wordService,
             Mock.Of<ILogger<BuddyService>>());
 

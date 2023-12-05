@@ -62,7 +62,8 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
                 var voiceMessage = voiceStream.ToArray();
 
-                var (recognizedMessage,  answerText, answerBytes, mistakes, words) =
+                var (recognizedMessage, answerText, answerBytes,
+                    pronunciationWordsBytes, mistakes, words) =
                     await _buddyService.ProcessUserMessage(user, voiceMessage, cancellationToken);
 
                 await _botClient.SendTextMessageAsync(
@@ -72,10 +73,16 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                 await _botClient.SendTextMessageAsync(
                     update.Message.Chat.Id, answerText, cancellationToken: cancellationToken);
 
-                using var memoryStream = new MemoryStream(answerBytes);
+                using var memoryStreamAnswer = new MemoryStream(answerBytes);
                 await _botClient.SendVoiceAsync(
                     chatId: update.Message.Chat.Id,
-                    voice: InputFile.FromStream(memoryStream, "answer.ogg"),
+                    voice: InputFile.FromStream(memoryStreamAnswer, "answer.ogg"),
+                    cancellationToken: cancellationToken);
+
+                using var memoryStreamPronunciation = new MemoryStream(pronunciationWordsBytes);
+                await _botClient.SendVoiceAsync(
+                    chatId: update.Message.Chat.Id,
+                    voice: InputFile.FromStream(memoryStreamPronunciation, "answer.ogg"),
                     cancellationToken: cancellationToken);
 
                 if (mistakes.Length > 0 && words.Count > 0)
