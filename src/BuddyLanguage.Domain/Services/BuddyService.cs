@@ -93,7 +93,7 @@ namespace BuddyLanguage.Domain.Services
 
             if (studiedWords.WordsCount > 0)
             {
-                await AddWordsToUser(studiedWords.StudiedWords, user.Id, cancellationToken);
+                await AddWordsToUser(studiedWords.StudiedWords, user.Id, targetLanguage, cancellationToken);
             }
 
             var botPronunciationWordsWavAnswer = await GetPronunciationWordsWavMessage(
@@ -163,6 +163,7 @@ namespace BuddyLanguage.Domain.Services
         private async Task AddWordsToUser(
             Dictionary<string, string> words,
             Guid userId,
+            Language language,
             CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(words);
@@ -175,7 +176,7 @@ namespace BuddyLanguage.Domain.Services
             {
                 //TODO: метод AddWords(words)
                 await _wordService.AddWord(
-                    userId, word.Key, word.Value, Language.English, WordEntityStatus.Learning, cancellationToken);
+                    userId, word.Key, word.Value, language, WordEntityStatus.Learning, cancellationToken);
             }
         }
 
@@ -208,7 +209,7 @@ namespace BuddyLanguage.Domain.Services
             if (badPronouncedWordsList.Count != 0)
             {
                 var badPronouncedWords = string.Join(",", badPronouncedWordsList);
-                var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
+                var textForBadPronunciation = "The pronunciation of the following words should be improved: ";     
                 return await _textToSpeechService.TextToWavByteArrayAsync(
                 $"{textForBadPronunciation} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
             }
