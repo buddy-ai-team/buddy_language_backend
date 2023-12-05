@@ -11,4 +11,8 @@
     <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
