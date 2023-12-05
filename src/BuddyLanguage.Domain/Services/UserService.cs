@@ -118,23 +118,13 @@ namespace BuddyLanguage.Domain.Services
 
         public virtual async Task<User> UpdateUserPreferencesByUserId(
             Guid id,
-            int nativeLanguage,
-            int targetLanguage,
-            int selectedSpeed,
-            int selectedVoice,
+            Language nativeLanguage,
+            Language targetLanguage,
+            TtsSpeed selectedSpeed,
+            Voice selectedVoice,
             Guid assistantRoleId,
             CancellationToken cancellationToken)
         {
-            if (nativeLanguage < 0 || nativeLanguage > 1 ||
-            targetLanguage < 0 || targetLanguage > 1 ||
-            selectedSpeed < 0 || selectedSpeed > 1 ||
-            selectedVoice < 0 || selectedVoice > 4)
-            {
-                throw new ArgumentOutOfRangeException("One of the parameters is out of range. " +
-                    "Native language, target language, and selected speed should be between 0 and 1. " +
-                    "Selected voice should be between 0 and 4.");
-            }
-
             var user = await _uow.UserRepository.GetById(id, cancellationToken);
             var role = await _uow.RoleRepository.GetById(assistantRoleId, cancellationToken);
 
@@ -148,15 +138,16 @@ namespace BuddyLanguage.Domain.Services
                 throw new RoleNotFoundException("User with given id not found");
             }
 
-            user.UserPreferences.NativeLanguage = (Language)nativeLanguage;
-            user.UserPreferences.TargetLanguage = (Language)targetLanguage;
-            user.UserPreferences.SelectedSpeed = (TtsSpeed)selectedSpeed;
-            user.UserPreferences.SelectedVoice = (Voice)selectedVoice;
+            user.UserPreferences.NativeLanguage = nativeLanguage;
+            user.UserPreferences.TargetLanguage = targetLanguage;
+            user.UserPreferences.SelectedSpeed = selectedSpeed;
+            user.UserPreferences.SelectedVoice = selectedVoice;
             user.UserPreferences.AssistantRoleId = role.Id;
+            user.UserPreferences.AssistantRole = role;
 
             await _uow.UserRepository.Update(user, cancellationToken);
             await _uow.SaveChangesAsync(cancellationToken);
-            return await _uow.UserRepository.GetById(user.Id, cancellationToken);
+            return user;
         }
 
         public virtual async Task<User> AddUser(

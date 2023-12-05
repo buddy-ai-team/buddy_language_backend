@@ -61,7 +61,7 @@ namespace BuddyLanguage.WebApi.Controllers
                 request.SelectedVoice,
                 request.AssistantRoleId,
                 cancellationToken);
-            return new UserResponse(userVar.Id, userVar.FirstName, userVar.LastName, userVar.TelegramId);
+            return Ok(userVar);
         }
 
         [HttpPost("add")]

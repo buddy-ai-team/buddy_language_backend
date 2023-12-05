@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BuddyLanguage.Domain.Enumerations;
 
 namespace BuddyLanguage.HttpModels.Requests.User
 {
@@ -13,16 +14,20 @@ namespace BuddyLanguage.HttpModels.Requests.User
         public Guid Id { get; set; }
 
         [Required]
-        public int NativeLanguage { get; set; }
+        [Range(0, 1)]
+        public Language NativeLanguage { get; set; }
 
         [Required]
-        public int TargetLanguage { get; set; }
+        [Range(0, 1)]
+        public Language TargetLanguage { get; set; }
 
         [Required]
-        public int SelectedSpeed { get; set; }
+        [Range(0, 4)]
+        public TtsSpeed SelectedSpeed { get; set; }
 
         [Required]
-        public int SelectedVoice { get; set; }
+        [Range(0, 1)]
+        public Voice SelectedVoice { get; set; }
 
         [Required]
         public Guid AssistantRoleId { get; set; }
