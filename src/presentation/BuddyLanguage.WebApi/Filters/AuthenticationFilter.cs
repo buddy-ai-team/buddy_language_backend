@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Web;
+using BuddyLanguage.Infrastructure;
 using BuddyLanguage.WebApi.Filters.AuthenticationData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -14,26 +15,24 @@ namespace BuddyLanguage.WebApi.Filters;
 /// Записывает в поле HttpContext.Items["TelegramUserId"] телеграм ID пользователя,
 /// сделавшего запрос
 /// </summary>
-public class AuthenticationFilter : Attribute, IAuthorizationFilter
+public class AuthenticationFilter : Attribute, IAuthorizationFilter, IFilterFactory
 {
     private const int RequestValidTimeInMinutes = 5;
     private readonly ILogger<AuthenticationFilter> _logger;
+    private readonly IConfiguration _configuration;
 
     public AuthenticationFilter(
-        ILogger<AuthenticationFilter> logger)
+        ILogger<AuthenticationFilter> logger,
+        IConfiguration configuration)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _configuration = configuration ?? throw new ArgumentNullException();
     }
+
+    public bool IsReusable => false;
 
     public void OnAuthorization(AuthorizationFilterContext context)
     {
-        // Получение токен телеграм бота из переменных среды
-        string? botToken = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN")!;
-        if (botToken is null)
-        {
-            throw new ArgumentNullException(nameof(botToken));
-        }
-
         // Получение строки заголовка Authorization
         string initDataHeader = context.HttpContext.Request.Headers["Authorization"].ToString();
 
@@ -45,6 +44,9 @@ public class AuthenticationFilter : Attribute, IAuthorizationFilter
 
         try
         {
+            // Получение токен телеграм бота
+            string botToken = _configuration.GetRequiredValue("TELEGRAM_BOT_TOKEN");
+
             // Преобразование строки заголовка Authorization к коллекции параметров
             var listOfParams = ParseHeaderToListOfData(initDataHeader);
 
@@ -72,6 +74,24 @@ public class AuthenticationFilter : Attribute, IAuthorizationFilter
         {
             context.Result = new UnauthorizedResult();
         }
+    }
+
+    public IFilterMetadata CreateInstance(IServiceProvider serviceProvider)
+    {
+        var log = serviceProvider.GetService<ILogger<AuthenticationFilter>>();
+        if (log is null)
+        {
+            throw new InvalidOperationException(nameof(ILogger<AuthenticationFilter>));
+        }
+
+        var conf = serviceProvider.GetService<IConfiguration>();
+
+        if (conf is null)
+        {
+            throw new InvalidOperationException(nameof(IConfiguration));
+        }
+
+        return new AuthenticationFilter(log, conf);
     }
 
     // Проверить корректность подписи полученных данных
