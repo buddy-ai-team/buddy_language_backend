@@ -1,5 +1,6 @@
 ﻿using BuddyLanguage.AzureServices;
 using BuddyLanguage.Domain.Entities;
+using BuddyLanguage.Domain.Enumerations;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -46,7 +47,8 @@ public class PronunciationAssessmentTest
 
         // Act
         IReadOnlyList<WordPronunciationAssessment> result =
-            await service.GetSpeechAssessmentAsync(ConvertOggToPcm(inputData), "en-US", default);
+            await service.GetSpeechAssessmentAsync(
+                ConvertOggToPcm(inputData), Language.English, default);
 
         // Assert
         result.Count.Should().BeGreaterThan(3);

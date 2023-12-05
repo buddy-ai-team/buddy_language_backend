@@ -78,7 +78,7 @@ namespace BuddyLanguage.Domain.Services
             var wordsTask = GetLearningWords(
                 userMessage, nativeLanguage, targetLanguage, cancellationToken);
             var pronunciationTask = _pronunciationAssessmentService.GetSpeechAssessmentAsync(
-                oggVoiceMessage, targetLanguage.ToString(), cancellationToken);
+                oggVoiceMessage, targetLanguage, cancellationToken);
             await Task.WhenAll(assistantTask, mistakesTask, wordsTask, pronunciationTask);
 
             var assistantAnswer = await assistantTask;

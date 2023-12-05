@@ -1,4 +1,5 @@
 ﻿using BuddyLanguage.Domain.Entities;
+using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
@@ -39,19 +40,16 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
     /// <param name="audioData">Голосовое сообщение в виде набора бойт.
     /// Поддерживаемые форматы: PCM, 16 bit, sample rate 16000, mono
     /// </param>
-    /// <param name="language">язык пользователя
+    /// <param name="targetLanguage">язык пользователя
     /// Для английского языка задать "en-US"</param>
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Оценка произношения для каждого слова</returns>
     public async Task<IReadOnlyList<WordPronunciationAssessment>> GetSpeechAssessmentAsync(
         byte[] audioData,
-        string language,
+        Language targetLanguage,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(language))
-        {
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(language));
-        }
+        var language = GetLanguageFromEnum(targetLanguage);
 
         // Specify exact language to recognizer
         _speechConfig.SpeechRecognitionLanguage = language;
@@ -94,5 +92,16 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
 
             return totalResult;
         }
+    }
+
+    private string GetLanguageFromEnum(Language language)
+    {
+        return language switch
+        {
+            Language.Russian => "ru-RU",
+            Language.English => "en-US",
+            _ => throw new NotSupportedException(
+                "The Language You Provided Is Not Currently Supported By Our Project!")
+        };
     }
 }
