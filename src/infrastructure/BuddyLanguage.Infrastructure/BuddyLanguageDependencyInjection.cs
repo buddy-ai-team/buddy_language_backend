@@ -82,6 +82,7 @@ public static class BuddyLanguageDependencyInjection
             });
 
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
+        services.AddScoped<IPronunciationAssessmentService, PronunciationAssessmentService>();
         services.AddScoped<ITextToSpeech, AzureTextToSpeech>();
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
