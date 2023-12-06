@@ -1,10 +1,20 @@
 ﻿using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Interfaces;
 
-namespace BuddyLanguage.PromptService
+namespace BuddyLanguage.Infrastucture.PromptService
 {
     public class PromptService : IPromptService
     {
+        public string GetNameForDefaultRole()
+        {
+            return "Friend";
+        }
+
+        public string GetPromptForDefaultRole()
+        {
+            return "Keep up a conversation with me as if you were my friend.";
+        }
+
         public string GetPromptForGrammarMistakes(Language nativeLanguage)
         {
             return $"Я хочу чтобы ты выступил в роли корректора. " +

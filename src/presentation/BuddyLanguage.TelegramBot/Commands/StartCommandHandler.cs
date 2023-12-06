@@ -1,6 +1,5 @@
 ﻿using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
-using BuddyLanguage.TelegramBot.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 

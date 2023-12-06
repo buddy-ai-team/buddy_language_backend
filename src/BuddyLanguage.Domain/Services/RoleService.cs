@@ -9,11 +9,16 @@ namespace BuddyLanguage.Domain.Services;
 public class RoleService
 {
     private readonly ILogger<RoleService> _logger;
+    private readonly IPromptService _promptService;
     private readonly IUnitOfWork _uow;
 
-    public RoleService(ILogger<RoleService> logger, IUnitOfWork uow)
+    public RoleService(
+        ILogger<RoleService> logger,
+        IPromptService promptService,
+        IUnitOfWork uow)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _promptService = promptService ?? throw new ArgumentNullException(nameof(promptService));
         _uow = uow ?? throw new ArgumentNullException(nameof(uow));
     }
 
@@ -80,8 +85,8 @@ public class RoleService
             RoleType.Default, cancellationToken);
         if (existedDefaultRole == null)
         {
-            string name = "Friend";
-            string prompt = "Keep up a conversation with me as if you were my friend..";
+            string name = _promptService.GetNameForDefaultRole();
+            string prompt = _promptService.GetPromptForDefaultRole();
             return await AddRole(name, prompt, RoleType.Default, cancellationToken);
         }
 

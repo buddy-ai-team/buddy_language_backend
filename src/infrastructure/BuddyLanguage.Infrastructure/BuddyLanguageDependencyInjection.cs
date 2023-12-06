@@ -4,6 +4,7 @@ using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Data.EntityFramework.Repositories;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
+using BuddyLanguage.Infrastucture.PromptService;
 using BuddyLanguage.NAudioOggToWavConverter;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
 using Microsoft.EntityFrameworkCore;
@@ -83,6 +84,7 @@ public static class BuddyLanguageDependencyInjection
             });
 
         services.AddSingleton<INAudioOggToPcmConverter, NAudioOggToPcmConverter>();
+        services.AddScoped<IPromptService, PromptService>();
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
         services.AddScoped<IPronunciationAssessmentService, PronunciationAssessmentService>();
         services.AddScoped<ITextToSpeech, AzureTextToSpeech>();

@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\BuddyLanguage.PromptService\BuddyLanguage.PromptService.csproj" />
       <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
       <ProjectReference Include="..\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj" />
       <ProjectReference Include="..\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj" />

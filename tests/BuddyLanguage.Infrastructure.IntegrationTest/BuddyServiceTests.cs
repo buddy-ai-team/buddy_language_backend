@@ -2,6 +2,7 @@
 using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
+using BuddyLanguage.Infrastucture.PromptService;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -37,12 +38,14 @@ public class BuddyServiceTests
 
         var wordService = new WordService(
             Mock.Of<IUnitOfWork>(), Mock.Of<ILogger<WordService>>());
+        var promptService = new PromptService();
 
         var buddyService = new BuddyService(
             chatGptService,
             Mock.Of<ISpeechRecognitionService>(),
             Mock.Of<ITextToSpeech>(),
             Mock.Of<IPronunciationAssessmentService>(),
+            promptService,
             wordService,
             Mock.Of<ILogger<BuddyService>>());
 
@@ -81,12 +84,14 @@ public class BuddyServiceTests
 
         var wordService = new WordService(
             Mock.Of<IUnitOfWork>(), Mock.Of<ILogger<WordService>>());
+        var promptService = new PromptService();
 
         var buddyService = new BuddyService(
             chatGptService,
             Mock.Of<ISpeechRecognitionService>(),
             Mock.Of<ITextToSpeech>(),
             Mock.Of<IPronunciationAssessmentService>(),
+            promptService,
             wordService,
             Mock.Of<ILogger<BuddyService>>());
 
