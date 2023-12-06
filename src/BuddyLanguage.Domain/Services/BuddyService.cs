@@ -13,6 +13,7 @@ namespace BuddyLanguage.Domain.Services
         private readonly ISpeechRecognitionService _speechRecognitionService;
         private readonly ITextToSpeech _textToSpeechService;
         private readonly IPronunciationAssessmentService _pronunciationAssessmentService;
+        private readonly IPromptService _promptService;
         private readonly WordService _wordService;
         private readonly ILogger<BuddyService> _logger;
 
@@ -21,6 +22,7 @@ namespace BuddyLanguage.Domain.Services
             ISpeechRecognitionService speechRecognitionService,
             ITextToSpeech textToSpeechService,
             IPronunciationAssessmentService pronunciationAssessmentService,
+            IPromptService promptService,
             WordService wordService,
             ILogger<BuddyService> logger)
         {
@@ -32,6 +34,8 @@ namespace BuddyLanguage.Domain.Services
                 ?? throw new ArgumentNullException(nameof(textToSpeechService));
             _pronunciationAssessmentService = pronunciationAssessmentService
                 ?? throw new ArgumentNullException(nameof(pronunciationAssessmentService));
+            _promptService = promptService
+                ?? throw new ArgumentNullException(nameof(promptService));
             _wordService = wordService
                 ?? throw new ArgumentNullException(nameof(wordService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -125,13 +129,7 @@ namespace BuddyLanguage.Domain.Services
             CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
-            var prompt = $"Я хочу чтобы ты выступил в роли корректора. " +
-                    $"Найди очень точно и верно грамматические ошибки (максимум 3) в этом тексте " +
-                    $"и сформулируй их подбробно на {nativeLanguage} языке, " +
-                    $"а также улучшения и исправления текста." +
-                    $"Не нужно воспринимать за грамматические ошибки слова, " +
-                    $"написанные на {nativeLanguage} языке." +
-                    $"Запиши их в поле \"GrammaMistakes\".";
+            var prompt = _promptService.GetPromptForGrammarMistakes(nativeLanguage);
             return await _chatGPTService.GetStructuredAnswer<MistakesAnswer>(
                 prompt, textMessage, cancellationToken);
         }
@@ -143,13 +141,7 @@ namespace BuddyLanguage.Domain.Services
             CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
-            var prompt = $"Я предоставлю тебе тексты, которые ты должен будешь проверить дважды " +
-                          $"на наличие {nativeLanguage} слов." +
-                          $"Посчитай количество {nativeLanguage} слов, а также найди " +
-                          $"абсолютно все {nativeLanguage} слова из текста, если они есть." +
-                          $"Затем запиши эти слова, а также " +
-                          $"перевод этих слов на {targetLanguage} в поле \"StudiedWords\"." +
-                          $"Пожалуйста, убедись, что ты нашел абсолютно все слова.";
+            var prompt = _promptService.GetPromptForLearningWords(nativeLanguage, targetLanguage);
             return await _chatGPTService.GetStructuredAnswer<WordAnswer>(
                 prompt, textMessage, cancellationToken);
         }
