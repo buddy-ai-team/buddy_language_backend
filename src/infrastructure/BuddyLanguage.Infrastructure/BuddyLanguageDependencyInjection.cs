@@ -4,6 +4,7 @@ using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Data.EntityFramework.Repositories;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
+using BuddyLanguage.NAudioOggToWavConverter;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -81,6 +82,7 @@ public static class BuddyLanguageDependencyInjection
                 settings.ApiKey = configuration.GetRequiredValue("OPENAI_API_KEY");
             });
 
+        services.AddSingleton<INAudioOggToPcmConverter, NAudioOggToPcmConverter>();
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
         services.AddScoped<IPronunciationAssessmentService, PronunciationAssessmentService>();
         services.AddScoped<ITextToSpeech, AzureTextToSpeech>();

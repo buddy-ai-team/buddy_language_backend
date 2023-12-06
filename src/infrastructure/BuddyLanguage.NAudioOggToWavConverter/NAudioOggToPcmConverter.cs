@@ -9,19 +9,20 @@
 // https://github.com/naudio/NAudio/tree/master/NAudio.Wasapi
 // https://markheath.net/post/how-to-resample-audio-with-naudio
 
+using BuddyLanguage.Domain.Interfaces;
 using NAudio.Vorbis;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
 namespace BuddyLanguage.NAudioOggToWavConverter
 {
-    public class NAudioOggToWavConverter
+    public class NAudioOggToPcmConverter : INAudioOggToPcmConverter
     {
-        public byte[] ConvertOggToWav(byte[] oggData)
+        public byte[] ConvertOggToPcm(byte[] oggData)
         {
             using (var oggStream = new MemoryStream(oggData))
             using (var pcmStream = new MemoryStream())
-            {
+            {   
                 using (var readerStream = new VorbisWaveReader(oggStream))
                 {
                     // 16kHz, 16bit, mono

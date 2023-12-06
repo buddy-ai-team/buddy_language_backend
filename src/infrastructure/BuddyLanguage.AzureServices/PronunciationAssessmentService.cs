@@ -12,12 +12,14 @@ namespace BuddyLanguage.AzureServices;
 public class PronunciationAssessmentService : IPronunciationAssessmentService
 {
     private readonly ILogger<PronunciationAssessmentService> _logger;
+    private readonly INAudioOggToPcmConverter _nAudioOggToWavConverter;
     private readonly PronunciationAssessmentConfig _pronunciationAssessmentConfig;
     private readonly SpeechConfig _speechConfig;
 
     public PronunciationAssessmentService(
         IOptions<AzureConfig> config,
-        ILogger<PronunciationAssessmentService> logger)
+        ILogger<PronunciationAssessmentService> logger,
+        INAudioOggToPcmConverter nAudioOggToWavConverter)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         AzureConfig azureConfig = config.Value ?? throw new ArgumentNullException(nameof(config));
@@ -27,11 +29,14 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
             referenceText: string.Empty,
             gradingSystem: GradingSystem.HundredMark,
             granularity: Granularity.Phoneme,
-            enableMiscue: false) { NBestPhonemeCount = 5 };
+            enableMiscue: false)
+        { NBestPhonemeCount = 5 };
 
         _speechConfig = SpeechConfig.FromSubscription(
             azureConfig.SpeechKey,
             azureConfig.SpeechRegion);
+        _nAudioOggToWavConverter = nAudioOggToWavConverter
+            ?? throw new ArgumentNullException(nameof(nAudioOggToWavConverter));
     }
 
     /// <summary>
@@ -50,6 +55,7 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         CancellationToken cancellationToken)
     {
         var language = GetLanguageFromEnum(targetLanguage);
+        var audioDataPCM = _nAudioOggToWavConverter.ConvertOggToPcm(audioData);
 
         // Specify exact language to recognizer
         _speechConfig.SpeechRecognitionLanguage = language;
@@ -62,7 +68,7 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         {
             _pronunciationAssessmentConfig.ApplyTo(speechRecognizer);
 
-            audioInputStream.Write(audioData);
+            audioInputStream.Write(audioDataPCM);
             audioInputStream.Write(new byte[0]); // send a zero-size chunk to signal the end of stream
 
             var result = await speechRecognizer.RecognizeOnceAsync().ConfigureAwait(false);
