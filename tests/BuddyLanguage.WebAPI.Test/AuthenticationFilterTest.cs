@@ -31,6 +31,7 @@ public class AuthenticationFilterTest
 
         var configuration = new ConfigurationBuilder()
             .AddUserSecrets<AuthenticationFilterTest>()
+            .AddEnvironmentVariables()
             .Build();
 
         // Получение Id пользователя телеграм из строки заголовка
