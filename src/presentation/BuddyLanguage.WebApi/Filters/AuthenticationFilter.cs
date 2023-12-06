@@ -45,7 +45,7 @@ public class AuthenticationFilter : Attribute, IAuthorizationFilter, IFilterFact
         try
         {
             // Получение токен телеграм бота
-            string botToken = _configuration.GetRequiredValue("TELEGRAM_BOT_TOKEN");
+            string botToken = _configuration.GetRequiredValue("BotConfiguration:Token");
 
             // Преобразование строки заголовка Authorization к коллекции параметров
             var listOfParams = ParseHeaderToListOfData(initDataHeader);
@@ -78,18 +78,8 @@ public class AuthenticationFilter : Attribute, IAuthorizationFilter, IFilterFact
 
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider)
     {
-        var log = serviceProvider.GetService<ILogger<AuthenticationFilter>>();
-        if (log is null)
-        {
-            throw new InvalidOperationException(nameof(ILogger<AuthenticationFilter>));
-        }
-
-        var conf = serviceProvider.GetService<IConfiguration>();
-
-        if (conf is null)
-        {
-            throw new InvalidOperationException(nameof(IConfiguration));
-        }
+        var log = serviceProvider.GetRequiredService<ILogger<AuthenticationFilter>>();
+        var conf = serviceProvider.GetRequiredService<IConfiguration>();
 
         return new AuthenticationFilter(log, conf);
     }
