@@ -1,12 +1,12 @@
 using System.Web;
 using BuddyLanguage.WebApi.Filters;
 using FluentAssertions;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace BuddyLanguage.WebAPI.Test;
@@ -29,7 +29,9 @@ public class AuthenticationFilterTest
         httpContext.Request.Headers["Authorization"] =
             $"tma {GetTestInitData()}";
 
-        var builder = WebApplication.CreateBuilder();
+        var configuration = new ConfigurationBuilder()
+            .AddUserSecrets<AuthenticationFilterTest>()
+            .Build();
 
         // Получение Id пользователя телеграм из строки заголовка
         int resultUserId = GetTgUserIdFromTma($"tma {GetTestInitData()}");
@@ -38,7 +40,7 @@ public class AuthenticationFilterTest
         var actionContext = new ActionContext(httpContext, new RouteData { }, new ControllerActionDescriptor { });
 
         // Инициалиазация тестиру
-        var filter = new AuthenticationFilter(_logger, builder.Configuration);
+        var filter = new AuthenticationFilter(_logger, configuration);
 
         // Act
         filter.OnAuthorization(new AuthorizationFilterContext(actionContext, new List<IFilterMetadata>()));
