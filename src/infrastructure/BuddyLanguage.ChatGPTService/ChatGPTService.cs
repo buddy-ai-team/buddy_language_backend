@@ -15,7 +15,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
     public class ChatGPTService : IChatGPTService
     {
         private readonly ChatGPTFactory _chatGptFactory;
-        private readonly IOpenAiClient _openAiClient;
+        private readonly IAiClient _openAiClient;
         private readonly ILogger<ChatGPTService> _logger;
         private readonly ChatGPTConfig _config; // TODO ChatGPTModelsConfig
         private readonly string _model = ChatCompletionModels.Gpt4Turbo;
@@ -23,7 +23,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
 
         public ChatGPTService(
             ChatGPTFactory chatGptFactory,
-            IOpenAiClient openAiClient,
+            IAiClient openAiClient,
             IOptionsSnapshot<ChatGPTConfig> chatgptOptions,
             ILogger<ChatGPTService> logger)
         {
@@ -102,7 +102,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
             Role role,
             CancellationToken cancellationToken)
         {
-            ArgumentNullException.ThrowIfNull(role); 
+            ArgumentNullException.ThrowIfNull(role);
             _config.Model = _model; // TODO fix
             ChatGPT chatGpt = await _chatGptFactory.Create(
                 userId.ToString(),
@@ -131,7 +131,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
                         $"{_config.InitialSystemMessage!}" +
                         $"\n\nRole: {role.Name}" +
                         $"\n\nPrompt: {role.Prompt}" +
-                        $"\n\nContext: {summary}"; 
+                        $"\n\nContext: {summary}";
                     var dialog = Dialog.StartAsSystem(initialMessage);
                     chatService = await chatGpt.StartNewTopic(
                         "Summarized",

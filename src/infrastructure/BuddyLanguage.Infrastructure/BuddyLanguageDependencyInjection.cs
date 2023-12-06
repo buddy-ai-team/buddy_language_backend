@@ -60,6 +60,7 @@ public static class BuddyLanguageDependencyInjection
             });
 
         services.AddChatGptEntityFrameworkIntegration(
+            configuration,
             options =>
             {
                 options.UseSqlServer(
