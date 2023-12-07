@@ -7,6 +7,7 @@ using BuddyLanguage.Infrastructure;
 using BuddyLanguage.WebApi.Filters.AuthenticationData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using ConfigurationExtensions = BuddyLanguage.Infrastructure.ConfigurationExtensions;
 
 namespace BuddyLanguage.WebApi.Filters;
 
@@ -16,19 +17,14 @@ namespace BuddyLanguage.WebApi.Filters;
 /// Записывает в поле HttpContext.Items["TelegramUserId"] телеграм ID пользователя,
 /// сделавшего запрос
 /// </summary>
-public class TmaAuthenticationFilter : Attribute, IAuthorizationFilter, IFilterFactory
-{
-    private const int RequestValidTimeInMinutes = 60;
-    private readonly ILogger<TmaAuthenticationFilter> _logger;
-    private readonly string _botToken;
-
-    public TmaAuthenticationFilter(
+public class TmaAuthenticationFilter(
         ILogger<TmaAuthenticationFilter> logger,
         IConfiguration configuration)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _botToken = configuration.GetRequiredValue("BotConfiguration:Token");
-    }
+    : Attribute, IAuthorizationFilter, IFilterFactory
+{
+    private const int RequestValidTimeInMinutes = 60;
+    private readonly ILogger<TmaAuthenticationFilter> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly string _botToken = configuration.GetRequiredValue("BotConfiguration:Token");
 
     public bool IsReusable => false;
 
