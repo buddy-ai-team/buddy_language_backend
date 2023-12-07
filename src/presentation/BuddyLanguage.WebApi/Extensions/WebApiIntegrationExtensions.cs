@@ -16,7 +16,7 @@ public static class WebApiIntegrationExtensions
         services.AddControllers(options =>
         {
             options.Filters.Add<CentralizedExceptionHandlingFilter>(order: 1);
-            options.Filters.Add<AuthenticationFilter>(order: 0);
+            options.Filters.Add<TmaAuthenticationFilter>(order: 0);
         });
 
         return services;
