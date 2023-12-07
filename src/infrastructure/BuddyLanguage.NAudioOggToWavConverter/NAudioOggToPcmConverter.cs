@@ -21,7 +21,7 @@ namespace BuddyLanguage.NAudioOggToWavConverter
         public byte[] ConvertOggToPcm(byte[] oggData)
         {
             using var oggStream = new MemoryStream(oggData);
-            using var vorbis = new VorbisWaveReader(oggStream, false);
+            using var vorbis = new VorbisWaveReader(oggStream);
             var resampler = new WdlResamplingSampleProvider(vorbis, 16000);
 
             // Converts from float to 16-bit PCM

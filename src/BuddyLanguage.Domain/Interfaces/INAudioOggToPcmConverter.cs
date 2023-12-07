@@ -2,6 +2,6 @@
 {
     public interface INAudioOggToPcmConverter
     {
-        byte[] ConvertOggToPcm(byte[] oggData); 
+        byte[] ConvertOggToPcm(byte[] oggData);
     }
 }
