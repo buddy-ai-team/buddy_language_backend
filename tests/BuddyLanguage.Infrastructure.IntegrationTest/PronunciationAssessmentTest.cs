@@ -1,8 +1,6 @@
 ﻿using BuddyLanguage.AzureServices;
 using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Enumerations;
-using BuddyLanguage.Domain.Interfaces;
-using BuddyLanguage.NAudioOggToWavConverter;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -41,9 +39,8 @@ public class PronunciationAssessmentTest
     public async Task Result_of_assessment_calculated()
     {
         // Arrange
-        byte[] inputData = File.ReadAllBytes("assets/Pronunciation.ogg");
-        NAudioOggToPcmConverter converter = new NAudioOggToPcmConverter();
-        var service = new PronunciationAssessmentService(_config, _logger, converter);
+        byte[] inputData = File.ReadAllBytes("assets/testAudio.ogg");
+        var service = new PronunciationAssessmentService(_config, _logger);
 
         // Act
         IReadOnlyList<WordPronunciationAssessment> result =

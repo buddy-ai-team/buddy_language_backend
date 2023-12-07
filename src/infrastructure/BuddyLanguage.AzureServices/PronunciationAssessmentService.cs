@@ -12,14 +12,12 @@ namespace BuddyLanguage.AzureServices;
 public class PronunciationAssessmentService : IPronunciationAssessmentService
 {
     private readonly ILogger<PronunciationAssessmentService> _logger;
-    private readonly INAudioOggToPcmConverter _nAudioOggToWavConverter;
     private readonly PronunciationAssessmentConfig _pronunciationAssessmentConfig;
     private readonly SpeechConfig _speechConfig;
 
     public PronunciationAssessmentService(
         IOptions<AzureConfig> config,
-        ILogger<PronunciationAssessmentService> logger,
-        INAudioOggToPcmConverter nAudioOggToWavConverter)
+        ILogger<PronunciationAssessmentService> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         AzureConfig azureConfig = config.Value ?? throw new ArgumentNullException(nameof(config));
@@ -35,8 +33,6 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         _speechConfig = SpeechConfig.FromSubscription(
             azureConfig.SpeechKey,
             azureConfig.SpeechRegion);
-        _nAudioOggToWavConverter = nAudioOggToWavConverter
-            ?? throw new ArgumentNullException(nameof(nAudioOggToWavConverter));
     }
 
     /// <summary>
@@ -55,12 +51,12 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         CancellationToken cancellationToken)
     {
         var language = GetLanguageFromEnum(targetLanguage);
-        var audioDataPCM = _nAudioOggToWavConverter.ConvertOggToPcm(audioData);
 
         // Specify exact language to recognizer
         _speechConfig.SpeechRecognitionLanguage = language;
 
-        using (var audioInputStream = AudioInputStream.CreatePushStream(AudioStreamFormat.GetWaveFormatPCM(16000, 16, 1))) // This need be set based on the format of the given audio data
+        using (var audioInputStream = AudioInputStream.CreatePushStream(
+                   AudioStreamFormat.GetCompressedFormat(AudioStreamContainerFormat.OGG_OPUS)))
         using (var audioConfig = AudioConfig.FromStreamInput(audioInputStream))
 
         // Specify the language used for Pronunciation Assessment.
@@ -68,7 +64,7 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         {
             _pronunciationAssessmentConfig.ApplyTo(speechRecognizer);
 
-            audioInputStream.Write(audioDataPCM);
+            audioInputStream.Write(audioData);
             audioInputStream.Write(new byte[0]); // send a zero-size chunk to signal the end of stream
 
             var result = await speechRecognizer.RecognizeOnceAsync().ConfigureAwait(false);
