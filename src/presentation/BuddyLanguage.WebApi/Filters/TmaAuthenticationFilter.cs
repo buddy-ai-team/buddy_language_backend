@@ -31,7 +31,7 @@ public class TmaAuthenticationFilter(
     /// <summary>
     /// Проверка соответствия полученного hash расчётному и запрос "свежий" и задает TelegramUserId в контексте запроса
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="context">AuthorizationFilterContext</param>
     /// <remarks>
     /// Строка заголовка Authorization начинается на tma затем пробел затем состоит из параметров в формате
     /// </remarks>
