@@ -44,45 +44,80 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         return await GetSpeechAssessmentFromRawPcmAsync(audioDataPcm, targetLanguage, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<WordPronunciationAssessment>>
-        GetSpeechAssessmentFromRawPcmAsync(
-            byte[] audioDataPcm,
-            Language targetLanguage,
-            CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<WordPronunciationAssessment>> GetSpeechAssessmentFromRawPcmAsync(
+        byte[] audioDataPcm,
+        Language targetLanguage,
+        CancellationToken cancellationToken)
     {
         var language = GetLanguageFromEnum(targetLanguage);
         _speechConfig.SpeechRecognitionLanguage = language;
-        using (var audioInputStream =
-               AudioInputStream.CreatePushStream(AudioStreamFormat.GetWaveFormatPCM(16000, 16, 1)))
+        var stopRecognition = new TaskCompletionSource<int>();
+
+        using (var audioInputStream = AudioInputStream.CreatePushStream(AudioStreamFormat.GetWaveFormatPCM(16000, 16, 1)))
         using (var audioConfig = AudioConfig.FromStreamInput(audioInputStream))
-        using (var speechRecognizer = new SpeechRecognizer(_speechConfig, language, audioConfig))
+        using (var recognizer = new SpeechRecognizer(_speechConfig, language, audioConfig))
         {
-            _pronunciationAssessmentConfig.ApplyTo(speechRecognizer);
+            _pronunciationAssessmentConfig.ApplyTo(recognizer);
+
+            recognizer.Recognizing += (s, e) =>
+            {
+                // Handle intermediate recognition results if needed
+            };
+
+            var totalResults = new List<WordPronunciationAssessment>();
+
+            recognizer.Recognized += (s, e) =>
+            {
+                if (e.Result.Reason == ResultReason.RecognizedSpeech)
+                {
+                    var pronunciationAssessmentResult = PronunciationAssessmentResult.FromResult(e.Result);
+                    totalResults.AddRange(
+                        pronunciationAssessmentResult.Words
+                            .Select(word => new WordPronunciationAssessment(word.Word, word.AccuracyScore)));
+                }
+                else if (e.Result.Reason == ResultReason.NoMatch)
+                {
+                    _logger.LogWarning("NOMATCH: Speech could not be recognized");
+                }
+            };
+
+            recognizer.Canceled += (s, e) =>
+            {
+                if (e.Reason == CancellationReason.Error)
+                {
+                    throw new InvalidOperationException(
+                        $"CANCELED: ErrorCode={e.ErrorCode} ErrorDetails={e.ErrorDetails}");
+                }
+
+                if (e.Reason == CancellationReason.EndOfStream)
+                {
+                    _logger.LogInformation("End of stream reached");
+                }
+
+                stopRecognition.TrySetResult(0);
+            };
+
+            recognizer.SessionStarted += (s, e) =>
+            {
+                // Handle session start if needed
+            };
+
+            recognizer.SessionStopped += (s, e) =>
+            {
+                stopRecognition.TrySetResult(0);
+            };
+
             audioInputStream.Write(audioDataPcm);
             audioInputStream.Write(new byte[0]);
-            var result = await speechRecognizer.RecognizeOnceAsync().ConfigureAwait(false);
-            if (result.Reason == ResultReason.Canceled)
-            {
-                var cancellationDetail = CancellationDetails.FromResult(result);
-                throw cancellationDetail.Reason switch
-                {
-                    CancellationReason.Error => new Exception(
-                        $"CANCELED: ErrorCode={cancellationDetail.ErrorCode} ErrorDetails={cancellationDetail.ErrorDetails}"),
-                    CancellationReason.EndOfStream => new Exception(
-                        $"CANCELED: ReachedEndOfStream={cancellationDetail.ErrorDetails}"),
-                    _ => throw new Exception(
-                        $"CANCELED: Reason={cancellationDetail.Reason} ErrorDetails={cancellationDetail.ErrorDetails}"),
-                };
-            }
 
-            var pronunciationAssessmentResult =
-                PronunciationAssessmentResult.FromResult(result);
-            var totalResult =
-                pronunciationAssessmentResult
-                    .Words
-                    .Select(word => new WordPronunciationAssessment(word.Word, word.AccuracyScore))
-                    .ToList();
-            return totalResult;
+            await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
+
+            // Waits for completion.
+            await stopRecognition.Task.WaitAsync(TimeSpan.FromSeconds(30), cancellationToken);
+
+            await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
+
+            return totalResults.AsReadOnly();
         }
     }
 
