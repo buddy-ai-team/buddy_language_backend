@@ -10,7 +10,7 @@ public class OggOpusToPcmConverterConcentus : IOggOpusToPcmConverter
     {
         using var oggStream = new MemoryStream(oggData);
         using var pcmStream = new MemoryStream();
-        var opusDecoder = new OpusDecoder(48000, 1); // Assuming 48kHz mono. Adjust if needed.
+        var opusDecoder = new OpusDecoder(16000, 1); // Assuming 48kHz mono. Adjust if needed.
         var reader = new OpusOggReadStream(opusDecoder, oggStream);
 
         while (reader.HasNextPacket)
