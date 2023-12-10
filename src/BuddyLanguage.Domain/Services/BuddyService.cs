@@ -81,7 +81,7 @@ namespace BuddyLanguage.Domain.Services
                 userMessage, nativeLanguage, cancellationToken);
             var wordsTask = GetLearningWords(
                 userMessage, nativeLanguage, targetLanguage, cancellationToken);
-            var pronunciationTask = _pronunciationAssessmentService.GetSpeechAssessmentAsync(
+            var pronunciationTask = _pronunciationAssessmentService.GetSpeechAssessmentFromOggAsync(
                 oggVoiceMessage, targetLanguage, cancellationToken);
             await Task.WhenAll(assistantTask, mistakesTask, wordsTask, pronunciationTask);
 
@@ -201,7 +201,7 @@ namespace BuddyLanguage.Domain.Services
             if (badPronouncedWordsList.Count != 0)
             {
                 var badPronouncedWords = string.Join(",", badPronouncedWordsList);
-                var textForBadPronunciation = "The pronunciation of the following words should be improved: ";     
+                var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
                 return await _textToSpeechService.TextToWavByteArrayAsync(
                 $"{textForBadPronunciation} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
             }

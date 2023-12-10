@@ -30,6 +30,11 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
         AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
-        ASPNETCORE_TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        ASPNETCORE_OpenAICredentials:ApiKey: ${{ secrets.OPENAI_API_KEY }}
+        AIProvider: ${{ env.AI_PROVIDER }}
+        BotConfiguration:Token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        OpenAICredentials:ApiKey: ${{ secrets.OPENAI_API_KEY }}
+        AzureOpenAICredentials:ApiKey: ${{ secrets.AZURE_OPENAI_API_KEY }}
+        AzureOpenAICredentials:ApiHost: ${{ secrets.AZURE_OPENAI_API_HOST }}
+        AzureOpenAICredentials:DeploymentName: ${{ secrets.AZURE_OPENAI_DEPLOYMENT_NAME }}
+
       run: dotnet test --no-build --verbosity normal
