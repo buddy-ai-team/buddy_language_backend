@@ -26,7 +26,7 @@ public class AuthenticationFilter : Attribute, IAuthorizationFilter, IFilterFact
         IConfiguration configuration)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _configuration = configuration ?? throw new ArgumentNullException();
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(_configuration));
     }
 
     public bool IsReusable => false;
