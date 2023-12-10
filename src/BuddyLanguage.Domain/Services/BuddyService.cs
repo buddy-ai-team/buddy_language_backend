@@ -176,7 +176,7 @@ namespace BuddyLanguage.Domain.Services
             IReadOnlyList<WordPronunciationAssessment> pronunciationWords)
         {
             ArgumentNullException.ThrowIfNull(pronunciationWords);
-            double acceptableAccuracyScore = 75;
+            double acceptableAccuracyScore = 85;
             var badPronouncedWords = new List<string>();
             foreach (var word in pronunciationWords)
             {
