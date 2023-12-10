@@ -84,14 +84,14 @@ public class BuddyServiceTests
 
         var wordService = new WordService(
             Mock.Of<IUnitOfWork>(), Mock.Of<ILogger<WordService>>());
-        var prompService = new PromptService();
+        var promptService = new PromptService();
 
         var buddyService = new BuddyService(
             chatGptService,
             Mock.Of<ISpeechRecognitionService>(),
             Mock.Of<ITextToSpeech>(),
             Mock.Of<IPronunciationAssessmentService>(),
-            prompService,
+            promptService,
             wordService,
             Mock.Of<ILogger<BuddyService>>());
 
