@@ -6,6 +6,7 @@ using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
 using BuddyLanguage.OggOpusToPcmConverterConcentusLib;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
+using BuddyLanguage.PromptServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -84,6 +85,7 @@ public static class BuddyLanguageDependencyInjection
             });
 
         services.AddSingleton<IOggOpusToPcmConverter, OggOpusToPcmConverterConcentus>();
+        services.AddScoped<IPromptService, PromptService>();
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
         services.AddScoped<IPronunciationAssessmentService, PronunciationAssessmentService>();
         services.AddScoped<ITextToSpeech, AzureTextToSpeech>();
