@@ -10,6 +10,7 @@ namespace BuddyLanguage.KiotaClient
         {
             ArgumentNullException.ThrowIfNull(httpClient);
             var authProvider = new AnonymousAuthenticationProvider();
+
             var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient);
             return new GeneratedOpenAiClient(adapter);
         }

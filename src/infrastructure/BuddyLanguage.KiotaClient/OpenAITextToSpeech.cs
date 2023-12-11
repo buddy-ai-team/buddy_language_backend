@@ -2,23 +2,46 @@
 using BuddyLanguage.Domain.Exceptions.TTS;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using OpenAI.ChatGpt.AspNetCore.Models;
 using OpenAI.GeneratedKiotaClient;
-using OpenAI.GeneratedKiotaClient.Audio.Speech;
 using OpenAI.GeneratedKiotaClient.Models;
 
 namespace BuddyLanguage.KiotaClient
 {
+    /// <summary>
+    /// Implementation of the ITextToSpeech interface using the OpenAI TTS API.
+    /// </summary>
     public class OpenAITextToSpeech : ITextToSpeech
     {
-        private readonly GeneratedOpenAiClient _client;
+        private readonly OpenAICredentials _openAiCredentials;
         private readonly ILogger<OpenAITextToSpeech> _logger;
+        private readonly GeneratedOpenAiClient _client;
 
-        public OpenAITextToSpeech(ILogger<OpenAITextToSpeech> logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenAITextToSpeech"/> class.
+        /// </summary>
+        /// <param name="options">Options for OpenAI credentials.</param>
+        /// <param name="logger">Logger for logging messages.</param>
+        public OpenAITextToSpeech(IOptions<OpenAICredentials> options, ILogger<OpenAITextToSpeech> logger)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _openAiCredentials = options.Value ?? throw new ArgumentNullException(nameof(options));
+
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = _openAiCredentials.GetAuthHeader();
             _client = GeneratedClientsFactory.CreateGeneratedOpenAiClient(new HttpClient());
         }
 
+        /// <summary>
+        /// Converts text to an MP3 audio byte array using the OpenAI TTS API.
+        /// </summary>
+        /// <param name="text">Text to be converted to speech.</param>
+        /// <param name="language">Language of the speech.</param>
+        /// <param name="voice">Voice gender for the speech.</param>
+        /// <param name="speed">Speed of the speech.</param>
+        /// <param name="cancellationToken">Cancellation token to cancel the operation.</param>
+        /// <returns>MP3 audio byte array.</returns>
         public async Task<byte[]> TextToByteArrayAsync(string text, Language language, Voice voice, TtsSpeed speed, CancellationToken cancellationToken)
         {
             // Create an instance of CreateSpeechRequest
@@ -41,7 +64,7 @@ namespace BuddyLanguage.KiotaClient
             {
                 // Log the response
                 _logger.LogInformation("OpenAI TTS Response Received.");
-                return ReadStream(responseStream); //MP3
+                return ReadStream(responseStream); // MP3
             }
             else if (responseStream is null)
             {
@@ -53,6 +76,11 @@ namespace BuddyLanguage.KiotaClient
             }
         }
 
+        /// <summary>
+        /// Gets the speaking rate based on the specified TtsSpeed.
+        /// </summary>
+        /// <param name="speed">TtsSpeed enumeration.</param>
+        /// <returns>Speaking rate as a double.</returns>
         private double GetSpeakingRate(TtsSpeed speed)
         {
             return speed switch
@@ -66,6 +94,11 @@ namespace BuddyLanguage.KiotaClient
             };
         }
 
+        /// <summary>
+        /// Gets the voice gender based on the specified Voice.
+        /// </summary>
+        /// <param name="voice">Voice enumeration.</param>
+        /// <returns>CreateSpeechRequest_voice representing the voice gender.</returns>
         private CreateSpeechRequest_voice GetVoiceGender(Voice voice)
         {
             return voice switch
@@ -76,6 +109,11 @@ namespace BuddyLanguage.KiotaClient
             };
         }
 
+        /// <summary>
+        /// Reads a stream and converts it to a byte array.
+        /// </summary>
+        /// <param name="input">Input stream to be read.</param>
+        /// <returns>Byte array representing the content of the stream.</returns>
         private byte[] ReadStream(Stream input)
         {
             using (MemoryStream ms = new MemoryStream())
