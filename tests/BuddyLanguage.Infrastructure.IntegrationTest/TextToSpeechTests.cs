@@ -1,9 +1,11 @@
 ﻿using BuddyLanguage.AzureServices;
 using BuddyLanguage.Domain.Enumerations;
+using BuddyLanguage.KiotaClient;
 using FluentAssertions;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenAI.ChatGpt.AspNetCore.Models;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest
 {
@@ -13,18 +15,21 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
     public class TextToSpeechTests
     {
         /// <summary>
-        /// Generates all possible combinations of languages and voices for testing.
+        /// Generates all possible combinations of languages and voices and ttsspeeds for testing.
         /// </summary>
-        /// <returns>Pair of possible variants Language-Voice</returns>
-        public static IEnumerable<(Language Language, Voice Voice)> GetLanguageVoiceCombinations()
+        /// <returns>Pair of possible variants Language-Voice-TtsSpeed</returns>
+        public static IEnumerable<(Language Language, Voice Voice, TtsSpeed Speed)> GetLanguageVoiceCombinations()
         {
-            var combinations = new List<(Language, Voice)>();
+            var combinations = new List<(Language, Voice, TtsSpeed)>();
 
             foreach (Language language in Enum.GetValues(typeof(Language)))
             {
                 foreach (Voice voice in Enum.GetValues(typeof(Voice)))
                 {
-                    combinations.Add((language, voice));
+                    foreach (TtsSpeed speed in Enum.GetValues(typeof(TtsSpeed)))
+                    {
+                        combinations.Add((language, voice, speed));
+                    }
                 }
             }
 
@@ -32,17 +37,17 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         }
 
         /// <summary>
-        /// Tests whether the Azure Text-to-Speech service correctly synthesizes speech for various languages and voices.
+        /// Tests whether the Azure Text-to-Speech service correctly synthesizes speech for various languages and voices and speeds.
         /// </summary>
         /// <returns>Nothing</returns>
         [Fact]
-        public async Task All_azure_TTS_languages_and_voices_synthesized()
+        public async Task All_azure_TTS_languages_voices_and_speeds_synthesized()
         {
             var combinations = GetLanguageVoiceCombinations();
 
             foreach (var combination in combinations)
             {
-                var (language, voice) = combination;
+                var (language, voice, speed) = combination;
 
                 // Arrange
                 var logger = new LoggerFactory().CreateLogger<AzureTextToSpeech>();
@@ -57,10 +62,43 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
                 var cancellationToken = CancellationToken.None;
 
                 // Act
-                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, language, voice, TtsSpeed.Medium, cancellationToken);
+                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, language, voice, speed, cancellationToken);
 
                 // Assert
                 audioData.Should().NotBeNullOrEmpty($"Audio Data For Language: {language} and Voice: {voice} combination was null/empty!");
+            }
+        }
+
+        /// <summary>
+        /// Tests whether the OpenAI Text-to-Speech service correctly synthesizes speech for various languages and voices and speeds.
+        /// </summary>
+        /// <returns>Nothing</returns>
+        [Fact]
+        public async Task All_openAI_TTS_languages_voices_and_speeds_synthesized()
+        {
+            var combinations = GetLanguageVoiceCombinations();
+
+            foreach (var combination in combinations)
+            {
+                var (language, voice, speed) = combination;
+
+                // Arrange
+                var logger = new LoggerFactory().CreateLogger<OpenAITextToSpeech>();
+                var options = Options.Create(new OpenAICredentials()
+                {
+                    ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
+                    ApiHost = "https://api.openai.com/v1/"
+                });
+
+                var textToSpeechClient = new OpenAITextToSpeech(options, logger);
+                var text = "Hello"; // You can use any sample text.
+                var cancellationToken = CancellationToken.None;
+
+                // Act
+                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, language, voice, speed, cancellationToken);
+
+                // Assert
+                audioData.Should().NotBeNullOrEmpty($"Audio Data For Language: {language} and Voice: {voice} and Speed: {speed} combination was null/empty!");
             }
         }
 
