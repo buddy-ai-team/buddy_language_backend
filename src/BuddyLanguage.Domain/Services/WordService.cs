@@ -75,5 +75,18 @@ namespace BuddyLanguage.Domain.Services
             await _uow.SaveChangesAsync(cancellationToken);
             return wordVar;
         }
+
+        public virtual async Task DeleteWordEntity(Guid wordEntityId, CancellationToken cancellationToken)
+        {
+            var wordVar = await _uow.WordEntityRepository.GetById(wordEntityId, cancellationToken);
+
+            if (wordVar is null)
+            {
+                throw new WordEntityNotFoundException("Word with given id not found");
+            }
+
+            await _uow.WordEntityRepository.Delete(wordVar, cancellationToken);
+            await _uow.SaveChangesAsync(cancellationToken);
+        }
     }
 }
