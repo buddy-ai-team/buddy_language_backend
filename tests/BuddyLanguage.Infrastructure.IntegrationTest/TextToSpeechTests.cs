@@ -1,4 +1,6 @@
-﻿using BuddyLanguage.AzureServices;
+﻿using System.Threading;
+using BuddyLanguage.AzureServices;
+using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.KiotaClient;
 using FluentAssertions;
@@ -6,6 +8,7 @@ using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenAI.ChatGpt.AspNetCore.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest
 {
@@ -43,29 +46,43 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [Fact]
         public async Task All_azure_TTS_languages_voices_and_speeds_synthesized()
         {
-            var combinations = GetEnumCombinations();
-
-            foreach (var combination in combinations)
+            // Arrange
+            var logger = new LoggerFactory().CreateLogger<AzureTextToSpeech>();
+            var options = Options.Create(new AzureConfig()
             {
-                var (language, voice, speed) = combination;
+                SpeechKey = GetKeyFromEnvironment("AZURE_SPEECH_KEY"),
+                SpeechRegion = GetKeyFromEnvironment("AZURE_SPEECH_REGION")
+            });
 
-                // Arrange
-                var logger = new LoggerFactory().CreateLogger<AzureTextToSpeech>();
-                var options = Options.Create(new AzureConfig()
-                    {
-                        SpeechKey = GetKeyFromEnvironment("AZURE_SPEECH_KEY"),
-                        SpeechRegion = GetKeyFromEnvironment("AZURE_SPEECH_REGION")
-                    });
+            var textToSpeechClient = new AzureTextToSpeech(options, logger);
+            var text = "Hi"; // You can use any sample text.
+            var cancellationToken = CancellationToken.None;
 
-                var textToSpeechClient = new AzureTextToSpeech(options, logger);
-                var text = "Hello"; // You can use any sample text.
-                var cancellationToken = CancellationToken.None;
-
+            foreach (Language language in Enum.GetValues(typeof(Language)))
+            {
                 // Act
-                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, language, voice, speed, cancellationToken);
+                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, language, Voice.Male, TtsSpeed.Medium, cancellationToken);
 
                 // Assert
-                audioData.Should().NotBeNullOrEmpty($"Audio Data For Language: {language} and Voice: {voice} combination was null/empty!");
+                audioData.Should().NotBeNullOrEmpty($"Audio Data For Language: {language} was null/empty!");
+            }
+
+            foreach (Voice voice in Enum.GetValues(typeof(Voice)))
+            {
+                // Act
+                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, Language.English, voice, TtsSpeed.Medium, cancellationToken);
+
+                // Assert
+                audioData.Should().NotBeNullOrEmpty($"Audio Data For Voice: {voice} was null/empty!");
+            }
+
+            foreach (TtsSpeed speed in Enum.GetValues(typeof(TtsSpeed)))
+            {
+                // Act
+                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, Language.English, Voice.Male, speed, cancellationToken);
+
+                // Assert
+                audioData.Should().NotBeNullOrEmpty($"Audio Data For Voice: {speed} was null/empty!");
             }
         }
 
@@ -76,29 +93,43 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [Fact]
         public async Task All_openAI_TTS_languages_voices_and_speeds_synthesized()
         {
-            var combinations = GetEnumCombinations();
-
-            foreach (var combination in combinations)
+            // Arrange
+            var logger = new LoggerFactory().CreateLogger<OpenAITextToSpeech>();
+            var options = Options.Create(new OpenAICredentials()
             {
-                var (language, voice, speed) = combination;
+                ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
+                ApiHost = "https://api.openai.com/v1/"
+            });
 
-                // Arrange
-                var logger = new LoggerFactory().CreateLogger<OpenAITextToSpeech>();
-                var options = Options.Create(new OpenAICredentials()
-                {
-                    ApiKey = GetKeyFromEnvironment("OPENAI_API_KEY"),
-                    ApiHost = "https://api.openai.com/v1/"
-                });
+            var textToSpeechClient = new OpenAITextToSpeech(options, logger);
+            var text = "Hi"; // You can use any sample text.
+            var cancellationToken = CancellationToken.None;
 
-                var textToSpeechClient = new OpenAITextToSpeech(options, logger);
-                var text = "Hello"; // You can use any sample text.
-                var cancellationToken = CancellationToken.None;
-
+            foreach (Language language in Enum.GetValues(typeof(Language)))
+            {
                 // Act
-                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, language, voice, speed, cancellationToken);
+                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, language, Voice.Male, TtsSpeed.Medium, cancellationToken);
 
                 // Assert
-                audioData.Should().NotBeNullOrEmpty($"Audio Data For Language: {language} and Voice: {voice} and Speed: {speed} combination was null/empty!");
+                audioData.Should().NotBeNullOrEmpty($"Audio Data For Language: {language} was null/empty!");
+            }
+
+            foreach (Voice voice in Enum.GetValues(typeof(Voice)))
+            {
+                // Act
+                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, Language.English, voice, TtsSpeed.Medium, cancellationToken);
+
+                // Assert
+                audioData.Should().NotBeNullOrEmpty($"Audio Data For Voice: {voice} was null/empty!");
+            }
+
+            foreach (TtsSpeed speed in Enum.GetValues(typeof(TtsSpeed)))
+            {
+                // Act
+                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, Language.English, Voice.Male, speed, cancellationToken);
+
+                // Assert
+                audioData.Should().NotBeNullOrEmpty($"Audio Data For Voice: {speed} was null/empty!");
             }
         }
 

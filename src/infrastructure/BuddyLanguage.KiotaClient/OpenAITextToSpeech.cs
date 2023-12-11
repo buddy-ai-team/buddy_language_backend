@@ -30,7 +30,7 @@ namespace BuddyLanguage.KiotaClient
 
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = _openAiCredentials.GetAuthHeader();
-            _client = GeneratedClientsFactory.CreateGeneratedOpenAiClient(new HttpClient());
+            _client = GeneratedClientsFactory.CreateGeneratedOpenAiClient(httpClient);
         }
 
         /// <summary>
