@@ -3,10 +3,11 @@ using BuddyLanguage.Domain.Interfaces;
 using Concentus.Oggfile;
 using Concentus.Structs;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
-namespace BuddyLanguage.NAudioMediaFoundationOggOpusToPcmConverterLib;
+namespace BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib;
 
-public class NAudioMediaFoundationOggOpusToPcmConverter : IOggOpusToPcmConverter
+public class NAudioConcentusOggOpusToPcmConverter : IOggOpusToPcmConverter
 {
     private const int DefaultSampleRate = 48000; // Assuming the original sample rate is 48 kHz
     private const int TargetSampleRate = 16000; // 16 kHz target sample rate
@@ -51,10 +52,9 @@ public class NAudioMediaFoundationOggOpusToPcmConverter : IOggOpusToPcmConverter
     {
         using var pcmStream = new MemoryStream(pcmData);
         using var waveStream = new RawSourceWaveStream(pcmStream, new WaveFormat(DefaultSampleRate, 16, ChannelCount));
-        using var resampler = new MediaFoundationResampler(waveStream, new WaveFormat(TargetSampleRate, 16, ChannelCount));
-        resampler.ResamplerQuality = 60; // Set the quality of the resampler
+        var resampler = new WdlResamplingSampleProvider(waveStream.ToSampleProvider(), TargetSampleRate);
         using var finalStream = new MemoryStream();
-        WaveFileWriter.WriteWavFileToStream(finalStream, resampler);
+        WaveFileWriter.WriteWavFileToStream(finalStream, resampler.ToWaveProvider16());
         return finalStream.ToArray();
     }
 }

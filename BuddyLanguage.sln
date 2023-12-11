@@ -45,7 +45,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.WebAPI.Test",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.PromptService", "src\infrastructure\BuddyLanguage.PromptService\BuddyLanguage.PromptService.csproj", "{E4CFCF0D-E7CF-4018-931C-86F18F855019}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.NAudioMediaFoundationOggOpusToPcmConverterLib", "src\infrastructure\BuddyLanguage.NAudioMediaFoundationOggOpusToPcmConverterLib\BuddyLanguage.NAudioMediaFoundationOggOpusToPcmConverterLib.csproj", "{31A0A274-0A7D-4DBE-AB0C-0DC999BFD3D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib", "src\infrastructure\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib.csproj", "{31A0A274-0A7D-4DBE-AB0C-0DC999BFD3D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

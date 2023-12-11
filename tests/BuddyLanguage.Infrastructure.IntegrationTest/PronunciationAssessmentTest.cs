@@ -1,7 +1,7 @@
 ﻿using BuddyLanguage.AzureServices;
 using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Enumerations;
-using BuddyLanguage.NAudioMediaFoundationOggOpusToPcmConverterLib;
+using BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -40,8 +40,8 @@ public class PronunciationAssessmentTest
     public async Task Pronunciation_assessment_succeeded()
     {
         // Arrange
-        byte[] inputData = await File.ReadAllBytesAsync("assets/bad_pronunciation_sample_4_words.ogg");
-        var oggOpusToPcmConverter = new NAudioMediaFoundationOggOpusToPcmConverter();
+        byte[] inputData = await File.ReadAllBytesAsync("assets/bad_pronunciation_sample_5_words.ogg");
+        var oggOpusToPcmConverter = new NAudioConcentusOggOpusToPcmConverter();
         var service = new PronunciationAssessmentService(_config, _logger, oggOpusToPcmConverter);
 
         // Act
@@ -50,7 +50,7 @@ public class PronunciationAssessmentTest
                 inputData, Language.English, default);
 
         // Assert
-        result.Should().HaveCount(4);
+        result.Should().HaveCount(5);
     }
 
     private class PcmToWavConverter
