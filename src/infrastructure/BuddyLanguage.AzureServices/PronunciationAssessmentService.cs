@@ -80,14 +80,14 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         using var recognizer = new SpeechRecognizer(speechConfig, language, audioConfig);
         pronunciationConfig.ApplyTo(recognizer);
 
-        recognizer.Recognizing += (s, e) =>
+        recognizer.Recognizing += (_, _) =>
         {
             // Handle intermediate recognition results if needed
         };
 
         var totalResults = new List<WordPronunciationAssessment>();
 
-        recognizer.Recognized += (s, e) =>
+        recognizer.Recognized += (_, e) =>
         {
             if (e.Result.Reason == ResultReason.RecognizedSpeech)
             {
@@ -107,7 +107,7 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
             }
         };
 
-        recognizer.Canceled += (s, e) =>
+        recognizer.Canceled += (_, e) =>
         {
             if (e.Reason == CancellationReason.Error)
             {
@@ -123,12 +123,12 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
             stopRecognitionTcs.TrySetResult(0);
         };
 
-        recognizer.SessionStarted += (s, e) =>
+        recognizer.SessionStarted += (_, _) =>
         {
             // Handle session start if needed
         };
 
-        recognizer.SessionStopped += (s, e) =>
+        recognizer.SessionStopped += (_, _) =>
         {
             stopRecognitionTcs.TrySetResult(0);
         };
