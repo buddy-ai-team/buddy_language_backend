@@ -13,6 +13,8 @@ public class PronunciationAssessmentTest
 {
     private readonly IOptions<AzureConfig> _config;
     private readonly ILogger<PronunciationAssessmentService> _logger;
+    private readonly PronunciationAssessmentService _service;
+    private readonly NAudioConcentusOggOpusToPcmConverter _oggOpusToPcmConverter;
 
     public PronunciationAssessmentTest()
     {
@@ -34,31 +36,34 @@ public class PronunciationAssessmentTest
         });
 
         _logger = new LoggerFactory().CreateLogger<PronunciationAssessmentService>();
+
+        _oggOpusToPcmConverter = new NAudioConcentusOggOpusToPcmConverter();
+        _service = new PronunciationAssessmentService(_config, _logger, _oggOpusToPcmConverter);
     }
 
     [Fact]
-    public async Task Pronunciation_assessment_succeeded()
+    public async Task Rodions_bad_pronunciation_assessment_found_bad_words()
     {
         // Arrange
         byte[] inputData = await File.ReadAllBytesAsync("assets/bad_pronunciation_sample_5_words.ogg");
-        var oggOpusToPcmConverter = new NAudioConcentusOggOpusToPcmConverter();
-        var service = new PronunciationAssessmentService(_config, _logger, oggOpusToPcmConverter);
 
         // Act
-        IReadOnlyList<WordPronunciationAssessment> result =
-            await service.GetSpeechAssessmentFromOggAsync(
-                inputData, Language.English, default);
+        var result = await _service.GetSpeechAssessmentFromOggOpus(inputData, Language.English, default);
 
         // Assert
         result.Should().HaveCount(5);
     }
 
-    private class PcmToWavConverter
+    [Fact]
+    public async Task Christinas_bad_pronunciation_assessment_found_bad_words2()
     {
-        public void ConvertPcmToWav(byte[] pcmData, string outputPath, int sampleRate = 48000, int channels = 1, int bitsPerSample = 16)
-        {
-            using var waveFile = new WaveFileWriter(outputPath, new WaveFormat(sampleRate, bitsPerSample, channels));
-            waveFile.Write(pcmData, 0, pcmData.Length);
-        }
+        // Arrange
+        byte[] inputData = await File.ReadAllBytesAsync("assets/bad_pronunciation_sample_3_words.ogg");
+
+        // Act
+        var result = await _service.GetSpeechAssessmentFromOggOpus(inputData, Language.English, default);
+
+        // Assert
+        result.Should().HaveCount(3); //90, 92, 65
     }
 }

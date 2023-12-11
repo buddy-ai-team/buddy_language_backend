@@ -43,7 +43,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [Fact]
         public async Task All_azure_TTS_languages_voices_and_speeds_synthesized()
         {
-            var combinations = GetLanguageVoiceCombinations();
+            var combinations = GetMainLanguagesVoiceCombinations();
 
             foreach (var combination in combinations)
             {

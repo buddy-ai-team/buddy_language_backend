@@ -59,6 +59,9 @@
     <None Update="assets\bad_pronunciation_sample_5_words.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="assets\bad_pronunciation_sample_3_words.ogg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
