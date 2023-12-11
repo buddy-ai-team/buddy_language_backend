@@ -11,4 +11,8 @@
     <PackageReference Include="Microsoft.Kiota.Serialization.Json" Version="1.1.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\Yehia\source\repos\buddy_language_backend\src\infrastructure\BuddyLanguage.KiotaClient\.editorconfig" />
+  </ItemGroup>
+
 </Project>

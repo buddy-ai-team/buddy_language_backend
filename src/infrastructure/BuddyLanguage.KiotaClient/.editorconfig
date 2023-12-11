@@ -1,0 +1,59 @@
+root = true
+
+[Assistants/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[Audio/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[Chat/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[Completions/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[Edits/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[Embeddings/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[Files/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[Fine_tuning/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[FineTunes/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[Images/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[Models/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[ModelsRequests/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[Moderations/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+[Threads/*.cs]
+generated_code = true
+dotnet_diagnostic.*.severity = none
+
+
