@@ -1,5 +1,6 @@
 ﻿using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Exceptions.TTS;
+using BuddyLanguage.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using OpenAI.GeneratedKiotaClient;
 using OpenAI.GeneratedKiotaClient.Audio.Speech;
@@ -7,7 +8,7 @@ using OpenAI.GeneratedKiotaClient.Models;
 
 namespace BuddyLanguage.KiotaClient
 {
-    public class OpenAITextToSpeech
+    public class OpenAITextToSpeech : ITextToSpeech
     {
         private readonly GeneratedOpenAiClient _client;
         private readonly ILogger<OpenAITextToSpeech> _logger;
@@ -18,7 +19,7 @@ namespace BuddyLanguage.KiotaClient
             _client = GeneratedClientsFactory.CreateGeneratedOpenAiClient(new HttpClient());
         }
 
-        public async Task<byte[]> TextToMP3ByteArrayAsync(string text, Language language, Voice voice, TtsSpeed speed, CancellationToken cancellationToken)
+        public async Task<byte[]> TextToByteArrayAsync(string text, Language language, Voice voice, TtsSpeed speed, CancellationToken cancellationToken)
         {
             // Create an instance of CreateSpeechRequest
             var createSpeechRequest = new CreateSpeechRequest()
@@ -33,17 +34,14 @@ namespace BuddyLanguage.KiotaClient
                 Voice = GetVoiceGender(voice)
             };
 
-            // Create an instance of SpeechRequestBuilder
-            var speechRequestBuilder = new SpeechRequestBuilder(new Dictionary<string, object>(), _client.RequestAdapter);
-
             // Send a POST request to the Open AI TTS API
-            var responseStream = await speechRequestBuilder.PostAsync(createSpeechRequest);
+            var responseStream = await _client.Audio.Speech.PostAsync(createSpeechRequest);
 
             if (responseStream is not null)
             {
                 // Log the response
                 _logger.LogInformation("OpenAI TTS Response Received.");
-                return ReadStream(responseStream);
+                return ReadStream(responseStream); //MP3
             }
             else if (responseStream is null)
             {
