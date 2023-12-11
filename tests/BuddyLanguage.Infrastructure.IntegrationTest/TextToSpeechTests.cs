@@ -18,7 +18,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         /// Generates all possible combinations of languages and voices and ttsspeeds for testing.
         /// </summary>
         /// <returns>Pair of possible variants Language-Voice-TtsSpeed</returns>
-        public static IEnumerable<(Language Language, Voice Voice, TtsSpeed Speed)> GetLanguageVoiceCombinations()
+        public static IEnumerable<(Language Language, Voice Voice, TtsSpeed Speed)> GetEnumCombinations()
         {
             var combinations = new List<(Language, Voice, TtsSpeed)>();
 
@@ -43,7 +43,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [Fact]
         public async Task All_azure_TTS_languages_voices_and_speeds_synthesized()
         {
-            var combinations = GetMainLanguagesVoiceCombinations();
+            var combinations = GetEnumCombinations();
 
             foreach (var combination in combinations)
             {
@@ -76,7 +76,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [Fact]
         public async Task All_openAI_TTS_languages_voices_and_speeds_synthesized()
         {
-            var combinations = GetLanguageVoiceCombinations();
+            var combinations = GetEnumCombinations();
 
             foreach (var combination in combinations)
             {
