@@ -14,8 +14,10 @@ public interface IPronunciationAssessmentService
     /// <param name="targetLanguage">язык пользователя</param>
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Оценка произношения для каждого слова</returns>
-    Task<IReadOnlyList<WordPronunciationAssessment>> GetSpeechAssessmentFromOggAsync(
+    Task<IReadOnlyList<WordPronunciationAssessment>> GetSpeechAssessmentFromOggOpus(
         byte[] audioData,
         Language targetLanguage,
         CancellationToken cancellationToken);
+
+    bool IsLanguageSupported(Language language);
 }

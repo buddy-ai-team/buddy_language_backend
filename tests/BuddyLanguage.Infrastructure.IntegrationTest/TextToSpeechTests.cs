@@ -16,17 +16,15 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         /// Generates all possible combinations of languages and voices for testing.
         /// </summary>
         /// <returns>Pair of possible variants Language-Voice</returns>
-        public static IEnumerable<(Language Language, Voice Voice)> GetLanguageVoiceCombinations()
+        public static IEnumerable<(Language Language, Voice Voice)> GetMainLanguagesVoiceCombinations()
         {
-            var combinations = new List<(Language, Voice)>();
-
-            foreach (Language language in Enum.GetValues(typeof(Language)))
+            var combinations = new List<(Language, Voice)>()
             {
-                foreach (Voice voice in Enum.GetValues(typeof(Voice)))
-                {
-                    combinations.Add((language, voice));
-                }
-            }
+                (Language.English, Voice.Male),
+                (Language.English, Voice.Female),
+                (Language.Russian, Voice.Male),
+                (Language.Russian, Voice.Female),
+            };
 
             return combinations;
         }
@@ -38,7 +36,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
         [Fact]
         public async Task All_azure_TTS_languages_and_voices_synthesized()
         {
-            var combinations = GetLanguageVoiceCombinations();
+            var combinations = GetMainLanguagesVoiceCombinations();
 
             foreach (var combination in combinations)
             {

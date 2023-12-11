@@ -28,6 +28,7 @@ dotnet_diagnostic.RCS1037.severity = none
 dotnet_diagnostic.SA0001.severity = none
 dotnet_diagnostic.SA1401.severity = none
 dotnet_diagnostic.SA1629.severity = none
+dotnet_diagnostic.SA1602.severity = none
 dotnet_diagnostic.VSTHRD200.severity = none
 
 
