@@ -26,8 +26,8 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         _pronunciationAssessmentConfig = new PronunciationAssessmentConfig(
             referenceText: string.Empty,
             gradingSystem: GradingSystem.HundredMark,
-            granularity: Granularity.Phoneme,
-            enableMiscue: false) { NBestPhonemeCount = 5 };
+            granularity: Granularity.Word,
+            enableMiscue: true) { NBestPhonemeCount = 5 };
         _speechConfig = SpeechConfig.FromSubscription(
             azureConfig.SpeechKey,
             azureConfig.SpeechRegion);
@@ -44,7 +44,7 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         return await GetSpeechAssessmentFromRawPcmAsync(audioDataPcm, targetLanguage, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<WordPronunciationAssessment>> GetSpeechAssessmentFromRawPcmAsync(
+    private async Task<IReadOnlyList<WordPronunciationAssessment>> GetSpeechAssessmentFromRawPcmAsync(
         byte[] audioDataPcm,
         Language targetLanguage,
         CancellationToken cancellationToken)
@@ -79,6 +79,10 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
                 {
                     _logger.LogWarning("NOMATCH: Speech could not be recognized");
                 }
+                else
+                {
+                    _logger.LogError("Unhandled recognition result: {Reason}", e.Result.Reason);
+                }
             };
 
             recognizer.Canceled += (s, e) =>
@@ -108,14 +112,14 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
             };
 
             audioInputStream.Write(audioDataPcm);
-            audioInputStream.Write(new byte[0]);
+            audioInputStream.Write(Array.Empty<byte>());
 
-            await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
+            await recognizer.StartContinuousRecognitionAsync();
 
             // Waits for completion.
             await stopRecognition.Task.WaitAsync(TimeSpan.FromSeconds(30), cancellationToken);
 
-            await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
+            await recognizer.StopContinuousRecognitionAsync();
 
             return totalResults.AsReadOnly();
         }
