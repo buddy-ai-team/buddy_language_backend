@@ -80,11 +80,6 @@ namespace BuddyLanguage.Domain.Services
         {
             var wordVar = await _uow.WordEntityRepository.GetById(wordEntityId, cancellationToken);
 
-            if (wordVar is null)
-            {
-                throw new WordEntityNotFoundException("Word with given id not found");
-            }
-
             await _uow.WordEntityRepository.Delete(wordVar, cancellationToken);
             await _uow.SaveChangesAsync(cancellationToken);
         }
