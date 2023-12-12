@@ -32,12 +32,16 @@ public class TelegramBotService
 
     public Task HandleUpdate(Update update, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(update);
         return UpdateHandler(_botClient, update, cancellationToken);
     }
 
     public async Task UpdateHandler(
         ITelegramBotClient telegramBotClient, Update update, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(telegramBotClient);
+        ArgumentNullException.ThrowIfNull(update);
+
         if (update.Message is { } message)
         {
             var authenticated = await EnsureAuthenticated(message, cancellationToken);
