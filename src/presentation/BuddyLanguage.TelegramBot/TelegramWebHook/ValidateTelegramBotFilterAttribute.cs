@@ -23,7 +23,7 @@ public sealed class ValidateTelegramBotFilterAttribute : TypeFilterAttribute
         public ValidateTelegramBotFilter(IOptions<BotConfiguration> options)
         {
             ArgumentNullException.ThrowIfNull(options);
-            _secretToken = options.Value.Token;
+            _secretToken = options.Value.WebHookSecret;
         }
 
         public void OnActionExecuted(ActionExecutedContext context)

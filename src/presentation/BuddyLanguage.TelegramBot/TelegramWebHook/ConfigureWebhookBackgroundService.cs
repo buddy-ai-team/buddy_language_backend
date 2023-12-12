@@ -30,7 +30,7 @@ public class ConfigureWebhookBackgroundService : IHostedService
         return _botClient.SetWebhookAsync(
             url: webhookAddress,
             allowedUpdates: Array.Empty<UpdateType>(),
-            secretToken: _botConfig.Token,
+            secretToken: _botConfig.WebHookSecret,
             cancellationToken: cancellationToken);
     }
 

@@ -10,4 +10,7 @@ public class BotConfiguration
     [Required]
     [Url]
     public string WebHookHost { get; set; } = null!;
+
+    [Required]
+    public string WebHookSecret { get; set; } = null!;
 }
