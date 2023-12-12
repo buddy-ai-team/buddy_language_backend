@@ -8,6 +8,8 @@ namespace BuddyLanguage.Domain.Interfaces
 {
     public interface IMessageRepository
     {
-        Task<int> GetMessageCount(string userId, Guid topicId, CancellationToken cancellationToken);
+        Task<int> GetMessageCount(string id, Guid topicId, CancellationToken cancellationToken);
+
+        Task<int> GetNumbersDaysCommunication(string id, CancellationToken cancellationToken);
     }
 }

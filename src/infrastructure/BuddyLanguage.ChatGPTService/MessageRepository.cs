@@ -44,21 +44,44 @@ namespace BuddyLanguage.ChatGPTServiceLib
             }
         }
 
-        public async Task<int> GetNumbersDaysCommunication(string userId, CancellationToken cancellationToken)
+        public async Task<int> GetNumbersDaysCommunication(string id, CancellationToken cancellationToken)
         {
-            var topics = await _chatHistoryStorage.GetTopics(userId, cancellationToken);
-            var totalDays = 0;
-
-            /*foreach (var topic in topics)
+            var user = await _userRepository.FindUserByTelegramId(id, cancellationToken);
+            if (user != null)
             {
-                var topicMessages = await _chatHistoryStorage.GetMessages(userId, topic.Id, cancellationToken);
-                var firstMessageDate = topicMessages.Min(m => m.Timestamp).Date;
-                var lastMessageDate = topicMessages.Max(m => m.Timestamp).Date;
+                var topics = await _chatHistoryStorage.GetTopics(user.Id.ToString()!, cancellationToken);
+                if (topics.Count() > 1)
+                {
+                    var firstTopic = topics.First();
+                    var lastTopic = topics.Last();
 
-                totalDays += (int)(lastMessageDate - firstMessageDate).TotalDays + 1; // Plus 1 to include both first and last days
-            }*/
+                    var messagesLastTopic = await _chatHistoryStorage.GetMessages(user.Id.ToString(), lastTopic.Id, cancellationToken);
+                    var lastMessageTime = messagesLastTopic.Last().CreatedAt;
 
-            return totalDays;
+                    var start1 = firstTopic.CreatedAt;
+                    var end1 = lastMessageTime;
+                    var duration1 = (end1 - start1).TotalDays;
+                    return (int)duration1;
+                }
+                else if (topics.Count() == 1)
+                {
+                    var singlTopic = topics.First();
+                    var messagesSingleTopic = await _chatHistoryStorage.GetMessages(user.Id.ToString(), singlTopic.Id, cancellationToken);
+
+                    var start2 = singlTopic.CreatedAt;
+                    var end2 = messagesSingleTopic.Last().CreatedAt;
+                    var duration2 = (end2 - start2).TotalDays;
+                    return (int)duration2;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
+                throw new Exception("Пользователь не найден");
+            }
         }
     }
 }
