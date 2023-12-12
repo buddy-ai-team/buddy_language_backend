@@ -78,8 +78,13 @@ public class TelegramBotUpdatesListener : BackgroundService
 
         //Chain of responsibility
         var commandHandler = botCommandHandlers.FirstOrDefault(handler => handler.CanHandleCommand(update));
-        _logger.LogInformation("Received update of type {UpdateType}", update.Type);
-        _logger.LogInformation("Command handler: {CommandHandler}", commandHandler?.GetType().Name);
+        _logger.LogInformation(
+            "Received update of type {UpdateType}, {MessageType}, {MessageText}, {From}, {CommandHandler}",
+            update.Type,
+            update.Message?.Type,
+            update.Message?.Text,
+            update.Message?.From?.Id,
+            commandHandler?.GetType().Name);
 
         if (commandHandler != null && update.Message != null)
         {
