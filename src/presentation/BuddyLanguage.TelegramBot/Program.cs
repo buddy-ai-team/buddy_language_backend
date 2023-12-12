@@ -31,7 +31,8 @@ try
 
     builder.WebHost.UseSentry();
 
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+        .AddNewtonsoftJson();
 
     builder.Services.AddApplicationServices(builder.Configuration);
 
