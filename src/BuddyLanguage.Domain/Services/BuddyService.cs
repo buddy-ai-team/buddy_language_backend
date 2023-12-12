@@ -41,13 +41,7 @@ namespace BuddyLanguage.Domain.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public virtual async Task<(
-                string RecognizedMessage,
-                string BotAnswerMessage,
-                byte[] BotAnswerWavMessage,
-                byte[]? BotPronunciationWordsWavAnswer,
-                string[] Mistakes,
-                Dictionary<string, string> Words)>
+        public virtual async Task<UserMessageProcessingResult>
             ProcessUserMessage(
                 User user,
                 byte[] oggVoiceMessage,
@@ -87,7 +81,7 @@ namespace BuddyLanguage.Domain.Services
                 throw new UnsupportedLanguageFormatException("Can`t recognize the language");
             }
 
-            var pronunciationTask = _pronunciationAssessmentService.GetSpeechAssessmentFromOggAsync(
+            var pronunciationTask = _pronunciationAssessmentService.GetSpeechAssessmentFromOggOpus(
                 oggVoiceMessage, targetLanguage, cancellationToken);
             await Task.WhenAll(assistantTask, mistakesTask, wordsTask, pronunciationTask);
 
@@ -111,7 +105,7 @@ namespace BuddyLanguage.Domain.Services
             var botAnswerWavMessage = await _textToSpeechService.TextToByteArrayAsync(
                 assistantAnswer, targetLanguage, voice, speed, cancellationToken);
 
-            return (
+            return new UserMessageProcessingResult(
                 userMessage,
                 assistantAnswer,
                 botAnswerWavMessage,
@@ -211,7 +205,7 @@ namespace BuddyLanguage.Domain.Services
 
             var badPronouncedWords = string.Join(",", badPronouncedWordsList);
             var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
-            return await _textToSpeechService.TextToWavByteArrayAsync(
+            return await _textToSpeechService.TextToByteArrayAsync(
             $"{textForBadPronunciation} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
         }
     }

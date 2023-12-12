@@ -15,6 +15,11 @@ namespace BuddyLanguage.PromptServices
             return "Keep up a conversation with me as if you were my friend.";
         }
 
+        public string GetPromptToTranslateTextIntoNativeLanguage(Language nativeLanguage)
+        {
+            return $"Переведи данный текст на {nativeLanguage} язык и верни только перевод.";
+        }
+
         public string GetPromptForGrammarMistakes(Language nativeLanguage)
         {
             return $"Я хочу чтобы ты выступил в роли корректора. " +

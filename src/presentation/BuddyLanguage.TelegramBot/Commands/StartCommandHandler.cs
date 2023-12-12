@@ -10,17 +10,23 @@ public class StartCommandHandler : IBotCommandHandler
     private readonly ITelegramBotClient _botClient;
     private readonly UserService _userService;
     private readonly ITextToSpeech _textToSpeech;
+    private readonly IChatGPTService _chatGPTService;
+    private readonly IPromptService _promptService;
     private readonly ILogger<StartCommandHandler> _logger;
 
     public StartCommandHandler(
         ITelegramBotClient botClient,
         UserService userService,
         ITextToSpeech textToSpeech,
+        IChatGPTService chatGPTService,
+        IPromptService promptService,
         ILogger<StartCommandHandler> logger)
     {
         _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _textToSpeech = textToSpeech ?? throw new ArgumentNullException(nameof(textToSpeech));
+        _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
+        _promptService = promptService ?? throw new ArgumentNullException(nameof(promptService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -53,11 +59,16 @@ public class StartCommandHandler : IBotCommandHandler
              "Я могу поговорить на интересующие вас темы, а также я умею проводить " +
              "грамматический анализ сообщений, анализ произношения на иностранном языке" +
              " и исправлять найденные ошибки.";
+
+        var prompt = _promptService.GetPromptToTranslateTextIntoNativeLanguage(nativeLanguage);
+        var welcomeMessageInNativeLanguage = await _chatGPTService.GetAnswer(
+            welcomeMessage, prompt, cancellationToken);
+
         await _botClient.SendTextMessageAsync(
-            info.ChatId, welcomeMessage, cancellationToken: cancellationToken);
+            info.ChatId, welcomeMessageInNativeLanguage, cancellationToken: cancellationToken);
 
         var welcomeMessageBytes = await _textToSpeech.TextToByteArrayAsync(
-            welcomeMessage, nativeLanguage, voice, speed, cancellationToken);
+            welcomeMessageInNativeLanguage, nativeLanguage, voice, speed, cancellationToken);
 
         using var memoryStreamAnswer = new MemoryStream(welcomeMessageBytes);
         await _botClient.SendVoiceAsync(
