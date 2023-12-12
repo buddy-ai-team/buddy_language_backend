@@ -45,7 +45,7 @@ namespace BuddyLanguage.Domain.Services
                 string RecognizedMessage,
                 string BotAnswerMessage,
                 byte[] BotAnswerWavMessage,
-                byte[] BotPronunciationWordsWavAnswer,
+                byte[]? BotPronunciationWordsWavAnswer,
                 string[] Mistakes,
                 Dictionary<string, string> Words)>
             ProcessUserMessage(
@@ -100,7 +100,7 @@ namespace BuddyLanguage.Domain.Services
                 await AddWordsToUser(studiedWords.StudiedWords, user.Id, targetLanguage, cancellationToken);
             }
 
-            var botPronunciationWordsWavAnswer = await GetPronunciationWordsWavMessage(
+            var botPronunciationWordsWavAnswer = await FindPronunciationWordsWavMessage(
                 targetLanguage, voice, speed, badPronouncedWords, cancellationToken);
             var botAnswerWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
                 assistantAnswer, targetLanguage, voice, speed, cancellationToken);
@@ -176,7 +176,7 @@ namespace BuddyLanguage.Domain.Services
             IReadOnlyList<WordPronunciationAssessment> pronunciationWords)
         {
             ArgumentNullException.ThrowIfNull(pronunciationWords);
-            double acceptableAccuracyScore = 85;
+            double acceptableAccuracyScore = 98;
             var badPronouncedWords = new List<string>();
             foreach (var word in pronunciationWords)
             {
@@ -189,7 +189,7 @@ namespace BuddyLanguage.Domain.Services
             return badPronouncedWords;
         }
 
-        private async Task<byte[]> GetPronunciationWordsWavMessage(
+        private async Task<byte[]?> FindPronunciationWordsWavMessage(
             Language targetLanguage,
             Voice voice,
             TtsSpeed speed,
@@ -198,17 +198,15 @@ namespace BuddyLanguage.Domain.Services
         {
             ArgumentNullException.ThrowIfNull(badPronouncedWordsList);
 
-            if (badPronouncedWordsList.Count != 0)
+            if (badPronouncedWordsList.Count == 0)
             {
-                var badPronouncedWords = string.Join(",", badPronouncedWordsList);
-                var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
-                return await _textToSpeechService.TextToWavByteArrayAsync(
-                $"{textForBadPronunciation} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
+                return null; 
             }
 
-            var textForGoodPronunciation = "You have a good pronunciation!";
+            var badPronouncedWords = string.Join(",", badPronouncedWordsList);
+            var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
             return await _textToSpeechService.TextToWavByteArrayAsync(
-            textForGoodPronunciation, targetLanguage, voice, speed, cancellationToken);
+            $"{textForBadPronunciation} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
         }
     }
 }
