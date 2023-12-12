@@ -1,4 +1,6 @@
-﻿using BuddyLanguage.Domain.Services;
+﻿using BuddyLanguage.Domain.Interfaces;
+using BuddyLanguage.Domain.Services;
+using BuddyLanguage.PromptServices;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using File = Telegram.Bot.Types.File;
@@ -11,17 +13,23 @@ public class UserVoiceCommandHandler : IBotCommandHandler
     private readonly ILogger<UserVoiceCommandHandler> _logger;
     private readonly UserService _userService;
     private readonly BuddyService _buddyService;
+    private readonly IChatGPTService _chatGPTService;
+    private readonly IPromptService _promptService;
 
     public UserVoiceCommandHandler(
         ITelegramBotClient botClient,
         ILogger<UserVoiceCommandHandler> logger,
         UserService userService,
-        BuddyService buddyService)
+        BuddyService buddyService,
+        IChatGPTService chatGPTService,
+        IPromptService promptService)
     {
         _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _buddyService = buddyService ?? throw new ArgumentNullException(nameof(buddyService));
+        _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
+        _promptService = promptService ?? throw new ArgumentNullException(nameof(promptService));
     }
 
     public string? Command => null;
@@ -69,6 +77,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                 var answerBytes = userMessageResult.BotAnswerWavMessage;
                 var pronunciationWordsBytes = userMessageResult.BotPronunciationWordsWavAnswer;
                 var mistakes = userMessageResult.Mistakes;
+                var mistakesBytes = userMessageResult.MistakesWavAnswer;
                 var words = userMessageResult.Words;
 
                 await _botClient.SendTextMessageAsync(
@@ -128,14 +137,26 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                         text: $"Слова на изучение: {studiedWords}",
                         cancellationToken: cancellationToken);
                 }
+
+                if (mistakesBytes != null)
+                {
+                    using var memoryStreamMistakes = new MemoryStream(mistakesBytes);
+                    await _botClient.SendVoiceAsync(
+                        chatId: update.Message.Chat.Id,
+                        voice: InputFile.FromStream(memoryStreamMistakes, "mistakes.ogg"),
+                        cancellationToken: cancellationToken);
+                }
             }
             else
             {
                 string text = "Превышена допустимая длительность голосового сообщения. " +
                                     "Максимальная длительность: 3 минуты.";
+                var prompt =
+                    _promptService.GetPromptToTranslateTextIntoNativeLanguage(user.UserPreferences.NativeLanguage);
+                var textInNativeLanguage = await _chatGPTService.GetAnswer(prompt, text, cancellationToken);
                 await _botClient.SendTextMessageAsync(
                     chatId: update.Message.Chat.Id,
-                    text: text,
+                    text: textInNativeLanguage,
                     cancellationToken: cancellationToken);
             }
         }

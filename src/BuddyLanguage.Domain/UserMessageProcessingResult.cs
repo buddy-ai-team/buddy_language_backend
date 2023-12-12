@@ -8,6 +8,7 @@
             byte[] botAnswerWavMessage,
             byte[]? botPronunciationWordsWavAnswer,
             string[] mistakes,
+            byte[]? mistakesWavMessage,
             Dictionary<string, string> words)
         {
             RecognizedMessage = recognizedMessage
@@ -18,6 +19,7 @@
                 ?? throw new ArgumentNullException(nameof(botAnswerWavMessage));
             BotPronunciationWordsWavAnswer = botPronunciationWordsWavAnswer;
             Mistakes = mistakes ?? throw new ArgumentNullException(nameof(mistakes));
+            MistakesWavAnswer = mistakesWavMessage;
             Words = words ?? throw new ArgumentNullException(nameof(words));
         }
 
@@ -30,6 +32,8 @@
         public byte[]? BotPronunciationWordsWavAnswer { get; set; }
 
         public string[] Mistakes { get; set; }
+
+        public byte[]? MistakesWavAnswer { get; set; }
 
         public Dictionary<string, string> Words { get; set; }
     }

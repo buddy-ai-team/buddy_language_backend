@@ -62,7 +62,7 @@ public class StartCommandHandler : IBotCommandHandler
 
         var prompt = _promptService.GetPromptToTranslateTextIntoNativeLanguage(nativeLanguage);
         var welcomeMessageInNativeLanguage = await _chatGPTService.GetAnswer(
-            welcomeMessage, prompt, cancellationToken);
+            prompt, welcomeMessage, cancellationToken);
 
         await _botClient.SendTextMessageAsync(
             info.ChatId, welcomeMessageInNativeLanguage, cancellationToken: cancellationToken);

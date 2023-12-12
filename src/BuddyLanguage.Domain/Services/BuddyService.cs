@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using BuddyLanguage.Domain.Entities;
+﻿using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Exceptions;
 using BuddyLanguage.Domain.GptDataModels.Answers;
@@ -106,12 +105,17 @@ namespace BuddyLanguage.Domain.Services
             var botAnswerWavMessage = await _textToSpeechService.TextToByteArrayAsync(
                 assistantAnswer, targetLanguage, voice, speed, cancellationToken);
 
+            var grammarMistakes = string.Join(" ", mistakes.GrammaMistakes);
+            var mistakesWavMessage = mistakes.GrammaMistakesCount > 0 ? await _textToSpeechService.TextToByteArrayAsync(
+                    grammarMistakes, targetLanguage, voice, speed, cancellationToken) : null;
+
             return new UserMessageProcessingResult(
                 userMessage,
                 assistantAnswer,
                 botAnswerWavMessage,
                 botPronunciationWordsWavAnswer,
                 mistakes.GrammaMistakes,
+                mistakesWavMessage,
                 studiedWords.StudiedWords);
         }
 
@@ -209,7 +213,7 @@ namespace BuddyLanguage.Domain.Services
             var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
             var prompt = _promptService.GetPromptToTranslateTextIntoNativeLanguage(nativeLanguage);
             var textForbadPronunciationInNativeLanguage = _chatGPTService.GetAnswer(
-                textForBadPronunciation, prompt, cancellationToken);
+                prompt, textForBadPronunciation, cancellationToken);
             return await _textToSpeechService.TextToByteArrayAsync(
             $"{textForbadPronunciationInNativeLanguage} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
         }
