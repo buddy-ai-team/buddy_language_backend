@@ -89,7 +89,7 @@ public static class BuddyLanguageDependencyInjection
         services.AddScoped<IPromptService, PromptService>();
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
         services.AddScoped<IPronunciationAssessmentService, PronunciationAssessmentService>();
-        services.AddScoped<ITextToSpeech, OpenAITextToSpeech>();
+        services.AddHttpClient<ITextToSpeech, OpenAITextToSpeech>();
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
         //services.AddScoped<ITextToSpeech, AzureTextToSpeech>();

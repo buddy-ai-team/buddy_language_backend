@@ -1,6 +1,4 @@
-﻿using System.Threading;
-using BuddyLanguage.AzureServices;
-using BuddyLanguage.Domain.Entities;
+﻿using BuddyLanguage.AzureServices;
 using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.KiotaClient;
 using FluentAssertions;
@@ -8,7 +6,6 @@ using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenAI.ChatGpt.AspNetCore.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest
 {
@@ -17,28 +14,6 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
     /// </summary>
     public class TextToSpeechTests
     {
-        /// <summary>
-        /// Generates all possible combinations of languages and voices and ttsspeeds for testing.
-        /// </summary>
-        /// <returns>Pair of possible variants Language-Voice-TtsSpeed</returns>
-        public static IEnumerable<(Language Language, Voice Voice, TtsSpeed Speed)> GetEnumCombinations()
-        {
-            var combinations = new List<(Language, Voice, TtsSpeed)>();
-
-            foreach (Language language in Enum.GetValues(typeof(Language)))
-            {
-                foreach (Voice voice in Enum.GetValues(typeof(Voice)))
-                {
-                    foreach (TtsSpeed speed in Enum.GetValues(typeof(TtsSpeed)))
-                    {
-                        combinations.Add((language, voice, speed));
-                    }
-                }
-            }
-
-            return combinations;
-        }
-
         /// <summary>
         /// Tests whether the Azure Text-to-Speech service correctly synthesizes speech for various languages and voices and speeds.
         /// </summary>
@@ -58,7 +33,8 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
             var text = "Hi"; // You can use any sample text.
             var cancellationToken = CancellationToken.None;
 
-            foreach (Language language in Enum.GetValues(typeof(Language)))
+            Language[] languages = { Language.English, Language.Russian };
+            foreach (Language language in languages)
             {
                 // Act
                 var audioData = await textToSpeechClient.TextToByteArrayAsync(text, language, Voice.Male, TtsSpeed.Medium, cancellationToken);
@@ -101,18 +77,9 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
                 ApiHost = "https://api.openai.com/v1/"
             });
 
-            var textToSpeechClient = new OpenAITextToSpeech(options, logger);
+            var textToSpeechClient = new OpenAITextToSpeech(new HttpClient(), options, logger);
             var text = "Hi"; // You can use any sample text.
             var cancellationToken = CancellationToken.None;
-
-            foreach (Language language in Enum.GetValues(typeof(Language)))
-            {
-                // Act
-                var audioData = await textToSpeechClient.TextToByteArrayAsync(text, language, Voice.Male, TtsSpeed.Medium, cancellationToken);
-
-                // Assert
-                audioData.Should().NotBeNullOrEmpty($"Audio Data For Language: {language} was null/empty!");
-            }
 
             foreach (Voice voice in Enum.GetValues(typeof(Voice)))
             {

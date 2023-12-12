@@ -14,22 +14,16 @@ namespace BuddyLanguage.KiotaClient
     /// </summary>
     public class OpenAITextToSpeech : ITextToSpeech
     {
-        private readonly OpenAICredentials _openAiCredentials;
         private readonly ILogger<OpenAITextToSpeech> _logger;
         private readonly GeneratedOpenAiClient _client;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OpenAITextToSpeech"/> class.
-        /// </summary>
-        /// <param name="options">Options for OpenAI credentials.</param>
-        /// <param name="logger">Logger for logging messages.</param>
-        public OpenAITextToSpeech(IOptions<OpenAICredentials> options, ILogger<OpenAITextToSpeech> logger)
+        public OpenAITextToSpeech(HttpClient httpClient, IOptions<OpenAICredentials> options, ILogger<OpenAITextToSpeech> logger)
         {
+            ArgumentNullException.ThrowIfNull(httpClient);
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _openAiCredentials = options.Value ?? throw new ArgumentNullException(nameof(options));
-
-            var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = _openAiCredentials.GetAuthHeader();
+            var openAiCredentials = options.Value
+                                                  ?? throw new ArgumentNullException(nameof(options));
+            openAiCredentials.SetupHttpClient(httpClient);
             _client = GeneratedClientsFactory.CreateGeneratedOpenAiClient(httpClient);
         }
 
