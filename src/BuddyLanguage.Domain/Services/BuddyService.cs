@@ -102,7 +102,7 @@ namespace BuddyLanguage.Domain.Services
 
             var botPronunciationWordsWavAnswer = await GetPronunciationWordsWavMessage(
                 targetLanguage, voice, speed, badPronouncedWords, cancellationToken);
-            var botAnswerWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
+            var botAnswerWavMessage = await _textToSpeechService.TextToByteArrayAsync(
                 assistantAnswer, targetLanguage, voice, speed, cancellationToken);
 
             return (
@@ -202,12 +202,12 @@ namespace BuddyLanguage.Domain.Services
             {
                 var badPronouncedWords = string.Join(",", badPronouncedWordsList);
                 var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
-                return await _textToSpeechService.TextToWavByteArrayAsync(
+                return await _textToSpeechService.TextToByteArrayAsync(
                 $"{textForBadPronunciation} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
             }
 
             var textForGoodPronunciation = "You have a good pronunciation!";
-            return await _textToSpeechService.TextToWavByteArrayAsync(
+            return await _textToSpeechService.TextToByteArrayAsync(
             textForGoodPronunciation, targetLanguage, voice, speed, cancellationToken);
         }
     }

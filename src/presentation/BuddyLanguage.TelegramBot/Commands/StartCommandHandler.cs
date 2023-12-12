@@ -49,7 +49,7 @@ public class StartCommandHandler : IBotCommandHandler
         await _botClient.SendTextMessageAsync(
             info.ChatId, welcomeMessage, cancellationToken: cancellationToken);
 
-        var welcomeMessageBytes = await _textToSpeech.TextToWavByteArrayAsync(
+        var welcomeMessageBytes = await _textToSpeech.TextToByteArrayAsync(
             welcomeMessage, nativeLanguage, voice, speed, cancellationToken);
 
         using var memoryStreamAnswer = new MemoryStream(welcomeMessageBytes);
