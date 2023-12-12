@@ -30,7 +30,12 @@ public class TelegramBotService
         _telegramUserRepository = telegramUserRepository ?? throw new ArgumentNullException(nameof(telegramUserRepository));
     }
 
-    public async Task UpdateHander(
+    public Task HandleUpdate(Update update, CancellationToken cancellationToken)
+    {
+        return UpdateHandler(_botClient, update, cancellationToken);
+    }
+
+    public async Task UpdateHandler(
         ITelegramBotClient telegramBotClient, Update update, CancellationToken cancellationToken)
     {
         if (update.Message is { } message)

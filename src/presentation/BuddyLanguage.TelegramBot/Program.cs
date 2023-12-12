@@ -2,6 +2,8 @@ using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
 using BuddyLanguage.TelegramBot.Commands;
 using BuddyLanguage.TelegramBot.Services;
+using BuddyLanguage.TelegramBot.TelegramWebHook;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 using Telegram.Bot;
@@ -29,25 +31,38 @@ try
 
     builder.WebHost.UseSentry();
 
+    builder.Services.AddControllers();
+
     builder.Services.AddApplicationServices(builder.Configuration);
 
-    var token = builder.Configuration.GetRequiredValue("BotConfiguration:Token");
+    builder.Services.AddOptions<BotConfiguration>()
+        .BindConfiguration("BotConfiguration")
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 
-    builder.Services.AddSingleton(new TelegramBotClientOptions(token));
+    //builder.Services.AddSingleton(new TelegramBotClientOptions(token));
 
     // TODO Implement Polly after update to .NET 8: https://github.com/dotnet/docs/blob/main/docs/core/resilience/http-resilience.md
     builder.Services.AddHttpClient("TelegramBotClient");
     builder.Services.AddSingleton<ITelegramBotClient>(provider =>
     {
         IHttpClientFactory factory = provider.GetRequiredService<IHttpClientFactory>();
+        var options = provider.GetRequiredService<IOptions<BotConfiguration>>();
         HttpClient client = factory.CreateClient("TelegramBotClient");
-        return new TelegramBotClient(token, client);
+        return new TelegramBotClient(options.Value.Token, client);
     });
 
     builder.Services.AddSingleton<TelegramUserRepositoryInCache>();
     builder.Services.AddScoped<TelegramBotService>();
 
-    builder.Services.AddHostedService<TelegramBotUpdatesListener>();
+    if (builder.Environment.IsDevelopment())
+    {
+        builder.Services.AddHostedService<TelegramBotUpdatesListener>();
+    }
+    else
+    {
+        builder.Services.AddHostedService<ConfigureWebhookBackgroundService>();
+    }
 
     builder.Services.Scan(scan => scan
         .FromAssemblyOf<IBotCommandHandler>()
@@ -57,6 +72,7 @@ try
 
     var app = builder.Build();
 
+    app.MapControllers();
     app.MapGet("/", () => $"Ver: {ReflectionHelper.GetBuildDate():s}");
 
     app.Run();

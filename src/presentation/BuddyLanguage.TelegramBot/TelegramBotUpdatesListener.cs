@@ -42,7 +42,7 @@ public class TelegramBotUpdatesListener : BackgroundService
     {
         await using var scope = _serviceScopeFactory.CreateAsyncScope();
         var telegramBotService = scope.ServiceProvider.GetRequiredService<TelegramBotService>();
-        await telegramBotService.UpdateHander(telegramBotClient, update, cancellationToken);
+        await telegramBotService.UpdateHandler(telegramBotClient, update, cancellationToken);
     }
 
     private Task ErrorHandler(
