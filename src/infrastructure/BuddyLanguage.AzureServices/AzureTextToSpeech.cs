@@ -36,8 +36,8 @@ namespace BuddyLanguage.AzureServices
         /// <param name="voice">The desired voice for synthesis.</param>
         /// <param name="speed">The desired voice speed for synthesis.</param>
         /// <param name="cancellationToken">A CancellationToken for possible cancellation of the operation.</param>
-        /// <returns>A byte array containing the synthesized audio.</returns>
-        public async Task<byte[]> TextToWavByteArrayAsync(string text, Language language, Voice voice, TtsSpeed speed, CancellationToken cancellationToken)
+        /// <returns>A WAV byte array containing the synthesized audio.</returns>
+        public async Task<byte[]> TextToByteArrayAsync(string text, Language language, Voice voice, TtsSpeed speed, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(text);
 
@@ -69,7 +69,7 @@ namespace BuddyLanguage.AzureServices
             {
                 case ResultReason.SynthesizingAudioCompleted:
                     _logger.LogInformation("Speech synthesized to byte array");
-                    return result.AudioData;
+                    return result.AudioData; //WAV
                 case ResultReason.Canceled:
                     {
                         var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
