@@ -36,8 +36,8 @@ namespace BuddyLanguage.AzureServices
         /// <param name="voice">The desired voice for synthesis.</param>
         /// <param name="speed">The desired voice speed for synthesis.</param>
         /// <param name="cancellationToken">A CancellationToken for possible cancellation of the operation.</param>
-        /// <returns>A byte array containing the synthesized audio.</returns>
-        public async Task<byte[]> TextToWavByteArrayAsync(string text, Language language, Voice voice, TtsSpeed speed, CancellationToken cancellationToken)
+        /// <returns>A WAV byte array containing the synthesized audio.</returns>
+        public async Task<byte[]> TextToByteArrayAsync(string text, Language language, Voice voice, TtsSpeed speed, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(text);
 
@@ -69,7 +69,7 @@ namespace BuddyLanguage.AzureServices
             {
                 case ResultReason.SynthesizingAudioCompleted:
                     _logger.LogInformation("Speech synthesized to byte array");
-                    return result.AudioData;
+                    return result.AudioData; //WAV
                 case ResultReason.Canceled:
                     {
                         var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
@@ -117,12 +117,62 @@ namespace BuddyLanguage.AzureServices
         /// <returns>The Azure Cognitive Services voice name corresponding to the given language and voice type.</returns>
         private string GetSynthesisVoiceNameFromEnum(Language language, Voice voice)
         {
+            //https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts#supported-languages
             return (language, voice) switch
             {
-                (Russian, Female) => "ru-RU-SvetlanaNeural",
-                (Russian, Male) => "ru-RU-DmitryNeural",
+                (Arabic, Female) => "ar-AE-FatimaNeural",
+                (Arabic, Male) => "ar-AE-HamdanNeural",
+                (GermanGermany, Female) => "de-DE-KatjaNeural",
+                (GermanGermany, Male) => "de-DE-ConradNeural1",
+                (EnglishAustralia, Female) => "en-AU-NatashaNeural",
+                (EnglishAustralia, Male) => "en-AU-WilliamNeural",
+                (EnglishCanada, Female) => "en-CA-ClaraNeural",
+                (EnglishCanada, Male) => "en-CA-LiamNeural",
+                (EnglishUnitedKingdom, Female) => "en-GB-SoniaNeural",
+                (EnglishUnitedKingdom, Male) => "en-GB-RyanNeural",
+                (EnglishIndia, Female) => "en-IN-NeerjaNeural",
+                (EnglishIndia, Male) => "en-IN-PrabhatNeural",
                 (English, Female) => "en-US-JennyNeural",
                 (English, Male) => "en-US-GuyNeural",
+                (SpanishMexico, Female) => "es-MX-DaliaNeural",
+                (SpanishMexico, Male) => "es-MX-JorgeNeural",
+                (FrenchCanada, Female) => "fr-CA-SylvieNeural",
+                (FrenchCanada, Male) => "fr-CA-JeanNeural",
+                (French, Female) => "fr-FR-DeniseNeural",
+                (French, Male) => "fr-FR-HenriNeural",
+                (HindiIndia, Female) => "hi-IN-SwaraNeural",
+                (HindiIndia, Male) => "hi-IN-MadhurNeural",
+                (Indonesian, Female) => "id-ID-GadisNeural",
+                (Indonesian, Male) => "id-ID-ArdiNeural",
+                (Italian, Female) => "it-IT-ElsaNeural",
+                (Italian, Male) => "it-IT-DiegoNeural",
+                (Japanese, Female) => "ja-JP-NanamiNeural",
+                (Japanese, Male) => "ja-JP-KeitaNeural",
+                (Kazakh, Female) => "kk-KZ-AigulNeural2",
+                (Kazakh, Male) => "kk-KZ-DauletNeural2",
+                (Korean, Female) => "ko-KR-SunHiNeural",
+                (Korean, Male) => "ko-KR-InJoonNeural",
+                (Malay, Female) => "ms-MY-YasminNeural",
+                (Malay, Male) => "ms-MY-OsmanNeural",
+                (Norwegian, Female) => "nb-NO-PernilleNeural",
+                (Norwegian, Male) => "nb-NO-FinnNeural",
+                (Portuguese, Female) => "pt-BR-FranciscaNeural",
+                (Portuguese, Male) => "pt-BR-AntonioNeural",
+                (Russian, Female) => "ru-RU-SvetlanaNeural",
+                (Russian, Male) => "ru-RU-DmitryNeural",
+                (Spanish, Female) => "es-ES-ElviraNeural",
+                (Spanish, Male) => "es-ES-AlvaroNeural",
+                (Swedish, Female) => "sv-SE-SofieNeural",
+                (Swedish, Male) => "sv-SE-MattiasNeural",
+                (TamilIndia, Female) => "ta-IN-PallaviNeural",
+                (TamilIndia, Male) => "ta-IN-ValluvarNeural",
+                (Vietnamese, Female) => "vi-VN-HoaiMyNeural",
+                (Vietnamese, Male) => "vi-VN-NamMinhNeural",
+                (ChineseSimplified, Female) => "zh-CN-XiaoxiaoNeural",
+                (ChineseSimplified, Male) => "zh-CN-YunxiNeural",
+                (ChineseTraditional, Female) => "zh-TW-HsiaoChenNeural",
+                (ChineseTraditional, Male) => "zh-TW-YunJheNeural",
+
                 _ => throw new NotSupportedException("The Language/Voice You Provided Is Not Currently Supported By Our Project!")
             };
         }

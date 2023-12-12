@@ -1,5 +1,6 @@
 ﻿using BuddyLanguage.Domain.Entities;
 using BuddyLanguage.Domain.Enumerations;
+using BuddyLanguage.Domain.Exceptions.Role;
 using BuddyLanguage.Domain.Exceptions.User;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -113,6 +114,40 @@ namespace BuddyLanguage.Domain.Services
             await _uow.UserRepository.Update(user, cancellationToken);
             await _uow.SaveChangesAsync(cancellationToken);
             return await _uow.UserRepository.GetById(user.Id, cancellationToken);
+        }
+
+        public virtual async Task<User> UpdateUserPreferencesByUserId(
+            Guid id,
+            Language nativeLanguage,
+            Language targetLanguage,
+            TtsSpeed selectedSpeed,
+            Voice selectedVoice,
+            Guid assistantRoleId,
+            CancellationToken cancellationToken)
+        {
+            var user = await _uow.UserRepository.GetById(id, cancellationToken);
+            var role = await _uow.RoleRepository.GetById(assistantRoleId, cancellationToken);
+
+            if (user is null)
+            {
+                throw new UserNotFoundException("User with given id not found");
+            }
+
+            if (role is null)
+            {
+                throw new RoleNotFoundException("User with given id not found");
+            }
+
+            user.UserPreferences.NativeLanguage = nativeLanguage;
+            user.UserPreferences.TargetLanguage = targetLanguage;
+            user.UserPreferences.SelectedSpeed = selectedSpeed;
+            user.UserPreferences.SelectedVoice = selectedVoice;
+            user.UserPreferences.AssistantRoleId = role.Id;
+            user.UserPreferences.AssistantRole = role;
+
+            await _uow.UserRepository.Update(user, cancellationToken);
+            await _uow.SaveChangesAsync(cancellationToken);
+            return user;
         }
 
         public virtual async Task<User> AddUser(

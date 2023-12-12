@@ -12,6 +12,8 @@ namespace BuddyLanguage.Domain.Services
         private readonly IChatGPTService _chatGPTService;
         private readonly ISpeechRecognitionService _speechRecognitionService;
         private readonly ITextToSpeech _textToSpeechService;
+        private readonly IPronunciationAssessmentService _pronunciationAssessmentService;
+        private readonly IPromptService _promptService;
         private readonly WordService _wordService;
         private readonly ILogger<BuddyService> _logger;
 
@@ -19,14 +21,21 @@ namespace BuddyLanguage.Domain.Services
             IChatGPTService chatGPTService,
             ISpeechRecognitionService speechRecognitionService,
             ITextToSpeech textToSpeechService,
+            IPronunciationAssessmentService pronunciationAssessmentService,
+            IPromptService promptService,
             WordService wordService,
             ILogger<BuddyService> logger)
         {
-            _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
+            _chatGPTService = chatGPTService
+                ?? throw new ArgumentNullException(nameof(chatGPTService));
             _speechRecognitionService = speechRecognitionService
                 ?? throw new ArgumentNullException(nameof(speechRecognitionService));
             _textToSpeechService = textToSpeechService
                 ?? throw new ArgumentNullException(nameof(textToSpeechService));
+            _pronunciationAssessmentService = pronunciationAssessmentService
+                ?? throw new ArgumentNullException(nameof(pronunciationAssessmentService));
+            _promptService = promptService
+                ?? throw new ArgumentNullException(nameof(promptService));
             _wordService = wordService
                 ?? throw new ArgumentNullException(nameof(wordService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -36,6 +45,7 @@ namespace BuddyLanguage.Domain.Services
                 string RecognizedMessage,
                 string BotAnswerMessage,
                 byte[] BotAnswerWavMessage,
+                byte[] BotPronunciationWordsWavAnswer,
                 string[] Mistakes,
                 Dictionary<string, string> Words)>
             ProcessUserMessage(
@@ -71,27 +81,35 @@ namespace BuddyLanguage.Domain.Services
                 userMessage, nativeLanguage, cancellationToken);
             var wordsTask = GetLearningWords(
                 userMessage, nativeLanguage, targetLanguage, cancellationToken);
-            await Task.WhenAll(assistantTask, mistakesTask, wordsTask);
+            var pronunciationTask = _pronunciationAssessmentService.GetSpeechAssessmentFromOggOpus(
+                oggVoiceMessage, targetLanguage, cancellationToken);
+            await Task.WhenAll(assistantTask, mistakesTask, wordsTask, pronunciationTask);
 
             var assistantAnswer = await assistantTask;
             var mistakes = await mistakesTask;
             var studiedWords = await wordsTask;
+            var pronunciationWords = await pronunciationTask;
+
+            var badPronouncedWords = GetWordsWithBadPronunciation(pronunciationWords);
 
             _logger.LogDebug("Assistant answer: {AssistantAnswer}", assistantAnswer);
             _logger.LogDebug("Assistant answer: {AssistantAnswer}", mistakes);
 
             if (studiedWords.WordsCount > 0)
             {
-                await AddWordsToUser(studiedWords.StudiedWords, user.Id, cancellationToken);
+                await AddWordsToUser(studiedWords.StudiedWords, user.Id, targetLanguage, cancellationToken);
             }
 
-            var botAnswerWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
+            var botPronunciationWordsWavAnswer = await GetPronunciationWordsWavMessage(
+                targetLanguage, voice, speed, badPronouncedWords, cancellationToken);
+            var botAnswerWavMessage = await _textToSpeechService.TextToByteArrayAsync(
                 assistantAnswer, targetLanguage, voice, speed, cancellationToken);
 
             return (
                 userMessage,
                 assistantAnswer,
                 botAnswerWavMessage,
+                botPronunciationWordsWavAnswer,
                 mistakes.GrammaMistakes,
                 studiedWords.StudiedWords);
         }
@@ -111,13 +129,7 @@ namespace BuddyLanguage.Domain.Services
             CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
-            var prompt = $"Я хочу чтобы ты выступил в роли корректора. " +
-                    $"Найди очень точно и верно грамматические ошибки (максимум 3) в этом тексте " +
-                    $"и сформулируй их подбробно на {nativeLanguage} языке, " +
-                    $"а также улучшения и исправления текста." +
-                    $"Не нужно воспринимать за грамматические ошибки слова, " +
-                    $"написанные на {nativeLanguage} языке." +
-                    $"Запиши их в поле \"GrammaMistakes\".";
+            var prompt = _promptService.GetPromptForGrammarMistakes(nativeLanguage);
             return await _chatGPTService.GetStructuredAnswer<MistakesAnswer>(
                 prompt, textMessage, cancellationToken);
         }
@@ -129,13 +141,7 @@ namespace BuddyLanguage.Domain.Services
             CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(textMessage);
-            var prompt = $"Я предоставлю тебе тексты, которые ты должен будешь проверить дважды " +
-                          $"на наличие {nativeLanguage} слов." +
-                          $"Посчитай количество {nativeLanguage} слов, а также найди " +
-                          $"абсолютно все {nativeLanguage} слова из текста, если они есть." +
-                          $"Затем запиши эти слова, а также " +
-                          $"перевод этих слов на {targetLanguage} в поле \"StudiedWords\"." +
-                          $"Пожалуйста, убедись, что ты нашел абсолютно все слова.";
+            var prompt = _promptService.GetPromptForLearningWords(nativeLanguage, targetLanguage);
             return await _chatGPTService.GetStructuredAnswer<WordAnswer>(
                 prompt, textMessage, cancellationToken);
         }
@@ -149,6 +155,7 @@ namespace BuddyLanguage.Domain.Services
         private async Task AddWordsToUser(
             Dictionary<string, string> words,
             Guid userId,
+            Language language,
             CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(words);
@@ -161,8 +168,47 @@ namespace BuddyLanguage.Domain.Services
             {
                 //TODO: метод AddWords(words)
                 await _wordService.AddWord(
-                    userId, word.Key, word.Value, Language.English, WordEntityStatus.Learning, cancellationToken);
+                    userId, word.Key, word.Value, language, WordEntityStatus.Learning, cancellationToken);
             }
+        }
+
+        private IReadOnlyList<string> GetWordsWithBadPronunciation(
+            IReadOnlyList<WordPronunciationAssessment> pronunciationWords)
+        {
+            ArgumentNullException.ThrowIfNull(pronunciationWords);
+            double acceptableAccuracyScore = 85;
+            var badPronouncedWords = new List<string>();
+            foreach (var word in pronunciationWords)
+            {
+                if (word.AccuracyScore <= acceptableAccuracyScore)
+                {
+                    badPronouncedWords.Add(word.Word);
+                }
+            }
+
+            return badPronouncedWords;
+        }
+
+        private async Task<byte[]> GetPronunciationWordsWavMessage(
+            Language targetLanguage,
+            Voice voice,
+            TtsSpeed speed,
+            IReadOnlyList<string> badPronouncedWordsList,
+            CancellationToken cancellationToken)
+        {
+            ArgumentNullException.ThrowIfNull(badPronouncedWordsList);
+
+            if (badPronouncedWordsList.Count != 0)
+            {
+                var badPronouncedWords = string.Join(",", badPronouncedWordsList);
+                var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
+                return await _textToSpeechService.TextToByteArrayAsync(
+                $"{textForBadPronunciation} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
+            }
+
+            var textForGoodPronunciation = "You have a good pronunciation!";
+            return await _textToSpeechService.TextToByteArrayAsync(
+            textForGoodPronunciation, targetLanguage, voice, speed, cancellationToken);
         }
     }
 }

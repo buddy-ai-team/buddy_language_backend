@@ -34,13 +34,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj" />
+    <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\BuddyLanguage.AzureServices\BuddyLanguage.AzureServices.csproj" />
     <ProjectReference Include="..\..\src\presentation\BuddyLanguage.TelegramBot\BuddyLanguage.TelegramBot.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="assets\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,7 +50,16 @@
     <None Update="assets\History.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\Pronunciation.ogg">
+    <None Update="assets\good_pronunciation_sample_9_words.ogg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="assets\bad_pronunciation_sample_4_words.ogg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="assets\bad_pronunciation_sample_5_words.ogg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="assets\bad_pronunciation_sample_3_words.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

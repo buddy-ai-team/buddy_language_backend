@@ -1,11 +1,11 @@
 ﻿using BuddyLanguage.AzureServices;
 using BuddyLanguage.Domain.Entities;
+using BuddyLanguage.Domain.Enumerations;
+using BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NAudio.Vorbis;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 
 namespace BuddyLanguage.Infrastructure.IntegrationTest;
 
@@ -13,6 +13,8 @@ public class PronunciationAssessmentTest
 {
     private readonly IOptions<AzureConfig> _config;
     private readonly ILogger<PronunciationAssessmentService> _logger;
+    private readonly PronunciationAssessmentService _service;
+    private readonly NAudioConcentusOggOpusToPcmConverter _oggOpusToPcmConverter;
 
     public PronunciationAssessmentTest()
     {
@@ -30,54 +32,38 @@ public class PronunciationAssessmentTest
 
         _config = Options.Create(new AzureConfig
         {
-            SpeechKey = speechKey,
-            SpeechRegion = speechRegion
+            SpeechKey = speechKey, SpeechRegion = speechRegion
         });
 
         _logger = new LoggerFactory().CreateLogger<PronunciationAssessmentService>();
+
+        _oggOpusToPcmConverter = new NAudioConcentusOggOpusToPcmConverter();
+        _service = new PronunciationAssessmentService(_config, _logger, _oggOpusToPcmConverter);
     }
 
     [Fact]
-    public async Task Result_of_assessment_calculated()
+    public async Task Rodions_bad_pronunciation_assessment_found_bad_words()
     {
         // Arrange
-        byte[] inputData = File.ReadAllBytes("assets/Pronunciation.ogg");
-        var service = new PronunciationAssessmentService(_config, _logger);
+        byte[] inputData = await File.ReadAllBytesAsync("assets/bad_pronunciation_sample_5_words.ogg");
 
         // Act
-        IReadOnlyList<WordPronunciationAssessment> result =
-            await service.GetSpeechAssessmentAsync(ConvertOggToPcm(inputData), "en-US", default);
+        var result = await _service.GetSpeechAssessmentFromOggOpus(inputData, Language.English, default);
 
         // Assert
-        result.Count.Should().BeGreaterThan(3);
+        result.Should().HaveCount(5);
     }
 
-    private byte[] ConvertOggToPcm(byte[] oggData)
+    [Fact]
+    public async Task Christinas_bad_pronunciation_assessment_found_bad_words2()
     {
-        using var oggStream = new MemoryStream(oggData);
-        using var vorbis = new VorbisWaveReader(oggStream);
-        var resampler = new WdlResamplingSampleProvider(vorbis, 16000);
+        // Arrange
+        byte[] inputData = await File.ReadAllBytesAsync("assets/bad_pronunciation_sample_3_words.ogg");
 
-        // Converts from float to 16-bit PCM
-        var to16Bit = new WaveFloatTo16Provider(resampler.ToWaveProvider());
+        // Act
+        var result = await _service.GetSpeechAssessmentFromOggOpus(inputData, Language.English, default);
 
-        // Converts to mono
-        var mono = new StereoToMonoProvider16(to16Bit) { LeftVolume = 0.5f, RightVolume = 0.5f };
-
-        // Create a new MemoryStream to store the converted PCM data
-        using var pcmStream = new MemoryStream();
-
-        // Write the converted PCM data to the MemoryStream
-        using (var pcmWriter = new WaveFileWriter(pcmStream, mono.WaveFormat))
-        {
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = mono.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                pcmWriter.Write(buffer, 0, bytesRead);
-            }
-        }
-
-        return pcmStream.ToArray();
+        // Assert
+        result.Should().HaveCount(3); //90, 92, 65
     }
 }
