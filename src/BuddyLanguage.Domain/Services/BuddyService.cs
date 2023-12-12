@@ -81,6 +81,12 @@ namespace BuddyLanguage.Domain.Services
                 userMessage, nativeLanguage, cancellationToken);
             var wordsTask = GetLearningWords(
                 userMessage, nativeLanguage, targetLanguage, cancellationToken);
+
+            if (!_pronunciationAssessmentService.IsLanguageSupported(targetLanguage))
+            {
+                throw new UnsupportedLanguageFormatException("Can`t recognize the language");
+            }
+
             var pronunciationTask = _pronunciationAssessmentService.GetSpeechAssessmentFromOggAsync(
                 oggVoiceMessage, targetLanguage, cancellationToken);
             await Task.WhenAll(assistantTask, mistakesTask, wordsTask, pronunciationTask);
