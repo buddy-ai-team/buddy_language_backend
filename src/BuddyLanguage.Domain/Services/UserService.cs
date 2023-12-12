@@ -75,6 +75,11 @@ namespace BuddyLanguage.Domain.Services
             return user;
         }
 
+        public virtual async Task<IReadOnlyList<User>> GetAllUsers(CancellationToken cancellationToken)
+        {
+            return await _uow.UserRepository.GetAll(cancellationToken);
+        }
+
         public virtual async Task<User> GetUserByTelegramId(string telegramId, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(telegramId, nameof(telegramId));
@@ -87,6 +92,22 @@ namespace BuddyLanguage.Domain.Services
             }
 
             return user;
+        }
+
+        public virtual async Task<User> UpdateUserReminderSent(Guid userId, bool reminderSent, CancellationToken cancellationToken)
+        {
+            var user = await _uow.UserRepository.GetById(userId, cancellationToken);
+
+            if (user is null)
+            {
+                throw new UserNotFoundException("User with given id not found");
+            }
+
+            user.ReminderSent = reminderSent;
+
+            await _uow.UserRepository.Update(user, cancellationToken);
+            await _uow.SaveChangesAsync(cancellationToken);
+            return await _uow.UserRepository.GetById(user.Id, cancellationToken);
         }
 
         public virtual async Task<User> UpdateUserById(

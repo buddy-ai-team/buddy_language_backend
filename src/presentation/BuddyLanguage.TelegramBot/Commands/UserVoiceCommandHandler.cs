@@ -44,6 +44,8 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
         if (voice != null && update.Message != null)
         {
+            await _userService.UpdateUserReminderSent(user.Id, false, cancellationToken);
+
             var duration = TimeSpan.FromSeconds(voice.Duration);
 
             if (duration <= TimeSpan.FromMinutes(3))
