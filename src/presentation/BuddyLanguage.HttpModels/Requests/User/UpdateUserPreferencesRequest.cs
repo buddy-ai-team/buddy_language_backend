@@ -14,11 +14,11 @@ namespace BuddyLanguage.HttpModels.Requests.User
         public Guid Id { get; set; }
 
         [Required]
-        [Range(0, 1)]
+        [Range(0, 25)]
         public Language NativeLanguage { get; set; }
 
         [Required]
-        [Range(0, 1)]
+        [Range(0, 25)]
         public Language TargetLanguage { get; set; }
 
         [Required]

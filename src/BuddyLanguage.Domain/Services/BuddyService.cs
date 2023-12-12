@@ -108,7 +108,7 @@ namespace BuddyLanguage.Domain.Services
 
             var botPronunciationWordsWavAnswer = await FindPronunciationWordsWavMessage(
                 targetLanguage, voice, speed, badPronouncedWords, cancellationToken);
-            var botAnswerWavMessage = await _textToSpeechService.TextToWavByteArrayAsync(
+            var botAnswerWavMessage = await _textToSpeechService.TextToByteArrayAsync(
                 assistantAnswer, targetLanguage, voice, speed, cancellationToken);
 
             return (

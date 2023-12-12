@@ -43,9 +43,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.HttpModels", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.WebAPI.Test", "tests\BuddyLanguage.WebAPI.Test\BuddyLanguage.WebAPI.Test.csproj", "{98C162E5-F82A-44F0-A54E-717873F57B39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.PromptService", "src\infrastructure\BuddyLanguage.PromptService\BuddyLanguage.PromptService.csproj", "{E4CFCF0D-E7CF-4018-931C-86F18F855019}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.PromptService", "src\infrastructure\BuddyLanguage.PromptService\BuddyLanguage.PromptService.csproj", "{E4CFCF0D-E7CF-4018-931C-86F18F855019}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib", "src\infrastructure\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib.csproj", "{31A0A274-0A7D-4DBE-AB0C-0DC999BFD3D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib", "src\infrastructure\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib.csproj", "{31A0A274-0A7D-4DBE-AB0C-0DC999BFD3D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.KiotaClient", "src\infrastructure\BuddyLanguage.KiotaClient\BuddyLanguage.KiotaClient.csproj", "{1EC414DD-8E2F-448C-9394-83378FA58C52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,6 +115,10 @@ Global
 		{31A0A274-0A7D-4DBE-AB0C-0DC999BFD3D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31A0A274-0A7D-4DBE-AB0C-0DC999BFD3D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31A0A274-0A7D-4DBE-AB0C-0DC999BFD3D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EC414DD-8E2F-448C-9394-83378FA58C52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EC414DD-8E2F-448C-9394-83378FA58C52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EC414DD-8E2F-448C-9394-83378FA58C52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EC414DD-8E2F-448C-9394-83378FA58C52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -135,6 +141,7 @@ Global
 		{98C162E5-F82A-44F0-A54E-717873F57B39} = {29BBBC3B-7154-4E97-8CE0-82567911AFC0}
 		{E4CFCF0D-E7CF-4018-931C-86F18F855019} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 		{31A0A274-0A7D-4DBE-AB0C-0DC999BFD3D8} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
+		{1EC414DD-8E2F-448C-9394-83378FA58C52} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EA996F8-4CC9-4CE0-98C9-1833EAF2E957}

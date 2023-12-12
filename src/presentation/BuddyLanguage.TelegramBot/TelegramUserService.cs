@@ -4,9 +4,9 @@ namespace BuddyLanguage.TelegramBot;
 
 public class TelegramUserService
 {
-    private readonly TelegramUserRepository _telegramUserRepository;
+    private readonly TelegramUserRepositoryInCache _telegramUserRepository;
 
-    public TelegramUserService(TelegramUserRepository telegramUserRepository)
+    public TelegramUserService(TelegramUserRepositoryInCache telegramUserRepository)
     {
         _telegramUserRepository = telegramUserRepository;
     }
