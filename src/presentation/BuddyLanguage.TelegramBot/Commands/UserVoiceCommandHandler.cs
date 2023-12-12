@@ -1,6 +1,5 @@
 ﻿using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
-using BuddyLanguage.PromptServices;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using File = Telegram.Bot.Types.File;
@@ -14,22 +13,19 @@ public class UserVoiceCommandHandler : IBotCommandHandler
     private readonly UserService _userService;
     private readonly BuddyService _buddyService;
     private readonly IChatGPTService _chatGPTService;
-    private readonly IPromptService _promptService;
 
     public UserVoiceCommandHandler(
         ITelegramBotClient botClient,
         ILogger<UserVoiceCommandHandler> logger,
         UserService userService,
         BuddyService buddyService,
-        IChatGPTService chatGPTService,
-        IPromptService promptService)
+        IChatGPTService chatGPTService)
     {
         _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _buddyService = buddyService ?? throw new ArgumentNullException(nameof(buddyService));
         _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
-        _promptService = promptService ?? throw new ArgumentNullException(nameof(promptService));
     }
 
     public string? Command => null;
@@ -44,11 +40,17 @@ public class UserVoiceCommandHandler : IBotCommandHandler
             return;
         }
 
-        await _botClient.SendTextMessageAsync(
-            update.Message!.Chat.Id, "Обработка...", cancellationToken: cancellationToken);
-
         var user = await _userService.GetUserByTelegramId(telegramUserId, cancellationToken);
         _logger.LogInformation("Processing UserVoiceCommand...");
+
+        var nativeLanguage = user.UserPreferences.NativeLanguage;
+        var targetLanguage = user.UserPreferences.TargetLanguage;
+
+        var treatment = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
+            "Обработка...", nativeLanguage, targetLanguage, cancellationToken);
+
+        await _botClient.SendTextMessageAsync(
+            update.Message!.Chat.Id, treatment, cancellationToken: cancellationToken);
 
         if (voice != null && update.Message != null)
         {
@@ -82,7 +84,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
                 await _botClient.SendTextMessageAsync(
                     update.Message.Chat.Id,
-                    $"Вы сказали: \n```\n{recognizedMessage}\n```",
+                    $"\n```\n{recognizedMessage}\n```",
                     cancellationToken: cancellationToken);
                 await _botClient.SendTextMessageAsync(
                     update.Message.Chat.Id, answerText, cancellationToken: cancellationToken);
@@ -113,7 +115,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
                     await _botClient.SendTextMessageAsync(
                         chatId: update.Message.Chat.Id,
-                        text: $"Ваши ошибки: {grammaMistakes}\nСлова на изучение: {studiedWords}",
+                        text: $"{grammaMistakes}\n{studiedWords}",
                         cancellationToken: cancellationToken);
                 }
                 else if (mistakes.Length > 0 && words.Count == 0)
@@ -121,7 +123,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                     var grammaMistakes = string.Join(", ", mistakes);
                     await _botClient.SendTextMessageAsync(
                         chatId: update.Message.Chat.Id,
-                        text: $"Ваши ошибки: {grammaMistakes}",
+                        text: $"{grammaMistakes}",
                         cancellationToken: cancellationToken);
                 }
                 else if (mistakes.Length == 0 && words.Count > 0)
@@ -134,7 +136,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
                     await _botClient.SendTextMessageAsync(
                         chatId: update.Message.Chat.Id,
-                        text: $"Слова на изучение: {studiedWords}",
+                        text: $"{studiedWords}",
                         cancellationToken: cancellationToken);
                 }
 
@@ -151,9 +153,9 @@ public class UserVoiceCommandHandler : IBotCommandHandler
             {
                 string text = "Превышена допустимая длительность голосового сообщения. " +
                                     "Максимальная длительность: 3 минуты.";
-                var prompt =
-                    _promptService.GetPromptToTranslateTextIntoNativeLanguage(user.UserPreferences.NativeLanguage);
-                var textInNativeLanguage = await _chatGPTService.GetAnswer(prompt, text, cancellationToken);
+
+                var textInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
+                    text, nativeLanguage, targetLanguage, cancellationToken);
                 await _botClient.SendTextMessageAsync(
                     chatId: update.Message.Chat.Id,
                     text: textInNativeLanguage,

@@ -211,9 +211,8 @@ namespace BuddyLanguage.Domain.Services
 
             var badPronouncedWords = string.Join(",", badPronouncedWordsList);
             var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
-            var prompt = _promptService.GetPromptToTranslateTextIntoNativeLanguage(nativeLanguage);
-            var textForbadPronunciationInNativeLanguage = _chatGPTService.GetAnswer(
-                prompt, textForBadPronunciation, cancellationToken);
+            var textForbadPronunciationInNativeLanguage = _chatGPTService.GetTextTranslatedIntoNativeLanguage(
+                textForBadPronunciation, nativeLanguage, targetLanguage, cancellationToken);
             return await _textToSpeechService.TextToByteArrayAsync(
             $"{textForbadPronunciationInNativeLanguage} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
         }

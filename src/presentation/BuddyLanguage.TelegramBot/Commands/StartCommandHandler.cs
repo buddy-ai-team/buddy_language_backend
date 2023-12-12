@@ -11,7 +11,6 @@ public class StartCommandHandler : IBotCommandHandler
     private readonly UserService _userService;
     private readonly ITextToSpeech _textToSpeech;
     private readonly IChatGPTService _chatGPTService;
-    private readonly IPromptService _promptService;
     private readonly ILogger<StartCommandHandler> _logger;
 
     public StartCommandHandler(
@@ -19,14 +18,12 @@ public class StartCommandHandler : IBotCommandHandler
         UserService userService,
         ITextToSpeech textToSpeech,
         IChatGPTService chatGPTService,
-        IPromptService promptService,
         ILogger<StartCommandHandler> logger)
     {
         _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _textToSpeech = textToSpeech ?? throw new ArgumentNullException(nameof(textToSpeech));
         _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
-        _promptService = promptService ?? throw new ArgumentNullException(nameof(promptService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -47,6 +44,7 @@ public class StartCommandHandler : IBotCommandHandler
             info.FirstName, info.LastName, info.UserId, cancellationToken);
 
         var nativeLanguage = user.UserPreferences.NativeLanguage;
+        var targetLanguage = user.UserPreferences.TargetLanguage;
         var voice = user.UserPreferences.SelectedVoice;
         var speed = user.UserPreferences.SelectedSpeed;
 
@@ -60,9 +58,8 @@ public class StartCommandHandler : IBotCommandHandler
              "грамматический анализ сообщений, анализ произношения на иностранном языке" +
              " и исправлять найденные ошибки.";
 
-        var prompt = _promptService.GetPromptToTranslateTextIntoNativeLanguage(nativeLanguage);
-        var welcomeMessageInNativeLanguage = await _chatGPTService.GetAnswer(
-            prompt, welcomeMessage, cancellationToken);
+        var welcomeMessageInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
+            welcomeMessage, nativeLanguage, targetLanguage, cancellationToken);
 
         await _botClient.SendTextMessageAsync(
             info.ChatId, welcomeMessageInNativeLanguage, cancellationToken: cancellationToken);
