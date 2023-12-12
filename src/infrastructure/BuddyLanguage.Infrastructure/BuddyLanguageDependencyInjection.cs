@@ -4,8 +4,10 @@ using BuddyLanguage.Data.EntityFramework;
 using BuddyLanguage.Data.EntityFramework.Repositories;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
-using BuddyLanguage.NAudioOggToWavConverter;
+using BuddyLanguage.KiotaClient;
+using BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib;
 using BuddyLanguage.OpenAIWhisperSpeechRecognitionService;
+using BuddyLanguage.PromptServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -83,12 +85,16 @@ public static class BuddyLanguageDependencyInjection
                 settings.ApiKey = configuration.GetRequiredValue("OPENAI_API_KEY");
             });
 
-        services.AddSingleton<INAudioOggToPcmConverter, NAudioOggToPcmConverter>();
+        services.AddDistributedMemoryCache();
+
+        services.AddSingleton<IOggOpusToPcmConverter, NAudioConcentusOggOpusToPcmConverter>();
+        services.AddScoped<IPromptService, PromptService>();
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();
         services.AddScoped<IPronunciationAssessmentService, PronunciationAssessmentService>();
-        services.AddScoped<ITextToSpeech, AzureTextToSpeech>();
+        services.AddHttpClient<ITextToSpeech, OpenAITextToSpeech>();
         services.AddScoped<IChatGPTService, ChatGPTService>();
 
+        //services.AddScoped<ITextToSpeech, AzureTextToSpeech>();
         return services;
     }
 

@@ -9,13 +9,15 @@ public interface IPronunciationAssessmentService
     /// Получить оценку произношения
     /// </summary>
     /// <param name="audioData">Голосовое сообщение в виде набора бойт.
-    /// Поддерживаемые форматы: PCM, 16 bit, sample rate 16000, mono
+    /// Поддерживаемые форматы: OGG Opus
     /// </param>
     /// <param name="targetLanguage">язык пользователя</param>
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Оценка произношения для каждого слова</returns>
-    Task<IReadOnlyList<WordPronunciationAssessment>> GetSpeechAssessmentAsync(
+    Task<IReadOnlyList<WordPronunciationAssessment>> GetSpeechAssessmentFromOggOpus(
         byte[] audioData,
         Language targetLanguage,
         CancellationToken cancellationToken);
+
+    bool IsLanguageSupported(Language language);
 }

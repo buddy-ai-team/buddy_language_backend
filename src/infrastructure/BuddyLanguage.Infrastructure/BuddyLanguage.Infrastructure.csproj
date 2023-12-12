@@ -19,9 +19,11 @@
       <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
       <ProjectReference Include="..\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj" />
       <ProjectReference Include="..\BuddyLanguage.Data.EntityFramework\BuddyLanguage.Data.EntityFramework.csproj" />
-      <ProjectReference Include="..\BuddyLanguage.NAudioOggToWavConverter\BuddyLanguage.NAudioOggToPcmConverter.csproj" />
+      <ProjectReference Include="..\BuddyLanguage.KiotaClient\BuddyLanguage.KiotaClient.csproj" />
+      <ProjectReference Include="..\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib.csproj" />
       <ProjectReference Include="..\BuddyLanguage.OpenAIWhisperSpeechRecognition\BuddyLanguage.OpenAIWhisperSpeechRecognitionService.csproj" />
       <ProjectReference Include="..\BuddyLanguage.AzureServices\BuddyLanguage.AzureServices.csproj" />
+      <ProjectReference Include="..\BuddyLanguage.PromptService\BuddyLanguage.PromptService.csproj" />
     </ItemGroup>
 
 </Project>

@@ -13,11 +13,11 @@ namespace BuddyLanguage.WebAPI.Test;
 
 public class AuthenticationFilterTest
 {
-    private readonly ILogger<AuthenticationFilter> _logger;
+    private readonly ILogger<TmaAuthenticationFilter> _logger;
 
     public AuthenticationFilterTest()
     {
-        _logger = new LoggerFactory().CreateLogger<AuthenticationFilter>();
+        _logger = new LoggerFactory().CreateLogger<TmaAuthenticationFilter>();
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class AuthenticationFilterTest
         var actionContext = new ActionContext(httpContext, new RouteData { }, new ControllerActionDescriptor { });
 
         // Инициалиазация тестиру
-        var filter = new AuthenticationFilter(_logger, configuration);
+        var filter = new TmaAuthenticationFilter(_logger, configuration);
 
         // Act
         filter.OnAuthorization(new AuthorizationFilterContext(actionContext, new List<IFilterMetadata>()));
