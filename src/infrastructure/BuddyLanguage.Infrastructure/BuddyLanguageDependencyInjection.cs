@@ -85,6 +85,8 @@ public static class BuddyLanguageDependencyInjection
                 settings.ApiKey = configuration.GetRequiredValue("OPENAI_API_KEY");
             });
 
+        services.AddDistributedMemoryCache();
+
         services.AddSingleton<IOggOpusToPcmConverter, NAudioConcentusOggOpusToPcmConverter>();
         services.AddScoped<IPromptService, PromptService>();
         services.AddScoped<ISpeechRecognitionService, WhisperSpeechRecognitionService>();

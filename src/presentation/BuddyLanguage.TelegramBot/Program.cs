@@ -44,12 +44,13 @@ try
         return new TelegramBotClient(token, client);
     });
 
-    builder.Services.AddSingleton<TelegramUserRepository>();
+    builder.Services.AddSingleton<TelegramUserRepositoryInCache>();
+    builder.Services.AddScoped<TelegramBotService>();
 
     builder.Services.AddHostedService<TelegramBotUpdatesListener>();
 
     builder.Services.Scan(scan => scan
-        .FromAssemblyOf<StartCommandHandler>()
+        .FromAssemblyOf<IBotCommandHandler>()
         .AddClasses(classes => classes.AssignableTo<IBotCommandHandler>())
         .AsImplementedInterfaces()
         .WithScopedLifetime());

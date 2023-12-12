@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <Compile Update="Services\UserBotStates.cs">
-      <DependentUpon>TelegramUserRepository.cs</DependentUpon>
+      <DependentUpon>TelegramUserRepositoryInCache.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 
