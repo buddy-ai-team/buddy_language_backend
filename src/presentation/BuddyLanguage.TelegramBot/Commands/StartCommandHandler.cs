@@ -45,7 +45,14 @@ public class StartCommandHandler : IBotCommandHandler
         var speed = user.UserPreferences.SelectedSpeed;
 
         const string welcomeMessage =
-            "Привет! Поздравляю вас с регистрацией! Расскажу немного о себе, я ваш бот-собеседник. Вы можете отправлять голосовые сообщения на английском или русском языке не более 3х минут и я вам отвечу. Может поговорить на интересующие вас темы. Также я могу проводить грамматический анализ сообщений и исправлять ошибки.";
+             "Привет! Поздравляю вас с регистрацией! Расскажу немного о себе, " +
+             "я ваш виртуальный собеседник. Со мной вы можете изучать язык методом разговорной практики. " +
+             "Отправляйте мне голосовое сообщение на любом из поддерживаемых языков, " +
+             "список которых вы можете посмотреть в настройках, и я вам отвечу. " +
+             "Голосовые сообщения могут быть продолжительностью не более трёх минут. " +
+             "Я могу поговорить на интересующие вас темы, а также я умею проводить " +
+             "грамматический анализ сообщений, анализ произношения на иностранном языке" +
+             " и исправлять найденные ошибки.";
         await _botClient.SendTextMessageAsync(
             info.ChatId, welcomeMessage, cancellationToken: cancellationToken);
 
@@ -56,11 +63,6 @@ public class StartCommandHandler : IBotCommandHandler
         await _botClient.SendVoiceAsync(
             chatId: update.Message!.Chat.Id,
             voice: InputFile.FromStream(memoryStreamAnswer, "welcomeMessage.ogg"),
-            cancellationToken: cancellationToken);
-
-        await _botClient.SendTextMessageAsync(
-            info.ChatId,
-            "Hello! I am Buddy! What are we going to talk about today?",
             cancellationToken: cancellationToken);
     }
 }
