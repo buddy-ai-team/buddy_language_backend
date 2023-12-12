@@ -46,7 +46,7 @@ namespace BuddyLanguage.TelegramBot.Services
                 var lastMessageTime = messages.Last().CreatedAt;
                 var currentTime = DateTime.Now;
                 var afterLastMessageIntervalHours = (currentTime - lastMessageTime).TotalHours;
-                var assistantRole = await _roleService.GetOrCreateDefaultRole(cancellationToken);
+                var assistantRole = await _roleService.GetRoleById(user.UserPreferences.AssistantRoleId, cancellationToken);
 
                 if (afterLastMessageIntervalHours >= reminderIntervalHours)
                 {
