@@ -49,4 +49,11 @@ public class WordEntityController : ControllerBase
         WordEntity wordVar = await _wordService.AddWord(request.AccountId, request.Word, request.Translation, request.Language, request.Status, cancellationToken);
         return new WordEntityResponse(wordVar.Id, wordVar.UserId, wordVar.Word, wordVar.Translation, wordVar.Language, wordVar.WordStatus);
     }
+
+    [HttpPost("delete")]
+    public async Task<ActionResult> DeleteWordEntity(Guid wordEntityId, CancellationToken cancellationToken)
+    {
+        await _wordService.DeleteWordEntity(wordEntityId, cancellationToken);
+        return Ok();
+    }
 }
