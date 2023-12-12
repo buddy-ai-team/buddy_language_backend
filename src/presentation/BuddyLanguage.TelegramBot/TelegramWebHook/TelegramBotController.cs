@@ -4,7 +4,6 @@ using Telegram.Bot.Types;
 
 namespace BuddyLanguage.TelegramBot.TelegramWebHook;
 
-[ApiController]
 [Route("api/tg-webhook")]
 public class TelegramBotController : ControllerBase
 {
