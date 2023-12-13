@@ -43,7 +43,7 @@ namespace BuddyLanguage.WebApi.Controllers
             return countWordsLearning.Value;
         }
 
-        [HttpGet("get_messages")]
+        [HttpGet("get_count_messages")]
         public async Task<ActionResult<int>> GetTotalCountMessages(string id, Guid topicId, CancellationToken cancellationToken)
         {
             var totalCountMessages = await _statisticsService.GetTotalCountMessages(id, topicId, cancellationToken);
