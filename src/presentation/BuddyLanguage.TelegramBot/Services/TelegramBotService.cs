@@ -57,43 +57,37 @@ public class TelegramBotService
         }
 
         //Chain of responsibility
-        var commandHandler = _botCommandHandlers.FirstOrDefault(handler => handler.CanHandleCommand(update));
+        var commandHandler = _botCommandHandlers
+            .OrderBy(it => it.Order)
+            .First(handler => handler.CanHandleCommand(update));
         _logger.LogInformation(
             "Received update of type {UpdateType}, {MessageType}, {MessageText}, {From}, {CommandHandler}",
             update.Type,
             update.Message?.Type,
             update.Message?.Text,
             update.Message?.From?.Id,
-            commandHandler?.GetType().Name);
+            commandHandler.GetType().Name);
 
-        if (commandHandler != null && update.Message != null)
+        var ctsTyping = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _ = SendDelayedTypingActionAsync(update.Message!.Chat.Id, ctsTyping.Token); // Показываем, что робот печатает сообщение
+        try
         {
-            var ctsTyping = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            _ = SendDelayedTypingActionAsync(update.Message.Chat.Id, ctsTyping.Token); // Показываем, что робот печатает сообщение
-            try
-            {
-                await commandHandler.HandleAsync(update, cancellationToken);
-            }
-            catch (UserNotFoundException) when (update.Message.From is not null)
-            {
-                _logger.LogInformation(
-                    "User {TelegramId} not found - registering",
-                    update.Message.From.Id);
-                await RegisterUser(update, cancellationToken);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error in command handler {CommandHandler}", commandHandler.GetType().Name);
-                await SendErrorToUser(telegramBotClient, update.Message.Chat.Id, e, cancellationToken);
-            }
+            await commandHandler.HandleAsync(update, cancellationToken);
+        }
+        catch (UserNotFoundException) when (update.Message.From is not null)
+        {
+            _logger.LogInformation(
+                "User {TelegramId} not found - registering",
+                update.Message.From.Id);
+            await RegisterUser(update, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error in command handler {CommandHandler}", commandHandler.GetType().Name);
+            await SendErrorToUser(telegramBotClient, update.Message.Chat.Id, e, cancellationToken);
+        }
 
-            await ctsTyping.CancelAsync();
-        }
-        else
-        {
-            var unknownCommandHandler = _botCommandHandlers.First(handler => handler is UnknownCommandHandler);
-            await unknownCommandHandler.HandleAsync(update, cancellationToken);
-        }
+        await ctsTyping.CancelAsync();
     }
 
     private async Task SendDelayedTypingActionAsync(ChatId chatId, CancellationToken ctsTypingToken)

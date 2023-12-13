@@ -12,7 +12,9 @@ public class VersionCommandHandler : IBotCommandHandler
         _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
     }
 
-    public string? Command => "/version";
+    public int Order => 0;
+
+    public string Command => "/version";
 
     public async Task HandleAsync(Update update, CancellationToken cancellationToken)
     {

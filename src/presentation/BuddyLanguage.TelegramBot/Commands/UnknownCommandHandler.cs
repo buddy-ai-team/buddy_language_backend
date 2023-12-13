@@ -16,6 +16,8 @@ namespace BuddyLanguage.TelegramBot.Commands
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        public int Order => int.MaxValue;
+
         public string? Command => null;
 
         public async Task HandleAsync(Update update, CancellationToken cancellationToken)
@@ -30,9 +32,6 @@ namespace BuddyLanguage.TelegramBot.Commands
             }
         }
 
-        public bool CanHandleCommand(Update update)
-        {
-            return false;
-        }
+        public bool CanHandleCommand(Update update) => true;
     }
 }

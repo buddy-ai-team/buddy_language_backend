@@ -24,6 +24,8 @@ public class ResetTopicCommand : IBotCommandHandler
         _buddyService = buddyService ?? throw new ArgumentNullException(nameof(buddyService));
     }
 
+    public int Order => 0;
+
     public string Command => "/reset";
 
     public async Task HandleAsync(Update update, CancellationToken cancellationToken)
