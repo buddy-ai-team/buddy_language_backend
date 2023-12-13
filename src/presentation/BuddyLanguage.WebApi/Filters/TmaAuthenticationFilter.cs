@@ -20,10 +20,11 @@ namespace BuddyLanguage.WebApi.Filters;
 public class TmaAuthenticationFilter(
         ILogger<TmaAuthenticationFilter> logger,
         IConfiguration configuration)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _configuration = configuration ?? throw new ArgumentNullException();
-    }
+    : Attribute, IAuthorizationFilter, IFilterFactory
+{
+    private const int RequestValidTimeInMinutes = 60;
+    private readonly ILogger<TmaAuthenticationFilter> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly string _botToken = configuration.GetRequiredValue("BotConfiguration:Token");
 
     public bool IsReusable => false;
 
