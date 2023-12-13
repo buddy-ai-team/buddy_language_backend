@@ -79,11 +79,11 @@ namespace BuddyLanguage.KiotaClient
         {
             return speed switch
             {
-                TtsSpeed.Xslow => 0.25,
-                TtsSpeed.Slow => 0.50,
-                TtsSpeed.Medium => 1.0,
-                TtsSpeed.Fast => 1.5,
-                TtsSpeed.Xfast => 2.0,
+                TtsSpeed.Xslow => 0.75,
+                TtsSpeed.Slow => 1.0,
+                TtsSpeed.Medium => 1.5,
+                TtsSpeed.Fast => 2.0,
+                TtsSpeed.Xfast => 2.5,
                 _ => throw new NotSupportedException("The provided TtsSpeed is not supported.")
             };
         }
