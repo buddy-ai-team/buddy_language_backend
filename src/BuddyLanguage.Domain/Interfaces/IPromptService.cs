@@ -8,8 +8,6 @@ namespace BuddyLanguage.Domain.Interfaces
 
         string GetPromptForDefaultRole();
 
-        string GetPromptToTranslateTextIntoNativeLanguage(Language nativeLanguage);
-
         string GetPromptForGrammarMistakes(Language nativeLanguage);
 
         string GetPromptForLearningWords(Language nativeLanguage, Language targetLanguage);
