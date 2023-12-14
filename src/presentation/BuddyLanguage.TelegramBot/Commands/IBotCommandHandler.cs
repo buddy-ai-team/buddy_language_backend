@@ -5,6 +5,8 @@ namespace BuddyLanguage.TelegramBot.Commands;
 
 public interface IBotCommandHandler
 {
+    int Order { get; }
+
     string? Command { get; }
 
     Task HandleAsync(Update update, CancellationToken cancellationToken);

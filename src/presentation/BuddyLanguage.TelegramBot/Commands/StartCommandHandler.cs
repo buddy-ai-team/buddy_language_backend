@@ -24,6 +24,8 @@ public class StartCommandHandler : IBotCommandHandler
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    public int Order => 0;
+
     public string Command => "/start";
 
     public async Task HandleAsync(Update update, CancellationToken cancellationToken)

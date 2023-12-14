@@ -24,6 +24,8 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         _buddyService = buddyService ?? throw new ArgumentNullException(nameof(buddyService));
     }
 
+    public int Order => 0;
+
     public string? Command => null;
 
     public async Task HandleAsync(Update update, CancellationToken cancellationToken)
@@ -88,7 +90,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                 if (mistakes.Length > 0 && words.Count > 0)
                 {
                     var grammaMistakes = string.Join(", ", mistakes);
-                    string studiedWords = string.Empty; 
+                    string studiedWords = string.Empty;
                     foreach (var word in words)
                     {
                         studiedWords += $"{word.Key} - {word.Value}\n";
