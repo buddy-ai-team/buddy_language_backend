@@ -1,6 +1,7 @@
 ﻿using BuddyLanguage.ChatGPTServiceLib;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
+using BuddyLanguage.ExternalStatisticsServiceLib;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,63 +11,19 @@ namespace BuddyLanguage.WebApi.Controllers
     [ApiController]
     public class StatisticsController : ControllerBase
     {
-        private readonly StatisticsService _statisticsService;
+        private readonly ExternalStatisticsService _externalStatisticsService;
 
-        public StatisticsController(StatisticsService statisticsService)
+        public StatisticsController(ExternalStatisticsService externalStatisticsService)
         {
-            _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
+            _externalStatisticsService = externalStatisticsService ?? throw new ArgumentNullException(nameof(externalStatisticsService));
         }
 
-        [HttpGet("get_words_learned")]
-        public async Task<ActionResult<int>> GetCountWordsLearned(Guid id, CancellationToken cancellationToken)
+        [HttpGet("get_statistics")]
+        public async Task<ActionResult<StatisticsResponse>> GetCountOfDaysAndMessages(string id, CancellationToken cancellationToken)
         {
-            var countWordsLearned = await _statisticsService.GetCountWordsLearned(id, cancellationToken);
+            var statistics = await _externalStatisticsService.GetCountOfDaysAndMessages(id, cancellationToken);
 
-            if (countWordsLearned is null)
-            {
-                throw new Exception("The number of learned words wasn't found");
-            }
-
-            return countWordsLearned.Value;
-        }
-
-        [HttpGet("get_words_learning")]
-        public async Task<ActionResult<int>> GetCountWordsLearning(Guid id, CancellationToken cancellationToken)
-        {
-            var countWordsLearning = await _statisticsService.GetCountWordsLearning(id, cancellationToken);
-
-            if (countWordsLearning is null)
-            {
-                throw new Exception("The number of learned words wasn't found");
-            }
-
-            return countWordsLearning.Value;
-        }
-
-        [HttpGet("get_count_messages")]
-        public async Task<ActionResult<int>> GetTotalCountMessages(string id, Guid topicId, CancellationToken cancellationToken)
-        {
-            var totalCountMessages = await _statisticsService.GetTotalCountMessages(id, topicId, cancellationToken);
-
-            if (totalCountMessages is null)
-            {
-                throw new Exception("The total number of messages wasn't found");
-            }
-
-            return totalCountMessages.Value;
-        }
-
-        [HttpGet("get_days_communication")]
-        public async Task<ActionResult<int>> GetCountDaysCommunication(string id, CancellationToken cancellationToken)
-        {
-            var countDaysCommunication = await _statisticsService.GetCountDaysCommunication(id, cancellationToken);
-
-            if (countDaysCommunication is null)
-            {
-                throw new Exception("The total number of days of communication wasn't found");
-            }
-
-            return countDaysCommunication.Value;
+            return Ok(statistics);
         }
     }
 }

@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\application\BuddyLanguage.ExternalStatisticsServiceLib\BuddyLanguage.ExternalStatisticsServiceLib.csproj" />
       <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
       <ProjectReference Include="..\..\infrastructure\BuddyLanguage.ChatGPTService\BuddyLanguage.ChatGPTService.csproj" />
       <ProjectReference Include="..\..\infrastructure\BuddyLanguage.Infrastructure\BuddyLanguage.Infrastructure.csproj" />

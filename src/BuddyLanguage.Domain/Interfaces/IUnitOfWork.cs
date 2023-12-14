@@ -8,7 +8,5 @@ public interface IUnitOfWork
 
     IUserRepository UserRepository { get; }
 
-    IMessageRepository MessageRepository { get; }
-
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
