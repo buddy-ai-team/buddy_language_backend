@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BuddyLanguage.Data.EntityFramework.Repositories
 {
-    public class WordEntityRepositoryEf : EfRepository<WordEntity>
+    public class WordEntityRepositoryEf : EfRepository<WordEntity>, IWordEntityRepository
     {
         public WordEntityRepositoryEf(AppDbContext dbContext)
             : base(dbContext)
