@@ -1,4 +1,5 @@
 ﻿using BuddyLanguage.Domain.Entities;
+using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,7 @@ using OpenAI.ChatGpt.Models;
 using OpenAI.ChatGpt.Models.ChatCompletion;
 using OpenAI.ChatGpt.Models.ChatCompletion.Messaging;
 using OpenAI.ChatGpt.Modules.StructuredResponse;
+using OpenAI.ChatGpt.Modules.Translator;
 using Tiktoken;
 
 namespace BuddyLanguage.ChatGPTServiceLib
@@ -56,6 +58,21 @@ namespace BuddyLanguage.ChatGPTServiceLib
             var dialog = Dialog.StartAsUser(userMessage);
             var answer = await _openAiClient.GetChatCompletions(dialog, model: _model, cancellationToken: cancellationToken);
             return answer;
+        }
+
+        public async Task<string> GetTextTranslatedIntoNativeLanguage(
+            string userMessage,
+            Language nativeLanguage,
+            Language targetLanguage, 
+            CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrEmpty(userMessage))
+            {
+                throw new ArgumentException($"\"{nameof(userMessage)}\" it cannot be indefinite or empty.", nameof(userMessage));
+            }
+
+            return await _openAiClient.TranslateText(
+                userMessage, nativeLanguage.ToString(), targetLanguage.ToString());
         }
 
         public async Task<string> GetAnswer(string prompt, string userMessage, CancellationToken cancellationToken)

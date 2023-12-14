@@ -1,4 +1,5 @@
-﻿using BuddyLanguage.Domain.Services;
+﻿using BuddyLanguage.Domain.Interfaces;
+using BuddyLanguage.Domain.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using User = BuddyLanguage.Domain.Entities.User;
@@ -11,17 +12,20 @@ public class ResetTopicCommand : IBotCommandHandler
     private readonly UserService _userService;
     private readonly ILogger<ResetTopicCommand> _logger;
     private readonly BuddyService _buddyService;
+    private readonly IChatGPTService _chatGPTService;
 
     public ResetTopicCommand(
         ITelegramBotClient botClient,
         UserService userService,
         ILogger<ResetTopicCommand> logger,
-        BuddyService buddyService)
+        BuddyService buddyService,
+        IChatGPTService chatGPTService)
     {
         _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _buddyService = buddyService ?? throw new ArgumentNullException(nameof(buddyService));
+        _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
     }
 
     public int Order => 0;
@@ -35,9 +39,15 @@ public class ResetTopicCommand : IBotCommandHandler
         {
             var telegramId = message.From.Id.ToString();
             User user = await _userService.GetUserByTelegramId(telegramId, cancellationToken);
+            var nativeLanguage = user.UserPreferences.NativeLanguage;
+            var targetLanguage = user.UserPreferences.TargetLanguage;
+
+            var textInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
+                "Тема сброшена", nativeLanguage, targetLanguage, cancellationToken);
+  
             await _buddyService.ResetTopic(user, cancellationToken);
             await _botClient.SendTextMessageAsync(
-                message.Chat.Id, "Тема сброшена", cancellationToken: cancellationToken);
+                message.Chat.Id, textInNativeLanguage, cancellationToken: cancellationToken);
         }
     }
 }
