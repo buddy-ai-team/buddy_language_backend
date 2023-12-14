@@ -41,13 +41,7 @@ namespace BuddyLanguage.Domain.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public virtual async Task<(
-                string RecognizedMessage,
-                string BotAnswerMessage,
-                byte[] BotAnswerWavMessage,
-                byte[] BotPronunciationWordsWavAnswer,
-                string[] Mistakes,
-                Dictionary<string, string> Words)>
+        public virtual async Task<UserMessageProcessingResult>
             ProcessUserMessage(
                 User user,
                 byte[] oggVoiceMessage,
@@ -81,6 +75,12 @@ namespace BuddyLanguage.Domain.Services
                 userMessage, nativeLanguage, cancellationToken);
             var wordsTask = GetLearningWords(
                 userMessage, nativeLanguage, targetLanguage, cancellationToken);
+
+            if (!_pronunciationAssessmentService.IsLanguageSupported(targetLanguage))
+            {
+                throw new UnsupportedLanguageFormatException("Can`t recognize the language");
+            }
+
             var pronunciationTask = _pronunciationAssessmentService.GetSpeechAssessmentFromOggOpus(
                 oggVoiceMessage, targetLanguage, cancellationToken);
             await Task.WhenAll(assistantTask, mistakesTask, wordsTask, pronunciationTask);
@@ -100,17 +100,22 @@ namespace BuddyLanguage.Domain.Services
                 await AddWordsToUser(studiedWords.StudiedWords, user.Id, targetLanguage, cancellationToken);
             }
 
-            var botPronunciationWordsWavAnswer = await GetPronunciationWordsWavMessage(
-                targetLanguage, voice, speed, badPronouncedWords, cancellationToken);
+            var botPronunciationWordsWavAnswer = await FindPronunciationWordsWavMessage(
+                targetLanguage, nativeLanguage, voice, speed, badPronouncedWords, cancellationToken);
             var botAnswerWavMessage = await _textToSpeechService.TextToByteArrayAsync(
                 assistantAnswer, targetLanguage, voice, speed, cancellationToken);
 
-            return (
+            var grammarMistakes = string.Join(" ", mistakes.GrammaMistakes);
+            var mistakesWavMessage = mistakes.GrammaMistakesCount > 0 ? await _textToSpeechService.TextToByteArrayAsync(
+                    grammarMistakes, targetLanguage, voice, speed, cancellationToken) : null;
+
+            return new UserMessageProcessingResult(
                 userMessage,
                 assistantAnswer,
                 botAnswerWavMessage,
                 botPronunciationWordsWavAnswer,
                 mistakes.GrammaMistakes,
+                mistakesWavMessage,
                 studiedWords.StudiedWords);
         }
 
@@ -176,7 +181,7 @@ namespace BuddyLanguage.Domain.Services
             IReadOnlyList<WordPronunciationAssessment> pronunciationWords)
         {
             ArgumentNullException.ThrowIfNull(pronunciationWords);
-            double acceptableAccuracyScore = 85;
+            double acceptableAccuracyScore = 98;
             var badPronouncedWords = new List<string>();
             foreach (var word in pronunciationWords)
             {
@@ -189,8 +194,9 @@ namespace BuddyLanguage.Domain.Services
             return badPronouncedWords;
         }
 
-        private async Task<byte[]> GetPronunciationWordsWavMessage(
+        private async Task<byte[]?> FindPronunciationWordsWavMessage(
             Language targetLanguage,
+            Language nativeLanguage,
             Voice voice,
             TtsSpeed speed,
             IReadOnlyList<string> badPronouncedWordsList,
@@ -198,17 +204,17 @@ namespace BuddyLanguage.Domain.Services
         {
             ArgumentNullException.ThrowIfNull(badPronouncedWordsList);
 
-            if (badPronouncedWordsList.Count != 0)
+            if (badPronouncedWordsList.Count == 0)
             {
-                var badPronouncedWords = string.Join(",", badPronouncedWordsList);
-                var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
-                return await _textToSpeechService.TextToByteArrayAsync(
-                $"{textForBadPronunciation} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
+                return null; 
             }
 
-            var textForGoodPronunciation = "You have a good pronunciation!";
+            var badPronouncedWords = string.Join(",", badPronouncedWordsList);
+            var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
+            var textForbadPronunciationInNativeLanguage = _chatGPTService.GetTextTranslatedIntoNativeLanguage(
+                textForBadPronunciation, nativeLanguage, targetLanguage, cancellationToken);
             return await _textToSpeechService.TextToByteArrayAsync(
-            textForGoodPronunciation, targetLanguage, voice, speed, cancellationToken);
+            $"{textForbadPronunciationInNativeLanguage} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
         }
     }
 }

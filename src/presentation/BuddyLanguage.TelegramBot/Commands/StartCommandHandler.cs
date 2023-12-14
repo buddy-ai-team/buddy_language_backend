@@ -10,17 +10,20 @@ public class StartCommandHandler : IBotCommandHandler
     private readonly ITelegramBotClient _botClient;
     private readonly UserService _userService;
     private readonly ITextToSpeech _textToSpeech;
+    private readonly IChatGPTService _chatGPTService;
     private readonly ILogger<StartCommandHandler> _logger;
 
     public StartCommandHandler(
         ITelegramBotClient botClient,
         UserService userService,
         ITextToSpeech textToSpeech,
+        IChatGPTService chatGPTService,
         ILogger<StartCommandHandler> logger)
     {
         _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _textToSpeech = textToSpeech ?? throw new ArgumentNullException(nameof(textToSpeech));
+        _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -43,26 +46,33 @@ public class StartCommandHandler : IBotCommandHandler
             info.FirstName, info.LastName, info.UserId, cancellationToken);
 
         var nativeLanguage = user.UserPreferences.NativeLanguage;
+        var targetLanguage = user.UserPreferences.TargetLanguage;
         var voice = user.UserPreferences.SelectedVoice;
         var speed = user.UserPreferences.SelectedSpeed;
 
         const string welcomeMessage =
-            "Привет! Поздравляю вас с регистрацией! Расскажу немного о себе, я ваш бот-собеседник. Вы можете отправлять голосовые сообщения на английском или русском языке не более 3х минут и я вам отвечу. Может поговорить на интересующие вас темы. Также я могу проводить грамматический анализ сообщений и исправлять ошибки.";
+             "Привет! Поздравляю вас с регистрацией! Расскажу немного о себе, " +
+             "я ваш виртуальный собеседник. Со мной вы можете изучать язык методом разговорной практики. " +
+             "Отправляйте мне голосовое сообщение на любом из поддерживаемых языков, " +
+             "список которых вы можете посмотреть в настройках, и я вам отвечу. " +
+             "Голосовые сообщения могут быть продолжительностью не более трёх минут. " +
+             "Я могу поговорить на интересующие вас темы, а также я умею проводить " +
+             "грамматический анализ сообщений, анализ произношения на иностранном языке" +
+             " и исправлять найденные ошибки.";
+
+        var welcomeMessageInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
+            welcomeMessage, nativeLanguage, targetLanguage, cancellationToken);
+
         await _botClient.SendTextMessageAsync(
-            info.ChatId, welcomeMessage, cancellationToken: cancellationToken);
+            info.ChatId, welcomeMessageInNativeLanguage, cancellationToken: cancellationToken);
 
         var welcomeMessageBytes = await _textToSpeech.TextToByteArrayAsync(
-            welcomeMessage, nativeLanguage, voice, speed, cancellationToken);
+            welcomeMessageInNativeLanguage, nativeLanguage, voice, speed, cancellationToken);
 
         using var memoryStreamAnswer = new MemoryStream(welcomeMessageBytes);
         await _botClient.SendVoiceAsync(
             chatId: update.Message!.Chat.Id,
             voice: InputFile.FromStream(memoryStreamAnswer, "welcomeMessage.ogg"),
-            cancellationToken: cancellationToken);
-
-        await _botClient.SendTextMessageAsync(
-            info.ChatId,
-            "Hello! I am Buddy! What are we going to talk about today?",
             cancellationToken: cancellationToken);
     }
 }
