@@ -1,3 +1,5 @@
+using BuddyLanguage.Domain.Interfaces;
+using BuddyLanguage.ExternalStatisticsServiceLib;
 using BuddyLanguage.Infrastructure;
 using BuddyLanguage.WebApi.Extensions;
 using BuddyLanguage.WebApi.Filters;
@@ -31,6 +33,9 @@ try
 
     //Domain and Infrastructure services
     builder.Services.AddApplicationServices(builder.Configuration);
+
+    //Application service
+    builder.Services.AddScoped<IStatisticsService, ExternalStatisticsService>();
 
     var app = builder.Build();
 

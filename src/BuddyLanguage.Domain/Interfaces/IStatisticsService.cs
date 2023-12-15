@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BuddyLanguage.ExternalStatisticsServiceLib;
 
 namespace BuddyLanguage.Domain.Interfaces
 {
-    public interface IStatisticsService<TStatisticsResponse>
+    public interface IStatisticsService
     {
-        Task<TStatisticsResponse> GetCountOfDaysAndMessages(string id, CancellationToken cancellationToken);
+        Task<Statistics> GetCountOfDaysAndMessages(string id, CancellationToken cancellationToken);
     }
 }

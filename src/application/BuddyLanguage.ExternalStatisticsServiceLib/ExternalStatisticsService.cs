@@ -4,7 +4,7 @@ using OpenAI.ChatGpt.Interfaces;
 
 namespace BuddyLanguage.ExternalStatisticsServiceLib
 {
-    public class ExternalStatisticsService : IStatisticsService<StatisticsResponse>
+    public class ExternalStatisticsService : IStatisticsService
     {
         private readonly IChatHistoryStorage _chatHistoryStorage;
         private readonly IUserRepository _userRepository;
@@ -15,7 +15,7 @@ namespace BuddyLanguage.ExternalStatisticsServiceLib
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
-        public async Task<StatisticsResponse> GetCountOfDaysAndMessages(string id, CancellationToken cancellationToken)
+        public async Task<Statistics> GetCountOfDaysAndMessages(string id, CancellationToken cancellationToken)
         {
             var user = await _userRepository.FindUserByTelegramId(id, cancellationToken);
 
@@ -58,7 +58,7 @@ namespace BuddyLanguage.ExternalStatisticsServiceLib
                 totalMessages += messages.Count();
             }
 
-            return new StatisticsResponse
+            return new Statistics
             {
                 TotalMessages = totalMessages,
                 NumbersDaysCommunication = numbersDaysCommunication

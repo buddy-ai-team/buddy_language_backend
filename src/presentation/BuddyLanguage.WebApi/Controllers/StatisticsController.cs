@@ -2,6 +2,7 @@
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
 using BuddyLanguage.ExternalStatisticsServiceLib;
+using BuddyLanguage.HttpModels.Responses.Statistics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,19 +12,19 @@ namespace BuddyLanguage.WebApi.Controllers
     [ApiController]
     public class StatisticsController : ControllerBase
     {
-        private readonly ExternalStatisticsService _externalStatisticsService;
+        private readonly IStatisticsService _statisticServic;
 
-        public StatisticsController(ExternalStatisticsService externalStatisticsService)
+        public StatisticsController(IStatisticsService statisticServic)
         {
-            _externalStatisticsService = externalStatisticsService ?? throw new ArgumentNullException(nameof(externalStatisticsService));
+            _statisticServic = statisticServic ?? throw new ArgumentNullException(nameof(statisticServic));
         }
 
         [HttpGet("get_statistics")]
         public async Task<ActionResult<StatisticsResponse>> GetCountOfDaysAndMessages(string id, CancellationToken cancellationToken)
         {
-            var statistics = await _externalStatisticsService.GetCountOfDaysAndMessages(id, cancellationToken);
+            var st = await _statisticServic.GetCountOfDaysAndMessages(id, cancellationToken);
 
-            return Ok(statistics);
+            return new StatisticsResponse(st.TotalMessages, st.NumbersDaysCommunication);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BuddyLanguage.ExternalStatisticsServiceLib
 {
-    public class StatisticsResponse
+    public class Statistics
     {
         public int TotalMessages { get; set; }
 
