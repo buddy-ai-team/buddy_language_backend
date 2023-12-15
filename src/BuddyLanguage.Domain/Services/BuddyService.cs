@@ -158,6 +158,11 @@ namespace BuddyLanguage.Domain.Services
         private async Task<byte[]?> GetPronunciationWavMessageOrDefault(
             byte[] oggVoiceMessage, Language nativeLanguage, Language targetLanguage, Voice voice, TtsSpeed speed, Language sourceLanguage, CancellationToken cancellationToken)
         {
+            if (oggVoiceMessage.Length == 0)
+            {
+                throw new ArgumentException(nameof(oggVoiceMessage));
+            }
+
             if (_pronunciationAssessmentService.IsLanguageSupported(targetLanguage))
             {
                 var pronunciationWords =
