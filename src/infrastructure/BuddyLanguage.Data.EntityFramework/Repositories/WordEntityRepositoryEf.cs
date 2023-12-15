@@ -1,5 +1,4 @@
 ﻿using BuddyLanguage.Domain.Entities;
-using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
