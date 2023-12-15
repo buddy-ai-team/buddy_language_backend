@@ -54,6 +54,7 @@ namespace BuddyLanguage.Domain.Services
             var voice = user.UserPreferences.SelectedVoice;
             var speed = user.UserPreferences.SelectedSpeed;
             var role = user.UserPreferences.AssistantRole;
+            var sourceLanguage = Language.Russian;
 
             if (oggVoiceMessage.Length == 0)
             {
@@ -75,33 +76,30 @@ namespace BuddyLanguage.Domain.Services
                 userMessage, nativeLanguage, cancellationToken);
             var wordsTask = GetLearningWords(
                 userMessage, nativeLanguage, targetLanguage, cancellationToken);
-
-            if (!_pronunciationAssessmentService.IsLanguageSupported(targetLanguage))
-            {
-                throw new UnsupportedLanguageFormatException("Can`t recognize the language");
-            }
-
-            var pronunciationTask = _pronunciationAssessmentService.GetSpeechAssessmentFromOggOpus(
-                oggVoiceMessage, targetLanguage, cancellationToken);
-            await Task.WhenAll(assistantTask, mistakesTask, wordsTask, pronunciationTask);
+            var botPronunciationTask = GetPronunciationWavMessageOrDefault(
+                oggVoiceMessage,
+                nativeLanguage,
+                targetLanguage,
+                voice,
+                speed,
+                sourceLanguage,
+                cancellationToken);
+            await Task.WhenAll(assistantTask, mistakesTask, wordsTask, botPronunciationTask);
 
             var assistantAnswer = await assistantTask;
             var mistakes = await mistakesTask;
             var studiedWords = await wordsTask;
-            var pronunciationWords = await pronunciationTask;
-
-            var badPronouncedWords = GetWordsWithBadPronunciation(pronunciationWords);
+            var botPronunciationWordsWavAnswer = await botPronunciationTask;
 
             _logger.LogDebug("Assistant answer: {AssistantAnswer}", assistantAnswer);
             _logger.LogDebug("Assistant answer: {AssistantAnswer}", mistakes);
 
             if (studiedWords.WordsCount > 0)
             {
-                await AddWordsToUser(studiedWords.StudiedWords, user.Id, targetLanguage, cancellationToken);
+                await AddWordsToUser(
+                    studiedWords.StudiedWords, user.Id, targetLanguage, cancellationToken);
             }
 
-            var botPronunciationWordsWavAnswer = await FindPronunciationWordsWavMessage(
-                targetLanguage, nativeLanguage, voice, speed, badPronouncedWords, cancellationToken);
             var botAnswerWavMessage = await _textToSpeechService.TextToByteArrayAsync(
                 assistantAnswer, targetLanguage, voice, speed, cancellationToken);
 
@@ -157,24 +155,26 @@ namespace BuddyLanguage.Domain.Services
             return _chatGPTService.ResetTopic(user.Id, cancellationToken);
         }
 
-        private async Task AddWordsToUser(
-            Dictionary<string, string> words,
-            Guid userId,
-            Language language,
-            CancellationToken cancellationToken)
+        private async Task<byte[]?> GetPronunciationWavMessageOrDefault(
+            byte[] oggVoiceMessage, Language nativeLanguage, Language targetLanguage, Voice voice, TtsSpeed speed, Language sourceLanguage, CancellationToken cancellationToken)
         {
-            ArgumentNullException.ThrowIfNull(words);
-            if (words.Count == 0)
+            if (_pronunciationAssessmentService.IsLanguageSupported(targetLanguage))
             {
-                throw new ArgumentException(nameof(words));
+                var pronunciationWords =
+                    await _pronunciationAssessmentService.GetSpeechAssessmentFromOggOpus(
+                        oggVoiceMessage, targetLanguage, cancellationToken);
+                var badPronouncedWords = GetWordsWithBadPronunciation(pronunciationWords);
+                return await GetPronunciationWordsWavMessageOrDefault(
+                        sourceLanguage,
+                        targetLanguage,
+                        nativeLanguage,
+                        voice,
+                        speed,
+                        badPronouncedWords,
+                        cancellationToken);
             }
 
-            foreach (var word in words)
-            {
-                //TODO: метод AddWords(words)
-                await _wordService.AddWord(
-                    userId, word.Key, word.Value, language, WordEntityStatus.Learning, cancellationToken);
-            }
+            return null;
         }
 
         private IReadOnlyList<string> GetWordsWithBadPronunciation(
@@ -194,7 +194,8 @@ namespace BuddyLanguage.Domain.Services
             return badPronouncedWords;
         }
 
-        private async Task<byte[]?> FindPronunciationWordsWavMessage(
+        private async Task<byte[]?> GetPronunciationWordsWavMessageOrDefault(
+            Language sourceLanguage,
             Language targetLanguage,
             Language nativeLanguage,
             Voice voice,
@@ -206,15 +207,39 @@ namespace BuddyLanguage.Domain.Services
 
             if (badPronouncedWordsList.Count == 0)
             {
-                return null; 
+                return null;
             }
 
             var badPronouncedWords = string.Join(",", badPronouncedWordsList);
             var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
             var textForbadPronunciationInNativeLanguage = _chatGPTService.GetTextTranslatedIntoNativeLanguage(
-                textForBadPronunciation, nativeLanguage, targetLanguage, cancellationToken);
+                textForBadPronunciation, sourceLanguage, nativeLanguage, cancellationToken);
             return await _textToSpeechService.TextToByteArrayAsync(
             $"{textForbadPronunciationInNativeLanguage} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
+        }
+
+        private async Task AddWordsToUser(
+            Dictionary<string, string> words,
+            Guid userId,
+            Language language,
+            CancellationToken cancellationToken)
+        {
+            ArgumentNullException.ThrowIfNull(words);
+            if (words.Count == 0)
+            {
+                throw new ArgumentException(nameof(words));
+            }
+
+            foreach (var word in words)
+            {
+                //TODO: метод AddWords(words)
+                var existedWord = await _wordService.FindWordByName(userId, word.Value, cancellationToken);
+                if (existedWord == null)
+                {
+                    await _wordService.AddWord(
+                        userId, word.Value, word.Key, language, WordEntityStatus.Learning, cancellationToken);
+                }
+            }
         }
     }
 }

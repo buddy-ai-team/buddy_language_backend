@@ -44,7 +44,7 @@ namespace BuddyLanguage.TelegramBot.Commands
             var targetLanguage = user.UserPreferences.TargetLanguage;
 
             _logger.LogInformation("Unknown command received");
-            var text = "Пока что умею отвечать только на голосовые собощения на английском языке.";
+            var text = "Пока что умею отвечать только на голосовые собощения на изучаемом языке.";
             var textInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
                 text, nativeLanguage, targetLanguage, cancellationToken); 
             if (update.Message != null)
