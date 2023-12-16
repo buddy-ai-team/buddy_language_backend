@@ -60,19 +60,24 @@ namespace BuddyLanguage.ChatGPTServiceLib
                 dialog, model: _model, cancellationToken: cancellationToken);
         }
 
-        public async Task<string> GetTextTranslatedIntoNativeLanguage(
+        public Task<string> GetTextTranslatedIntoNativeLanguage(
             string text,
-            Language sourceLanguage, 
-            Language nativeLanguage,
+            Language sourceLanguage,
+            Language preferedLanguage,
             CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(text))
             {
                 throw new ArgumentException($"\"{nameof(text)}\" it cannot be indefinite or empty.", nameof(text));
             }
- 
-            return await _openAiClient.TranslateText(
-                text, sourceLanguage.ToString(), nativeLanguage.ToString(), cancellationToken: cancellationToken);
+
+            if (sourceLanguage == preferedLanguage)
+            {
+                return Task.FromResult(text);
+            }
+
+            return _openAiClient.TranslateText(
+                text, sourceLanguage.ToString(), preferedLanguage.ToString(), cancellationToken: cancellationToken);
         }
 
         public async Task<string> GetAnswer(string prompt, string userMessage, CancellationToken cancellationToken)
