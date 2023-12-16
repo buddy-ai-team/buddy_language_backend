@@ -1,4 +1,6 @@
-﻿namespace BuddyLanguage.Domain;
+﻿using BuddyLanguage.Domain.Entities;
+
+namespace BuddyLanguage.Domain;
 
 public class UserMessageProcessingResult
 {
@@ -7,6 +9,7 @@ public class UserMessageProcessingResult
         string botAnswerMessage,
         byte[] botAnswerWavMessage,
         byte[]? badPronunciationAudio,
+        Dictionary<string, double>? badPronunciationWords, 
         string[] grammarMistakes,
         byte[]? grammarMistakesAudio,
         Dictionary<string, string> words)
@@ -18,6 +21,7 @@ public class UserMessageProcessingResult
         BotAnswerAudio = botAnswerWavMessage
                          ?? throw new ArgumentNullException(nameof(botAnswerWavMessage));
         BadPronunciationAudio = badPronunciationAudio;
+        BadPronunciationWords = badPronunciationWords;
         GrammarMistakes = grammarMistakes ?? throw new ArgumentNullException(nameof(grammarMistakes));
         GrammarMistakesAudio = grammarMistakesAudio;
         Words = words ?? throw new ArgumentNullException(nameof(words));
@@ -28,6 +32,8 @@ public class UserMessageProcessingResult
     public string BotAnswerMessage { get; set; }
 
     public byte[] BotAnswerAudio { get; set; }
+
+    public Dictionary<string, double>? BadPronunciationWords { get; set; }
 
     public byte[]? BadPronunciationAudio { get; set; }
 

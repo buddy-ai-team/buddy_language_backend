@@ -106,6 +106,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         var answerText = userMessageResult.BotAnswerMessage;
         var answerBytes = userMessageResult.BotAnswerAudio;
         var pronunciationWordsBytes = userMessageResult.BadPronunciationAudio;
+        var badPronunciationWords = userMessageResult.BadPronunciationWords; 
         var mistakes = userMessageResult.GrammarMistakes;
         var mistakesBytes = userMessageResult.GrammarMistakesAudio;
         var words = userMessageResult.Words;
@@ -178,6 +179,21 @@ public class UserVoiceCommandHandler : IBotCommandHandler
             await _botClient.SendVoiceAsync(
                 chatId: update.Message.Chat.Id,
                 voice: InputFile.FromStream(memoryStreamMistakes, "mistakes.ogg"),
+                cancellationToken: cancellationToken);
+        }
+
+        if (badPronunciationWords != null && badPronunciationWords.Count > 0)
+        {
+            var sb = new StringBuilder();
+            foreach (var word in words)
+            {
+                sb.Append(word.Key).Append(" - ").Append(word.Value).Append('\n');
+            }
+
+            string finalText = sb.ToString();
+            await _botClient.SendTextMessageAsync(
+                chatId: update.Message.Chat.Id,
+                text: finalText,
                 cancellationToken: cancellationToken);
         }
     }
