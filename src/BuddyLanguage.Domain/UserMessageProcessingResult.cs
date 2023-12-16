@@ -3,37 +3,37 @@
     public class UserMessageProcessingResult
     {
         public UserMessageProcessingResult(
-            string recognizedMessage,
+            string recognizedUserMessage,
             string botAnswerMessage,
             byte[] botAnswerWavMessage,
-            byte[]? botPronunciationWordsWavAnswer,
-            string[] mistakes,
-            byte[]? mistakesWavMessage,
+            byte[]? badPronunciationAudio,
+            string[] grammarMistakes,
+            byte[]? grammarMistakesWavMessage,
             Dictionary<string, string> words)
         {
-            RecognizedMessage = recognizedMessage
-                ?? throw new ArgumentNullException(nameof(recognizedMessage));
+            RecognizedUserMessage = recognizedUserMessage
+                ?? throw new ArgumentNullException(nameof(recognizedUserMessage));
             BotAnswerMessage = botAnswerMessage
                 ?? throw new ArgumentNullException(nameof(botAnswerMessage));
-            BotAnswerWavMessage = botAnswerWavMessage
+            BotAnswerAudio = botAnswerWavMessage
                 ?? throw new ArgumentNullException(nameof(botAnswerWavMessage));
-            BotPronunciationWordsWavAnswer = botPronunciationWordsWavAnswer;
-            Mistakes = mistakes ?? throw new ArgumentNullException(nameof(mistakes));
-            MistakesWavAnswer = mistakesWavMessage;
+            BadPronunciationAudio = badPronunciationAudio;
+            GrammarMistakes = grammarMistakes ?? throw new ArgumentNullException(nameof(grammarMistakes));
+            GrammarMistakesAudio = grammarMistakesWavMessage;
             Words = words ?? throw new ArgumentNullException(nameof(words));
         }
 
-        public string RecognizedMessage { get; set; }
+        public string RecognizedUserMessage { get; set; }
 
         public string BotAnswerMessage { get; set; }
 
-        public byte[] BotAnswerWavMessage { get; set; }
+        public byte[] BotAnswerAudio { get; set; }
 
-        public byte[]? BotPronunciationWordsWavAnswer { get; set; }
+        public byte[]? BadPronunciationAudio { get; set; }
 
-        public string[] Mistakes { get; set; }
+        public string[] GrammarMistakes { get; set; }
 
-        public byte[]? MistakesWavAnswer { get; set; }
+        public byte[]? GrammarMistakesAudio { get; set; }
 
         public Dictionary<string, string> Words { get; set; }
     }

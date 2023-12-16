@@ -56,9 +56,9 @@ public class BuddyServiceTests
         // Assert
         mistakes.Should().NotBeNull();
         mistakes.GrammaMistakesCount.Should().Be(1);
-        mistakes.GrammaMistakes.Should().NotBeNull();
-        mistakes.GrammaMistakes.Should().HaveCount(1);
-        mistakes.GrammaMistakes.Should().ContainMatch("*like*");
+        mistakes.GrammarMistakes.Should().NotBeNull();
+        mistakes.GrammarMistakes.Should().HaveCount(1);
+        mistakes.GrammarMistakes.Should().ContainMatch("*like*");
     }
 
     [Fact]

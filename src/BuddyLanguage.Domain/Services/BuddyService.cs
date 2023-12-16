@@ -103,8 +103,8 @@ namespace BuddyLanguage.Domain.Services
             var botAnswerWavMessage = await _textToSpeechService.TextToByteArrayAsync(
                 assistantAnswer, targetLanguage, voice, speed, cancellationToken);
 
-            var grammarMistakes = string.Join(" ", mistakes.GrammaMistakes);
-            var mistakesWavMessage = mistakes.GrammaMistakesCount > 0 ? await _textToSpeechService.TextToByteArrayAsync(
+            var grammarMistakes = string.Join(" ", mistakes.GrammarMistakes);
+            var grammarMistakesAudio = mistakes.GrammaMistakesCount > 0 ? await _textToSpeechService.TextToByteArrayAsync(
                     grammarMistakes, targetLanguage, voice, speed, cancellationToken) : null;
 
             return new UserMessageProcessingResult(
@@ -112,8 +112,8 @@ namespace BuddyLanguage.Domain.Services
                 assistantAnswer,
                 botAnswerWavMessage,
                 botPronunciationWordsWavAnswer,
-                mistakes.GrammaMistakes,
-                mistakesWavMessage,
+                mistakes.GrammarMistakes,
+                grammarMistakesAudio,
                 studiedWords.StudiedWords);
         }
 

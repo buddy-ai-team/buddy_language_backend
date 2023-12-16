@@ -5,7 +5,7 @@ public class MistakesAnswer
 {
     public int GrammaMistakesCount { get; set; }
 
-    public string[] GrammaMistakes { get; set; }
+    public string[] GrammarMistakes { get; set; }
 
-    public override string ToString() => string.Join(",", GrammaMistakes);
+    public override string ToString() => string.Join(",", GrammarMistakes);
 }

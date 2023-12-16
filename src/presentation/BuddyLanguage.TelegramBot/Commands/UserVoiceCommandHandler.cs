@@ -104,15 +104,15 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         CancellationToken cancellationToken)
     {
         var answerText = userMessageResult.BotAnswerMessage;
-        var answerBytes = userMessageResult.BotAnswerWavMessage;
-        var pronunciationWordsBytes = userMessageResult.BotPronunciationWordsWavAnswer;
-        var mistakes = userMessageResult.Mistakes;
-        var mistakesBytes = userMessageResult.MistakesWavAnswer;
+        var answerBytes = userMessageResult.BotAnswerAudio;
+        var pronunciationWordsBytes = userMessageResult.BadPronunciationAudio;
+        var mistakes = userMessageResult.GrammarMistakes;
+        var mistakesBytes = userMessageResult.GrammarMistakesAudio;
         var words = userMessageResult.Words;
 
         await _botClient.SendTextMessageAsync(
             update.Message!.Chat.Id,
-            $"\n```\n{userMessageResult.RecognizedMessage}\n```",
+            $"\n```\n{userMessageResult.RecognizedUserMessage}\n```",
             parseMode: ParseMode.Markdown,
             cancellationToken: cancellationToken);
 
