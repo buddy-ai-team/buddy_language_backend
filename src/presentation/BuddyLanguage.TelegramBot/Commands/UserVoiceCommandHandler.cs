@@ -1,10 +1,11 @@
-﻿using BuddyLanguage.Domain.Enumerations;
+﻿using System.Text;
+using BuddyLanguage.Domain;
+using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 using File = Telegram.Bot.Types.File;
 
 namespace BuddyLanguage.TelegramBot.Commands;
@@ -35,18 +36,17 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
     public string? Command => null;
 
+    public bool CanHandleCommand(Update update)
+        => update.Message?.Voice != null;
+
     public async Task HandleAsync(Update update, CancellationToken cancellationToken)
     {
-        var voice = update.Message?.Voice;
-        var telegramUserId = update.Message?.From?.Id.ToString();
-        if (telegramUserId is null)
-        {
-            _logger.LogError("Can`t get telegram user id from update message! {@Update}", update);
-            return;
-        }
+        var info = IBotCommandHandler.GetTelegramMessageBaseInfoOrThrow(update);
 
-        var user = await _userService.GetUserByTelegramId(telegramUserId, cancellationToken);
-        _logger.LogInformation("Processing UserVoiceCommand...");
+        var voice = update.Message!.Voice!;
+
+        var user = await _userService.GetUserByTelegramId(info.UserId, cancellationToken);
+        _logger.LogInformation($"Run {nameof(UserVoiceCommandHandler)}...");
 
         var nativeLanguage = user.UserPreferences.NativeLanguage;
         var sourceLanguage = Language.Russian;
@@ -54,13 +54,12 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         var treatment = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
             "Обработка...", sourceLanguage, nativeLanguage, cancellationToken);
 
-        await _botClient.SendTextMessageAsync(
+        var thinkingMessage = await _botClient.SendTextMessageAsync(
             update.Message!.Chat.Id, treatment, cancellationToken: cancellationToken);
 
-        if (voice != null && update.Message != null)
+        try
         {
             var duration = TimeSpan.FromSeconds(voice.Duration);
-
             if (duration <= TimeSpan.FromMinutes(3))
             {
                 File voiceFile = await _botClient.GetFileAsync(voice.FileId, cancellationToken);
@@ -73,103 +72,129 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                 else
                 {
                     _logger.LogError("Can`t get file path for voice message! {@VoiceFile}", voiceFile);
+                    await _botClient.SendTextMessageAsync(
+                        update.Message.Chat.Id,
+                        "Can`t get file path for voice message!", // TODO LocalizationService
+                        cancellationToken: cancellationToken);
+                    return;
                 }
-
-                var voiceMessage = voiceStream.ToArray();
 
                 var userMessageResult =
-                        await _buddyService.ProcessUserMessage(user, voiceMessage, cancellationToken);
-                var recognizedMessage = userMessageResult.RecognizedMessage;
-                var answerText = userMessageResult.BotAnswerMessage;
-                var answerBytes = userMessageResult.BotAnswerWavMessage;
-                var pronunciationWordsBytes = userMessageResult.BotPronunciationWordsWavAnswer;
-                var mistakes = userMessageResult.Mistakes;
-                var mistakesBytes = userMessageResult.MistakesWavAnswer;
-                var words = userMessageResult.Words;
-               
-                await _botClient.SendTextMessageAsync(
-                    update.Message.Chat.Id,
-                    $"\n```\n{recognizedMessage}\n```",
-                    parseMode: ParseMode.Markdown,
-                    cancellationToken: cancellationToken);
-                await _botClient.SendTextMessageAsync(
-                    update.Message.Chat.Id, answerText, cancellationToken: cancellationToken);
+                    await _buddyService.ProcessUserMessage(user, voiceStream.ToArray(), cancellationToken);
 
-                using var memoryStreamAnswer = new MemoryStream(answerBytes);
-                await _botClient.SendVoiceAsync(
-                    chatId: update.Message.Chat.Id,
-                    voice: InputFile.FromStream(memoryStreamAnswer, "answer.ogg"),
-                    cancellationToken: cancellationToken);
-
-                if (pronunciationWordsBytes != null)
-                {
-                    using var memoryStreamPronunciation = new MemoryStream(pronunciationWordsBytes);
-                    await _botClient.SendVoiceAsync(
-                        chatId: update.Message.Chat.Id,
-                        voice: InputFile.FromStream(memoryStreamPronunciation, "answer.ogg"),
-                        cancellationToken: cancellationToken);
-                }
-
-                if (mistakes.Length > 0 && words.Count > 0)
-                {
-                    var grammaMistakes = string.Join(", ", mistakes);
-                    string studiedWords = string.Empty;
-                    foreach (var word in words)
-                    {
-                        studiedWords += $"{word.Key} - {word.Value}\n";
-                    }
-
-                    await _botClient.SendTextMessageAsync(
-                        chatId: update.Message.Chat.Id,
-                        text: $"{grammaMistakes}\n{studiedWords}",
-                        cancellationToken: cancellationToken);
-                }
-                else if (mistakes.Length > 0 && words.Count == 0)
-                {
-                    var grammaMistakes = string.Join(", ", mistakes);
-                    await _botClient.SendTextMessageAsync(
-                        chatId: update.Message.Chat.Id,
-                        text: $"{grammaMistakes}",
-                        cancellationToken: cancellationToken);
-                }
-                else if (mistakes.Length == 0 && words.Count > 0)
-                {
-                    string studiedWords = string.Empty;
-                    foreach (var word in words)
-                    {
-                        studiedWords += $"{word.Key} - {word.Value}\n";
-                    }
-
-                    await _botClient.SendTextMessageAsync(
-                        chatId: update.Message.Chat.Id,
-                        text: $"{studiedWords}",
-                        cancellationToken: cancellationToken);
-                }
-
-                if (mistakesBytes != null)
-                {
-                    using var memoryStreamMistakes = new MemoryStream(mistakesBytes);
-                    await _botClient.SendVoiceAsync(
-                        chatId: update.Message.Chat.Id,
-                        voice: InputFile.FromStream(memoryStreamMistakes, "mistakes.ogg"),
-                        cancellationToken: cancellationToken);
-                }
+                await SendResultToUser(update, userMessageResult, cancellationToken);
             }
             else
             {
-                string text = "Превышена допустимая длительность голосового сообщения. " +
-                                    "Максимальная длительность: 3 минуты.";
-
-                var textInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
-                    text, sourceLanguage, nativeLanguage, cancellationToken);
-                await _botClient.SendTextMessageAsync(
-                    chatId: update.Message.Chat.Id,
-                    text: textInNativeLanguage,
-                    cancellationToken: cancellationToken);
+                await SendSpeechDurationExceededMessage(update, nativeLanguage, cancellationToken);
             }
+        }
+        finally
+        {
+            await _botClient.DeleteMessageAsync(
+                update.Message.Chat.Id,
+                thinkingMessage.MessageId,
+                cancellationToken);
         }
     }
 
-    public bool CanHandleCommand(Update update)
-        => update.Message?.Voice != null;
+    private async Task SendResultToUser(
+        Update update,
+        UserMessageProcessingResult userMessageResult,
+        CancellationToken cancellationToken)
+    {
+        var answerText = userMessageResult.BotAnswerMessage;
+        var answerBytes = userMessageResult.BotAnswerWavMessage;
+        var pronunciationWordsBytes = userMessageResult.BotPronunciationWordsWavAnswer;
+        var mistakes = userMessageResult.Mistakes;
+        var mistakesBytes = userMessageResult.MistakesWavAnswer;
+        var words = userMessageResult.Words;
+
+        await _botClient.SendTextMessageAsync(
+            update.Message!.Chat.Id,
+            $"\n```\n{userMessageResult.RecognizedMessage}\n```",
+            parseMode: ParseMode.Markdown,
+            cancellationToken: cancellationToken);
+
+        using var memoryStreamAnswer = new MemoryStream(answerBytes);
+        await _botClient.SendVoiceAsync(
+            chatId: update.Message.Chat.Id,
+            voice: InputFile.FromStream(memoryStreamAnswer, "answer.ogg"),
+            caption: answerText,
+            replyToMessageId: update.Message.MessageId,
+            cancellationToken: cancellationToken);
+
+        if (pronunciationWordsBytes != null)
+        {
+            using var memoryStreamPronunciation = new MemoryStream(pronunciationWordsBytes);
+            await _botClient.SendVoiceAsync(
+                chatId: update.Message.Chat.Id,
+                voice: InputFile.FromStream(memoryStreamPronunciation, "answer.ogg"),
+                cancellationToken: cancellationToken);
+        }
+
+        if (mistakes.Length > 0 && words.Count > 0)
+        {
+            var sb = new StringBuilder();
+            string grammaMistakes = string.Join(", ", mistakes);
+            sb.Append(grammaMistakes);
+            sb.Append('\n');
+            foreach (var word in words)
+            {
+                sb.Append(word.Key).Append(" - ").Append(word.Value).Append('\n');
+            }
+
+            string finalText = sb.ToString();
+            await _botClient.SendTextMessageAsync(
+                chatId: update.Message.Chat.Id,
+                text: finalText,
+                cancellationToken: cancellationToken);
+        }
+        else if (mistakes.Length > 0 && words.Count == 0)
+        {
+            var grammaMistakes = string.Join(", ", mistakes);
+            await _botClient.SendTextMessageAsync(
+                chatId: update.Message.Chat.Id,
+                text: $"{grammaMistakes}",
+                cancellationToken: cancellationToken);
+        }
+        else if (mistakes.Length == 0 && words.Count > 0)
+        {
+            string studiedWords = string.Empty;
+            foreach (var word in words)
+            {
+                studiedWords += $"{word.Key} - {word.Value}\n";
+            }
+
+            await _botClient.SendTextMessageAsync(
+                chatId: update.Message.Chat.Id,
+                text: $"{studiedWords}",
+                cancellationToken: cancellationToken);
+        }
+
+        if (mistakesBytes != null)
+        {
+            using var memoryStreamMistakes = new MemoryStream(mistakesBytes);
+            await _botClient.SendVoiceAsync(
+                chatId: update.Message.Chat.Id,
+                voice: InputFile.FromStream(memoryStreamMistakes, "mistakes.ogg"),
+                cancellationToken: cancellationToken);
+        }
+    }
+
+    private async Task SendSpeechDurationExceededMessage(
+        Update update,
+        Language nativeLanguage,
+        CancellationToken cancellationToken)
+    {
+        string text = "Превышена допустимая длительность голосового сообщения. " +
+                      "Максимальная длительность: 3 минуты.";
+
+        var textInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
+            text, Language.Russian, nativeLanguage, cancellationToken);
+        await _botClient.SendTextMessageAsync(
+            chatId: update.Message!.Chat.Id,
+            text: textInNativeLanguage,
+            cancellationToken: cancellationToken);
+    }
 }

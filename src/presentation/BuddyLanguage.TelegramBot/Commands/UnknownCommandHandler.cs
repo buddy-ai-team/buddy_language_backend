@@ -1,4 +1,4 @@
-﻿using BuddyLanguage.ChatGPTServiceLib;
+﻿using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
 using Telegram.Bot;
@@ -40,13 +40,10 @@ namespace BuddyLanguage.TelegramBot.Commands
 
             var user = await _userService.GetUserByTelegramId(telegramUserId, cancellationToken);
 
-            var nativeLanguage = user.UserPreferences.NativeLanguage;
-            var targetLanguage = user.UserPreferences.TargetLanguage;
-
             _logger.LogInformation("Unknown command received");
             var text = "Пока что умею отвечать только на голосовые собощения на изучаемом языке.";
             var textInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
-                text, nativeLanguage, targetLanguage, cancellationToken); 
+                text, Language.Russian, user.UserPreferences.NativeLanguage, cancellationToken);
             if (update.Message != null)
             {
                 await _botClient.SendTextMessageAsync(
