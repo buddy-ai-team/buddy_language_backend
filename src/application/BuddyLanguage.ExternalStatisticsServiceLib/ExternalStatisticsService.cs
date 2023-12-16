@@ -25,32 +25,13 @@ namespace BuddyLanguage.ExternalStatisticsServiceLib
             }
 
             var topics = await _chatHistoryStorage.GetTopics(user.Id.ToString(), cancellationToken);
+            var topicsSort = topics.OrderBy(topic => topic.CreatedAt);
             var totalMessages = 0;
             int numbersDaysCommunication = 0;
 
-            if (topics.Count() > 1)
-            {
-                var firstTopic = topics.First();
-                var lastTopic = topics.Last();
-
-                var messagesLastTopic = await _chatHistoryStorage.GetMessages(user.Id.ToString(), lastTopic.Id, cancellationToken);
-                var lastMessageTime = messagesLastTopic.Last().CreatedAt;
-
-                var start1 = firstTopic.CreatedAt;
-                var end1 = lastMessageTime;
-                var duration1 = (end1 - start1).TotalDays;
-                numbersDaysCommunication = (int)duration1;
-            }
-            else if (topics.Count() == 1)
-            {
-                var singleTopic = topics.First();
-                var messagesSingleTopic = await _chatHistoryStorage.GetMessages(user.Id.ToString(), singleTopic.Id, cancellationToken);
-
-                var start2 = singleTopic.CreatedAt;
-                var end2 = messagesSingleTopic.Last().CreatedAt;
-                var duration2 = (end2 - start2).TotalDays;
-                numbersDaysCommunication = (int)duration2;
-            }
+            var firstTopic = topicsSort.First();
+            var lastTopic = topicsSort.Last();
+            numbersDaysCommunication = (int)(lastTopic.CreatedAt - firstTopic.CreatedAt).TotalDays;
 
             foreach (var topic in topics)
             {
