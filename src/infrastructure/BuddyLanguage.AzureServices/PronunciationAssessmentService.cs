@@ -139,7 +139,7 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         await recognizer.StartContinuousRecognitionAsync();
 
         // Waits for completion.
-        await stopRecognitionTcs.Task.WaitAsync(TimeSpan.FromSeconds(30), cancellationToken);
+        await stopRecognitionTcs.Task.WaitAsync(TimeSpan.FromMinutes(2), cancellationToken);
 
         await recognizer.StopContinuousRecognitionAsync();
 

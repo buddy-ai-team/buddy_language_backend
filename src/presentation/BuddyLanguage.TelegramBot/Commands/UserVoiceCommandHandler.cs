@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using BuddyLanguage.Domain;
 using BuddyLanguage.Domain.Enumerations;
 using BuddyLanguage.Domain.Interfaces;
@@ -49,14 +50,11 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         _logger.LogInformation($"Run {nameof(UserVoiceCommandHandler)}...");
 
         var nativeLanguage = user.UserPreferences.NativeLanguage;
-        var sourceLanguage = Language.Russian;
-
-        var treatment = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
-            "Обработка...", sourceLanguage, nativeLanguage, cancellationToken);
 
         var thinkingMessage = await _botClient.SendTextMessageAsync(
-            update.Message!.Chat.Id, treatment, cancellationToken: cancellationToken);
+            update.Message!.Chat.Id, "\u23f3 Analyzing...", cancellationToken: cancellationToken);
 
+        var sw = Stopwatch.StartNew();
         try
         {
             var duration = TimeSpan.FromSeconds(voice.Duration);
@@ -91,10 +89,12 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         }
         finally
         {
-            await _botClient.DeleteMessageAsync(
+            sw.Stop();
+            await _botClient.EditMessageTextAsync(
                 update.Message.Chat.Id,
                 thinkingMessage.MessageId,
-                cancellationToken);
+                "✅ Analyzed in " + sw.Elapsed.TotalSeconds.ToString("0.00") + "s",
+                cancellationToken: cancellationToken);
         }
     }
 
