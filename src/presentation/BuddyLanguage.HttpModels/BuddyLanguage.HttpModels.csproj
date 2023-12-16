@@ -10,8 +10,4 @@
       <ProjectReference Include="..\..\BuddyLanguage.Domain\BuddyLanguage.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-
-    </ItemGroup>
-
 </Project>

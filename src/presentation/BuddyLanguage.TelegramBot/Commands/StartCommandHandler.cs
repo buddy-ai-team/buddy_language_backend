@@ -1,4 +1,5 @@
-﻿using BuddyLanguage.Domain.Interfaces;
+﻿using BuddyLanguage.Domain.Enumerations;
+using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -46,9 +47,9 @@ public class StartCommandHandler : IBotCommandHandler
             info.FirstName, info.LastName, info.UserId, cancellationToken);
 
         var nativeLanguage = user.UserPreferences.NativeLanguage;
-        var targetLanguage = user.UserPreferences.TargetLanguage;
         var voice = user.UserPreferences.SelectedVoice;
         var speed = user.UserPreferences.SelectedSpeed;
+        var sourceLanguage = Language.Russian; 
 
         const string welcomeMessage =
              "Привет! Поздравляю вас с регистрацией! Расскажу немного о себе, " +
@@ -61,7 +62,7 @@ public class StartCommandHandler : IBotCommandHandler
              " и исправлять найденные ошибки.";
 
         var welcomeMessageInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
-            welcomeMessage, nativeLanguage, targetLanguage, cancellationToken);
+            welcomeMessage, sourceLanguage, nativeLanguage, cancellationToken);
 
         await _botClient.SendTextMessageAsync(
             info.ChatId, welcomeMessageInNativeLanguage, cancellationToken: cancellationToken);

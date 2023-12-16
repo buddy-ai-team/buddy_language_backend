@@ -35,7 +35,7 @@ namespace BuddyLanguage.Domain.Interfaces
         Task<string> GetAnswer(string prompt, string userMessage, CancellationToken cancellationToken);
 
         Task<string> GetTextTranslatedIntoNativeLanguage(
-            string userMessage, Language nativeLanguage, Language targetLanguage, CancellationToken cancellationToken);
+            string text, Language sourceLanguage, Language nativeLanguage, CancellationToken cancellationToken);
 
         Task<TResult> GetStructuredAnswer<TResult>(
             string prompt, string userMessage, CancellationToken cancellationToken);

@@ -44,35 +44,40 @@ namespace BuddyLanguage.ChatGPTServiceLib
             ArgumentException.ThrowIfNullOrEmpty(userMessage);
             ArgumentNullException.ThrowIfNull(role);
             ChatService chatService = await GetChatServiceDialog(userId, role, cancellationToken);
-            string answer = await chatService.GetNextMessageResponse(userMessage, cancellationToken);
-            return answer;
+            return await chatService.GetNextMessageResponse(userMessage, cancellationToken);
         }
 
         public async Task<string> GetAnswer(string userMessage, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(userMessage))
             {
-                throw new ArgumentException($"\"{nameof(userMessage)}\" it cannot be indefinite or empty.", nameof(userMessage));
+                throw new ArgumentException(
+                    $"\"{nameof(userMessage)}\" it cannot be indefinite or empty.", nameof(userMessage));
             }
 
             var dialog = Dialog.StartAsUser(userMessage);
-            var answer = await _openAiClient.GetChatCompletions(dialog, model: _model, cancellationToken: cancellationToken);
-            return answer;
+            return await _openAiClient.GetChatCompletions(
+                dialog, model: _model, cancellationToken: cancellationToken);
         }
 
-        public async Task<string> GetTextTranslatedIntoNativeLanguage(
-            string userMessage,
-            Language nativeLanguage,
-            Language targetLanguage, 
+        public Task<string> GetTextTranslatedIntoNativeLanguage(
+            string text,
+            Language sourceLanguage,
+            Language preferedLanguage,
             CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(userMessage))
+            if (string.IsNullOrEmpty(text))
             {
-                throw new ArgumentException($"\"{nameof(userMessage)}\" it cannot be indefinite or empty.", nameof(userMessage));
+                throw new ArgumentException($"\"{nameof(text)}\" it cannot be indefinite or empty.", nameof(text));
             }
 
-            return await _openAiClient.TranslateText(
-                userMessage, nativeLanguage.ToString(), targetLanguage.ToString());
+            if (sourceLanguage == preferedLanguage)
+            {
+                return Task.FromResult(text);
+            }
+
+            return _openAiClient.TranslateText(
+                text, sourceLanguage.ToString(), preferedLanguage.ToString(), cancellationToken: cancellationToken);
         }
 
         public async Task<string> GetAnswer(string prompt, string userMessage, CancellationToken cancellationToken)

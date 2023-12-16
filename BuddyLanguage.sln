@@ -47,7 +47,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.PromptService
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib", "src\infrastructure\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib\BuddyLanguage.NAudioConcentusOggOpusToPcmConverterLib.csproj", "{31A0A274-0A7D-4DBE-AB0C-0DC999BFD3D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.KiotaClient", "src\infrastructure\BuddyLanguage.KiotaClient\BuddyLanguage.KiotaClient.csproj", "{1EC414DD-8E2F-448C-9394-83378FA58C52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuddyLanguage.KiotaClient", "src\infrastructure\BuddyLanguage.KiotaClient\BuddyLanguage.KiotaClient.csproj", "{1EC414DD-8E2F-448C-9394-83378FA58C52}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "application", "application", "{1879A152-00DE-4EEF-94BC-40329F295339}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuddyLanguage.ExternalStatisticsServiceLib", "src\application\BuddyLanguage.ExternalStatisticsServiceLib\BuddyLanguage.ExternalStatisticsServiceLib.csproj", "{60753166-1874-40A3-95AB-BE1D1CDEEDEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,6 +123,10 @@ Global
 		{1EC414DD-8E2F-448C-9394-83378FA58C52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EC414DD-8E2F-448C-9394-83378FA58C52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EC414DD-8E2F-448C-9394-83378FA58C52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60753166-1874-40A3-95AB-BE1D1CDEEDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60753166-1874-40A3-95AB-BE1D1CDEEDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60753166-1874-40A3-95AB-BE1D1CDEEDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60753166-1874-40A3-95AB-BE1D1CDEEDEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,6 +150,8 @@ Global
 		{E4CFCF0D-E7CF-4018-931C-86F18F855019} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 		{31A0A274-0A7D-4DBE-AB0C-0DC999BFD3D8} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
 		{1EC414DD-8E2F-448C-9394-83378FA58C52} = {B7E89B02-7310-4605-9FB5-C6816DD5EE51}
+		{1879A152-00DE-4EEF-94BC-40329F295339} = {8BAB869C-0136-46CC-B9A0-46636FC4C9C8}
+		{60753166-1874-40A3-95AB-BE1D1CDEEDEF} = {1879A152-00DE-4EEF-94BC-40329F295339}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EA996F8-4CC9-4CE0-98C9-1833EAF2E957}

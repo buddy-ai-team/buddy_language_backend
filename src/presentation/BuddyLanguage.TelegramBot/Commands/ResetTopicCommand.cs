@@ -1,4 +1,5 @@
-﻿using BuddyLanguage.Domain.Interfaces;
+﻿using BuddyLanguage.Domain.Enumerations;
+using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -40,10 +41,10 @@ public class ResetTopicCommand : IBotCommandHandler
             var telegramId = message.From.Id.ToString();
             User user = await _userService.GetUserByTelegramId(telegramId, cancellationToken);
             var nativeLanguage = user.UserPreferences.NativeLanguage;
-            var targetLanguage = user.UserPreferences.TargetLanguage;
+            var sourceLanguage = Language.Russian;
 
             var textInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
-                "Тема сброшена", nativeLanguage, targetLanguage, cancellationToken);
+                "Тема сброшена", sourceLanguage, nativeLanguage, cancellationToken);
   
             await _buddyService.ResetTopic(user, cancellationToken);
             await _botClient.SendTextMessageAsync(
