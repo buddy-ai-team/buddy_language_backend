@@ -216,11 +216,11 @@ namespace BuddyLanguage.Domain.Services
             }
 
             var badPronouncedWords = string.Join(",", badPronouncedWordsList);
-            var textForBadPronunciation = "The pronunciation of the following words should be improved: ";
-            var textForbadPronunciationInNativeLanguage = _chatGPTService.GetTextTranslatedIntoNativeLanguage(
-                textForBadPronunciation, sourceLanguage, nativeLanguage, cancellationToken);
+            var textForBadPronunciation = "Над правильным произношением следующих слов следует поработать: ";
+            var textForbadPronunciationInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
+                textForBadPronunciation, Language.Russian, nativeLanguage, cancellationToken);
             return await _textToSpeechService.TextToByteArrayAsync(
-            $"{textForbadPronunciationInNativeLanguage} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
+                $"{textForbadPronunciationInNativeLanguage} {badPronouncedWords}", targetLanguage, voice, speed, cancellationToken);
         }
 
         private async Task AddWordsToUser(
