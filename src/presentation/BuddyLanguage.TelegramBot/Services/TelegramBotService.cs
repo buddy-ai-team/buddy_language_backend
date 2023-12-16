@@ -158,7 +158,7 @@ public class TelegramBotService
 
         await _botClient.SendTextMessageAsync(
             message.Chat.Id,
-            "Вы не авторизованы. Пожалуйста, авторизуйтесь.\nВведите пароль:",
+            "Вы не авторизованы. Пожалуйста, авторизуйтесь. Для получения доступа обратитесь к Родиону. \nВведите пароль:",
             cancellationToken: cancellationToken);
         _telegramUserRepository.SetUserState(message.From.Id, UserBotStates.AccessPassword);
 
