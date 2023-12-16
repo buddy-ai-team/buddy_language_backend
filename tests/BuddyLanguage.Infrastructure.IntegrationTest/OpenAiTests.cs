@@ -44,7 +44,7 @@ namespace BuddyLanguage.Infrastructure.IntegrationTest
             }
 
             var openaiClient = new OpenAiClient(openaiKey);
-            
+
             //Act
             var result = await openaiClient.TranslateText(
                text, sourceLanguage, preferedLanguage);
