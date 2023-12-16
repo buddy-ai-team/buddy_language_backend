@@ -134,6 +134,21 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                 cancellationToken: cancellationToken);
         }
 
+        if (badPronunciationWords != null && badPronunciationWords.Count > 0)
+        {
+            var sb = new StringBuilder();
+            foreach (var word in badPronunciationWords)
+            {
+                sb.Append(word.Key).Append(" - ").Append(word.Value).Append('\n');
+            }
+
+            string finalText = sb.ToString();
+            await _botClient.SendTextMessageAsync(
+                chatId: update.Message.Chat.Id,
+                text: finalText,
+                cancellationToken: cancellationToken);
+        }
+
         if (mistakes.Length > 0 && words.Count > 0)
         {
             var sb = new StringBuilder();
@@ -179,21 +194,6 @@ public class UserVoiceCommandHandler : IBotCommandHandler
             await _botClient.SendVoiceAsync(
                 chatId: update.Message.Chat.Id,
                 voice: InputFile.FromStream(memoryStreamMistakes, "mistakes.ogg"),
-                cancellationToken: cancellationToken);
-        }
-
-        if (badPronunciationWords != null && badPronunciationWords.Count > 0)
-        {
-            var sb = new StringBuilder();
-            foreach (var word in words)
-            {
-                sb.Append(word.Key).Append(" - ").Append(word.Value).Append('\n');
-            }
-
-            string finalText = sb.ToString();
-            await _botClient.SendTextMessageAsync(
-                chatId: update.Message.Chat.Id,
-                text: finalText,
                 cancellationToken: cancellationToken);
         }
     }
