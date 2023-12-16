@@ -1,7 +1,10 @@
-﻿using BuddyLanguage.Domain.Interfaces;
+﻿using BuddyLanguage.Domain.Enumerations;
+using BuddyLanguage.Domain.Interfaces;
 using BuddyLanguage.Domain.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using File = Telegram.Bot.Types.File;
 
 namespace BuddyLanguage.TelegramBot.Commands;
@@ -46,10 +49,10 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         _logger.LogInformation("Processing UserVoiceCommand...");
 
         var nativeLanguage = user.UserPreferences.NativeLanguage;
-        var targetLanguage = user.UserPreferences.TargetLanguage;
+        var sourceLanguage = Language.Russian;
 
         var treatment = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
-            "Обработка...", nativeLanguage, targetLanguage, cancellationToken);
+            "Обработка...", sourceLanguage, nativeLanguage, cancellationToken);
 
         await _botClient.SendTextMessageAsync(
             update.Message!.Chat.Id, treatment, cancellationToken: cancellationToken);
@@ -83,10 +86,11 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                 var mistakes = userMessageResult.Mistakes;
                 var mistakesBytes = userMessageResult.MistakesWavAnswer;
                 var words = userMessageResult.Words;
-
+               
                 await _botClient.SendTextMessageAsync(
                     update.Message.Chat.Id,
                     $"\n```\n{recognizedMessage}\n```",
+                    parseMode: ParseMode.Markdown,
                     cancellationToken: cancellationToken);
                 await _botClient.SendTextMessageAsync(
                     update.Message.Chat.Id, answerText, cancellationToken: cancellationToken);
@@ -157,7 +161,7 @@ public class UserVoiceCommandHandler : IBotCommandHandler
                                     "Максимальная длительность: 3 минуты.";
 
                 var textInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
-                    text, nativeLanguage, targetLanguage, cancellationToken);
+                    text, sourceLanguage, nativeLanguage, cancellationToken);
                 await _botClient.SendTextMessageAsync(
                     chatId: update.Message.Chat.Id,
                     text: textInNativeLanguage,
