@@ -188,7 +188,18 @@ namespace BuddyLanguage.Domain.Services
             {
                 if (word.AccuracyScore <= acceptableAccuracyScore)
                 {
-                    badPronouncedWords.Add(word.Word, word.AccuracyScore);
+                    if (badPronouncedWords.TryGetValue(word.Word, out var accuracyScore))
+                    {
+                        // Оставляем худший вариант произношения в случае если слово было произнесено несколько раз
+                        if (word.AccuracyScore < accuracyScore)
+                        {
+                            badPronouncedWords[word.Word] = word.AccuracyScore;
+                        }
+                    }
+                    else
+                    {
+                        badPronouncedWords.Add(word.Word, word.AccuracyScore);
+                    }
                 }
             }
 

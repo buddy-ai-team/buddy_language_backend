@@ -173,10 +173,10 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         }
         else if (mistakes.Length > 0 && words.Count == 0)
         {
-            var grammaMistakes = string.Join(", ", mistakes);
+            var grammarMistakes = string.Join(", ", mistakes);
             await _botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
-                text: $"{grammaMistakes}",
+                text: $"{grammarMistakes}",
                 cancellationToken: cancellationToken);
         }
         else if (mistakes.Length == 0 && words.Count > 0)
