@@ -13,6 +13,9 @@ namespace BuddyLanguage.TelegramBot.Commands;
 
 public class UserVoiceCommandHandler : IBotCommandHandler
 {
+    // Длительность больше минуты обрабатывается очень долго, выходит за таймаута WebHook'а телеграмма и бот не отвечает
+    private static readonly TimeSpan _audioDurationLimit = TimeSpan.FromMinutes(1);
+
     private readonly ITelegramBotClient _botClient;
     private readonly ILogger<UserVoiceCommandHandler> _logger;
     private readonly UserService _userService;
@@ -57,8 +60,8 @@ public class UserVoiceCommandHandler : IBotCommandHandler
         var sw = Stopwatch.StartNew();
         try
         {
-            var duration = TimeSpan.FromSeconds(voice.Duration);
-            if (duration <= TimeSpan.FromMinutes(3))
+            var currentDuration = TimeSpan.FromSeconds(voice.Duration);
+            if (currentDuration <= _audioDurationLimit)
             {
                 File voiceFile = await _botClient.GetFileAsync(voice.FileId, cancellationToken);
                 using var voiceStream = new MemoryStream(); //voiceFile.FileSize
