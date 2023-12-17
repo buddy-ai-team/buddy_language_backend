@@ -3,7 +3,7 @@ using Telegram.Bot.Types;
 
 namespace BuddyLanguage.TelegramBot.Commands;
 
-public class VersionCommandHandler : IBotCommandHandler
+public class VersionCommandHandler : BotTextCommandHandler
 {
     private readonly ITelegramBotClient _botClient;
 
@@ -12,11 +12,11 @@ public class VersionCommandHandler : IBotCommandHandler
         _botClient = botClient ?? throw new ArgumentNullException(nameof(botClient));
     }
 
-    public int Order => 0;
+    public override int Order => 0;
 
-    public string Command => "/version";
+    public override string Command => "/version";
 
-    public async Task HandleAsync(Update update, CancellationToken cancellationToken)
+    public override async Task HandleAsync(Update update, CancellationToken cancellationToken)
     {
         var info = IBotCommandHandler.GetTelegramMessageBaseInfoOrThrow(update);
         var version = $"Ver: {ReflectionHelper.GetBuildDate():s}";

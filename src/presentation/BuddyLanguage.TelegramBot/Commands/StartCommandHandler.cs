@@ -6,7 +6,7 @@ using Telegram.Bot.Types;
 
 namespace BuddyLanguage.TelegramBot.Commands;
 
-public class StartCommandHandler : IBotCommandHandler
+public class StartCommandHandler : BotTextCommandHandler
 {
     private readonly ITelegramBotClient _botClient;
     private readonly UserService _userService;
@@ -28,11 +28,11 @@ public class StartCommandHandler : IBotCommandHandler
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public int Order => 0;
+    public override int Order => 0;
 
-    public string Command => "/start";
+    public override string Command => "/start";
 
-    public async Task HandleAsync(Update update, CancellationToken cancellationToken)
+    public override async Task HandleAsync(Update update, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(update);
         var info = IBotCommandHandler.GetTelegramMessageBaseInfoOrThrow(update);
@@ -49,7 +49,7 @@ public class StartCommandHandler : IBotCommandHandler
         var nativeLanguage = user.UserPreferences.NativeLanguage;
         var voice = user.UserPreferences.SelectedVoice;
         var speed = user.UserPreferences.SelectedSpeed;
-        var sourceLanguage = Language.Russian; 
+        var sourceLanguage = Language.Russian;
 
         const string welcomeMessage =
              "Привет! Поздравляю вас с регистрацией! Расскажу немного о себе, " +

@@ -7,12 +7,9 @@ public interface IBotCommandHandler
 {
     int Order { get; }
 
-    string? Command { get; }
+    public bool CanHandleCommand(Update update);
 
     Task HandleAsync(Update update, CancellationToken cancellationToken);
-
-    public bool CanHandleCommand(Update update)
-        => update.Message?.Text == Command;
 
     public static TelegramMessageBaseInfo GetTelegramMessageBaseInfoOrThrow(Update update)
     {

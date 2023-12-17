@@ -7,7 +7,7 @@ using User = BuddyLanguage.Domain.Entities.User;
 
 namespace BuddyLanguage.TelegramBot.Commands;
 
-public class ResetTopicCommand : IBotCommandHandler
+public class ResetTopicCommand : BotTextCommandHandler
 {
     private readonly ITelegramBotClient _botClient;
     private readonly UserService _userService;
@@ -29,11 +29,11 @@ public class ResetTopicCommand : IBotCommandHandler
         _chatGPTService = chatGPTService ?? throw new ArgumentNullException(nameof(chatGPTService));
     }
 
-    public int Order => 0;
+    public override int Order => 0;
 
-    public string Command => "/reset";
+    public override string Command => "/reset";
 
-    public async Task HandleAsync(Update update, CancellationToken cancellationToken)
+    public override async Task HandleAsync(Update update, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(update);
         if (update.Message is { From: not null } message)
@@ -45,7 +45,7 @@ public class ResetTopicCommand : IBotCommandHandler
 
             var textInNativeLanguage = await _chatGPTService.GetTextTranslatedIntoNativeLanguage(
                 "Тема сброшена", sourceLanguage, nativeLanguage, cancellationToken);
-  
+
             await _buddyService.ResetTopic(user, cancellationToken);
             await _botClient.SendTextMessageAsync(
                 message.Chat.Id, textInNativeLanguage, cancellationToken: cancellationToken);
