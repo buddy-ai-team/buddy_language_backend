@@ -38,8 +38,6 @@ public class UserVoiceCommandHandler : IBotCommandHandler
 
     public int Order => 0;
 
-    public string? Command => null;
-
     public bool CanHandleCommand(Update update)
         => update.Message?.Voice != null;
 
@@ -64,7 +62,13 @@ public class UserVoiceCommandHandler : IBotCommandHandler
             if (currentDuration <= _audioDurationLimit)
             {
                 File voiceFile = await _botClient.GetFileAsync(voice.FileId, cancellationToken);
-                using var voiceStream = new MemoryStream(); //voiceFile.FileSize
+
+                /* файл почти всегда будет весить больше 85 кб, поэтому в этом месте будет происходить дорогая аллокация в LOH.
+                  Скорее всего, можно обойтись вообще без лишних аллокаций:
+                    если пулить один раз буффер для MemoryStream, затем во все методы передавать этот MemoryStream
+                  Или использовать это решение: Microsoft.IO.RecyclableMemoryStream
+                */
+                using var voiceStream = new MemoryStream((int)voiceFile.FileSize.GetValueOrDefault());
 
                 if (voiceFile.FilePath is { } filePath)
                 {

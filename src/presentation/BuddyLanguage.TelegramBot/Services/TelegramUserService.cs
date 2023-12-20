@@ -1,6 +1,4 @@
-﻿using BuddyLanguage.TelegramBot.Services;
-
-namespace BuddyLanguage.TelegramBot;
+﻿namespace BuddyLanguage.TelegramBot.Services;
 
 public class TelegramUserService
 {

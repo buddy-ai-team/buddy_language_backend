@@ -20,7 +20,8 @@ namespace BuddyLanguage.ChatGPTServiceLib
         private readonly IAiClient _openAiClient;
         private readonly ILogger<ChatGPTService> _logger;
         private readonly ChatGPTConfig _config; // TODO ChatGPTModelsConfig
-        private readonly string _model = ChatCompletionModels.Gpt4Turbo;
+        private readonly string _chatModel = ChatCompletionModels.Gpt3_5_Turbo;
+        private readonly string _analyzesModel = ChatCompletionModels.Gpt4Turbo;
         private readonly Encoding _dialogEncoding;
 
         public ChatGPTService(
@@ -47,7 +48,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
             return await chatService.GetNextMessageResponse(userMessage, cancellationToken);
         }
 
-        public async Task<string> GetAnswer(string userMessage, CancellationToken cancellationToken)
+        public Task<string> GetAnswer(string userMessage, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(userMessage))
             {
@@ -56,8 +57,8 @@ namespace BuddyLanguage.ChatGPTServiceLib
             }
 
             var dialog = Dialog.StartAsUser(userMessage);
-            return await _openAiClient.GetChatCompletions(
-                dialog, model: _model, cancellationToken: cancellationToken);
+            return _openAiClient.GetChatCompletions(
+                dialog, model: _analyzesModel, cancellationToken: cancellationToken);
         }
 
         public Task<string> GetTextTranslatedIntoNativeLanguage(
@@ -96,7 +97,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
 
             var answer = await _openAiClient.GetChatCompletions(
                 dialog,
-                model: _model,
+                model: _analyzesModel,
                 cancellationToken: cancellationToken);
 
             return answer;
@@ -110,7 +111,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
 
             var dialog = Dialog.StartAsSystem(prompt).ThenUser(userMessage);
             return _openAiClient.GetStructuredResponse<TResult>(
-                dialog, model: _model, cancellationToken: cancellationToken);
+                dialog, model: _analyzesModel, cancellationToken: cancellationToken);
         }
 
         public async Task ResetTopic(Guid userId, CancellationToken cancellationToken)
@@ -125,12 +126,20 @@ namespace BuddyLanguage.ChatGPTServiceLib
             CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(role);
-            _config.Model = _model; // TODO fix
+            var config = new ChatGPTConfig()
+            {
+                // TODO think about it
+                InitialSystemMessage = $"{_config.InitialSystemMessage!}" +
+                        $"\n\nRole: {role.Name}" +
+                        $"\n\nPrompt: {role.Prompt}",
+                Model = _chatModel,
+            };
             ChatGPT chatGpt = await _chatGptFactory.Create(
                 userId.ToString(),
-                _config,
+                config,
                 cancellationToken: cancellationToken);
             var chatService = await chatGpt.ContinueOrStartNewTopic(cancellationToken);
+
             ChatCompletionMessage[] messages = (await chatService.GetMessages(cancellationToken))
                 .Cast<ChatCompletionMessage>()
                 .ToArray();
@@ -138,7 +147,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
             {
                 var dialogText = string.Join('\n', messages.Select(it => it.Content));
                 var tokenCount = _dialogEncoding.CountTokens(dialogText);
-                if ((tokenCount + 500) > ChatCompletionModels.GetMaxTokensLimitForModel(_model))
+                if ((tokenCount + 500) > ChatCompletionModels.GetMaxTokensLimitForModel(_chatModel))
                 {
                     // TODO: делать суммаризацию после выполнения основной работы в фоне
                     _logger.LogInformation("Dialog is too long ({TokenCount}), compacting...", tokenCount);
@@ -146,7 +155,7 @@ namespace BuddyLanguage.ChatGPTServiceLib
                     messages[0] = new SystemMessage(summaryPrompt);
                     string summary = await _openAiClient.GetChatCompletions(
                         messages,
-                        model: _model,
+                        model: _chatModel,
                         cancellationToken: cancellationToken);
 
                     string initialMessage =

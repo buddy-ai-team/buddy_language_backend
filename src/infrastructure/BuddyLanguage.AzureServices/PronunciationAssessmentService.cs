@@ -11,6 +11,9 @@ namespace BuddyLanguage.AzureServices;
 
 public class PronunciationAssessmentService : IPronunciationAssessmentService
 {
+    // TODO: move to BuddyConfig
+    private static readonly TimeSpan RecognitionTimeout = TimeSpan.FromMinutes(2);
+
     private static readonly Dictionary<Language, string> LanguagesBCP47 = new()
     {
         [Language.Russian] = "ru-RU",
@@ -67,69 +70,32 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
         return await GetSpeechAssessmentFromRawPcmAsync(audioDataPcm, targetLanguage, cancellationToken);
     }
 
+    // More examples of this module usage: https://github.com/Azure-Samples/cognitive-services-speech-sdk/blob/master/samples/csharp/sharedcontent/console/speech_recognition_samples.cs
     private async Task<IReadOnlyList<WordPronunciationAssessment>> GetSpeechAssessmentFromRawPcmAsync(
         byte[] audioDataPcm,
         Language targetLanguage,
         CancellationToken cancellationToken)
     {
         var (language, speechConfig, pronunciationConfig) = GetConfigs(targetLanguage);
-        var stopRecognitionTcs = new TaskCompletionSource<int>();
+        var stopRecognitionTcs = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         using var audioInputStream = AudioInputStream.CreatePushStream(AudioStreamFormat.GetWaveFormatPCM(16000, 16, 1));
         using var audioConfig = AudioConfig.FromStreamInput(audioInputStream);
         using var recognizer = new SpeechRecognizer(speechConfig, language, audioConfig);
         pronunciationConfig.ApplyTo(recognizer);
 
-        recognizer.Recognizing += (_, _) =>
-        {
-            // Handle intermediate recognition results if needed
-        };
-
         var totalResults = new List<WordPronunciationAssessment>();
 
-        recognizer.Recognized += (_, e) =>
-        {
-            if (e.Result.Reason == ResultReason.RecognizedSpeech)
-            {
-                // для англ. языка можно просто брать худшию фонему
-                var pronunciationAssessmentResult = PronunciationAssessmentResult.FromResult(e.Result);
-                totalResults.AddRange(
-                    pronunciationAssessmentResult.Words
-                        .Select(word => new WordPronunciationAssessment(word.Word, word.AccuracyScore)));
-            }
-            else if (e.Result.Reason == ResultReason.NoMatch)
-            {
-                _logger.LogWarning("NOMATCH: Speech could not be recognized");
-            }
-            else
-            {
-                _logger.LogError("Unhandled recognition result: {Reason}", e.Result.Reason);
-            }
-        };
-
-        recognizer.Canceled += (_, e) =>
-        {
-            if (e.Reason == CancellationReason.Error)
-            {
-                throw new InvalidOperationException(
-                    $"CANCELED: ErrorCode={e.ErrorCode} ErrorDetails={e.ErrorDetails}");
-            }
-
-            if (e.Reason == CancellationReason.EndOfStream)
-            {
-                _logger.LogInformation("End of stream reached");
-            }
-
-            stopRecognitionTcs.TrySetResult(0);
-        };
-
-        recognizer.SessionStarted += (_, _) =>
-        {
-            // Handle session start if needed
-        };
-
+        // More examples that are using events: https://github.com/Azure-Samples/cognitive-services-speech-sdk/blob/master/samples/csharp/sharedcontent/console/speech_recognition_samples.cs#L1146
+        recognizer.Recognized += OnRecognized;
+        recognizer.Canceled += OnCanceled;
+        recognizer.SessionStarted += (_, _) => _logger.LogDebug("Session started");
+        recognizer.SpeechStartDetected += (_, _) => _logger.LogDebug("Speech start detected");
+        recognizer.SpeechEndDetected += (_, _) => _logger.LogDebug("Speech end detected");
+        recognizer.Recognizing += (_, _) => _logger.LogDebug("Recognizing");
         recognizer.SessionStopped += (_, _) =>
         {
+            _logger.LogDebug("Session stopped");
             stopRecognitionTcs.TrySetResult(0);
         };
 
@@ -138,12 +104,58 @@ public class PronunciationAssessmentService : IPronunciationAssessmentService
 
         await recognizer.StartContinuousRecognitionAsync();
 
-        // Waits for completion.
-        await stopRecognitionTcs.Task.WaitAsync(TimeSpan.FromMinutes(2), cancellationToken);
+        await stopRecognitionTcs.Task.WaitAsync(RecognitionTimeout, cancellationToken);
 
         await recognizer.StopContinuousRecognitionAsync();
 
         return totalResults.AsReadOnly();
+
+        void OnRecognized(object? sender, SpeechRecognitionEventArgs e)
+        {
+            switch (e.Result.Reason)
+            {
+                case ResultReason.RecognizedSpeech:
+                    {
+                        // for English language we can simply take the worst phoneme
+                        var result = PronunciationAssessmentResult.FromResult(e.Result);
+                        var assessments = result.Words
+                            .Select(it => new WordPronunciationAssessment(it.Word, it.AccuracyScore));
+                        totalResults.AddRange(assessments);
+                        break;
+                    }
+
+                case ResultReason.NoMatch:
+                    _logger.LogWarning("NOMATCH: Speech could not be recognized");
+                    break;
+                default:
+                    _logger.LogError("Unhandled recognition result: {Reason}", e.Result.Reason);
+                    break;
+            }
+        }
+
+        void OnCanceled(object? sender, SpeechRecognitionCanceledEventArgs e)
+        {
+            switch (e.Reason)
+            {
+                case CancellationReason.Error:
+                    stopRecognitionTcs.SetException(new OperationCanceledException(
+                        $"Regognition error. ErrorCode={e.ErrorCode} ErrorDetails={e.ErrorDetails}"));
+                    break;
+                case CancellationReason.EndOfStream:
+                    _logger.LogInformation("End of stream reached");
+                    stopRecognitionTcs.TrySetResult(0);
+                    break;
+                case CancellationReason.CancelledByUser:
+                    _logger.LogInformation("Cancelled by user");
+                    stopRecognitionTcs.SetException(new OperationCanceledException(
+                        $"Cancelled by user. ErrorCode={e.ErrorCode} ErrorDetails={e.ErrorDetails}"));
+                    break;
+                default:
+                    stopRecognitionTcs.SetException(new InvalidOperationException(
+                        $"Unhandled cancellation reason: {e.Reason}. ErrorCode={e.ErrorCode} ErrorDetails={e.ErrorDetails}"));
+                    break;
+            }
+        }
     }
 
     private Configs GetConfigs(Language targetLanguage)

@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using BuddyLanguage.TelegramBot.Configurations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;

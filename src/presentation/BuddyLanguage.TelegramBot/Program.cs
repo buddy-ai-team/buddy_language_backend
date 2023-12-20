@@ -1,6 +1,7 @@
 using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
-using BuddyLanguage.TelegramBot.Commands;
+using BuddyLanguage.TelegramBot.Configurations;
+using BuddyLanguage.TelegramBot.Extensions;
 using BuddyLanguage.TelegramBot.Services;
 using BuddyLanguage.TelegramBot.TelegramWebHook;
 using Microsoft.Extensions.Options;
@@ -41,10 +42,11 @@ try
         .ValidateDataAnnotations()
         .ValidateOnStart();
 
-    //builder.Services.AddSingleton(new TelegramBotClientOptions(token));
+    IHttpClientBuilder httpClientBuilder = builder.Services.AddHttpClient("TelegramBotClient");
 
-    // TODO Implement Polly after update to .NET 8: https://github.com/dotnet/docs/blob/main/docs/core/resilience/http-resilience.md
-    builder.Services.AddHttpClient("TelegramBotClient");
+    // More info: https://learn.microsoft.com/en-us/dotnet/core/resilience/http-resilience
+    httpClientBuilder.AddStandardResilienceHandler();
+
     builder.Services.AddSingleton<ITelegramBotClient>(provider =>
     {
         IHttpClientFactory factory = provider.GetRequiredService<IHttpClientFactory>();
@@ -65,11 +67,7 @@ try
         builder.Services.AddHostedService<ConfigureWebhookBackgroundService>();
     }
 
-    builder.Services.Scan(scan => scan
-        .FromAssemblyOf<IBotCommandHandler>()
-        .AddClasses(classes => classes.AssignableTo<IBotCommandHandler>())
-        .AsImplementedInterfaces()
-        .WithScopedLifetime());
+    builder.Services.AddBotCommandHandlers();
 
     var app = builder.Build();
 

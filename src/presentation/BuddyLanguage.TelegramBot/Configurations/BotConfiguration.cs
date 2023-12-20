@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BuddyLanguage.TelegramBot;
+namespace BuddyLanguage.TelegramBot.Configurations;
 
 public class BotConfiguration
 {

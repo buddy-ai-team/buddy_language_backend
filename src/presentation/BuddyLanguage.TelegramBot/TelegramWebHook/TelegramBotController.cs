@@ -10,12 +10,13 @@ public class TelegramBotController : ControllerBase
 {
     [HttpPost]
     [ValidateTelegramBotFilter]
-    public async Task<IActionResult> Post(
+    public IActionResult Post(
         [FromBody] Update update,
         [FromServices] TelegramBotService telegramBotService,
         CancellationToken cancellationToken)
     {
-        await telegramBotService.HandleUpdate(update, cancellationToken);
+        // TODO: Add cancellation token
+        _ = telegramBotService.HandleUpdate(update, default);
         return Ok();
     }
 }

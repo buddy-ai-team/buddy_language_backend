@@ -2,6 +2,7 @@ using System.Reflection;
 using BuddyLanguage.Domain.Services;
 using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
+using BuddyLanguage.TelegramBot.Services;
 using BuddyLanguage.WebApi.Extensions;
 using FluentAssertions;
 using NetArchTest.Rules;

@@ -1,4 +1,5 @@
-﻿using BuddyLanguage.TelegramBot.Services;
+﻿using System.Runtime;
+using BuddyLanguage.TelegramBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
