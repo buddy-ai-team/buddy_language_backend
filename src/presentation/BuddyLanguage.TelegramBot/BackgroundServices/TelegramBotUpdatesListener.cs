@@ -1,11 +1,10 @@
-﻿using System.Runtime;
-using BuddyLanguage.TelegramBot.Services;
+﻿using BuddyLanguage.TelegramBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace BuddyLanguage.TelegramBot;
+namespace BuddyLanguage.TelegramBot.BackgroundServices;
 
 public class TelegramBotUpdatesListener : BackgroundService
 {

@@ -1,5 +1,6 @@
 using BuddyLanguage.Infrastructure;
 using BuddyLanguage.TelegramBot;
+using BuddyLanguage.TelegramBot.BackgroundServices;
 using BuddyLanguage.TelegramBot.Configurations;
 using BuddyLanguage.TelegramBot.Extensions;
 using BuddyLanguage.TelegramBot.Services;
@@ -57,6 +58,7 @@ try
 
     builder.Services.AddSingleton<TelegramUserRepositoryInCache>();
     builder.Services.AddScoped<TelegramBotService>();
+    builder.Services.AddHostedService<AppMemoryProfilerBackgroundService>();
 
     if (builder.Environment.IsDevelopment())
     {
