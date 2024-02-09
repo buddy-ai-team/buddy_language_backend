@@ -16,6 +16,7 @@ namespace BuddyLanguage.WebApi.Filters;
 /// Проверяет соответствие полученного hash ключа расчётному.
 /// Записывает в поле HttpContext.Items["TelegramUserId"] телеграм ID пользователя,
 /// сделавшего запрос
+/// Tma - Telegram Message Authentication
 /// </summary>
 public class TmaAuthenticationFilter(
         ILogger<TmaAuthenticationFilter> logger,
